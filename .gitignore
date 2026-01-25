@@ -1,0 +1,8 @@
+# XAMPP/PHP common ignores
+/uploads/*
+/database/*.sql
+.DS_Store
+Thumbs.db
+
+# Config files with sensitive info (if applicable)
+# config/db.php

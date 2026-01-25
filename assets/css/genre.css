@@ -1,0 +1,108 @@
+/* Genre Section */
+.genre-section {
+    padding: 4rem 0 2rem;
+    background: var(--white);
+}
+
+.text-left {
+    text-align: left !important;
+}
+
+.genre-scroll-container {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 1rem;
+    padding: 2rem 0;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE/Edge */
+    width: 100%;
+    max-width: 100%;
+}
+
+.genre-scroll-container::-webkit-scrollbar {
+    display: none;
+    /* Chrome/Safari */
+}
+
+.genre-scroll-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    transition: all 0.3s ease;
+    z-index: 10;
+    font-size: 1.2rem;
+}
+
+.genre-scroll-btn:hover {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.genre-scroll-left {
+    left: -24px;
+}
+
+.genre-scroll-right {
+    right: -24px;
+}
+
+.genre-item {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: auto;
+    flex-shrink: 0;
+    transition: var(--transition);
+    padding: 0.75rem 1.25rem;
+    background: white;
+    border-radius: 50px;
+    border: 1px solid #e2e8f0;
+    white-space: nowrap;
+}
+
+.genre-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    border-color: var(--accent);
+}
+
+.genre-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    transition: var(--transition);
+    flex-shrink: 0;
+}
+
+.genre-item:hover .genre-icon {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.genre-item span {
+    font-weight: 600;
+    color: var(--text-dark);
+    font-size: 0.95rem;
+}
