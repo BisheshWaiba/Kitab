@@ -9,6 +9,17 @@ $result_best = $conn->query($sql_best);
 // Fetch New Arrivals (Latest)
 $sql_new = "SELECT * FROM books ORDER BY created_at DESC LIMIT 4";
 $result_new = $conn->query($sql_new);
+
+// Fetch Curated Categories
+$curated_cats = ['Arts & Photography', 'Travel', 'Nature'];
+$curated_data = [];
+foreach ($curated_cats as $cat) {
+    $sql_curated = "SELECT * FROM books WHERE category = ? ORDER BY RAND() LIMIT 4";
+    $stmt = $conn->prepare($sql_curated);
+    $stmt->bind_param("s", $cat);
+    $stmt->execute();
+    $curated_data[$cat] = $stmt->get_result();
+}
 ?>
 
 <!-- Hero Section -->
@@ -36,7 +47,8 @@ $result_new = $conn->query($sql_new);
         <button onclick="scrollGenres('left')" class="genre-scroll-btn genre-scroll-left">
             <i class="fas fa-chevron-left"></i>
         </button>
-        <div class="genre-scroll-container" id="genreScroll" style="display: flex; flex-direction: row; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; gap: 1rem; scroll-behavior: smooth;">
+        <div class="genre-scroll-container" id="genreScroll"
+            style="display: flex; flex-direction: row; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; gap: 1rem; scroll-behavior: smooth;">
             <a href="shop.php?category=Fiction" class="genre-item">
                 <div class="genre-icon" style="background:#e0f2fe; color:#0284c7;">
                     <i class="fas fa-magic"></i>
@@ -185,5 +197,63 @@ $result_new = $conn->query($sql_new);
         </div>
     </div>
 </div>
+
+<!-- Our Picks Section -->
+<div class="curated-section">
+    <div class="container curated-layout">
+        <div class="curated-content">
+            <h2>Our picks for you</h2>
+            <p>We have curated special book collection for you</p>
+            <div class="curated-filters">
+                <?php $first = true;
+                foreach ($curated_cats as $cat): ?>
+                    <button class="filter-chip <?php echo $first ? 'active' : ''; ?>"
+                        onclick="switchCategory('<?php echo str_replace(' ', '-', strtolower($cat)); ?>', this)">
+                        <?php echo htmlspecialchars($cat); ?>
+                    </button>
+                    <?php $first = false; endforeach; ?>
+            </div>
+        </div>
+        <div class="curated-display">
+            <?php $first = true;
+            foreach ($curated_data as $cat => $books): ?>
+                <div id="<?php echo str_replace(' ', '-', strtolower($cat)); ?>"
+                    class="curated-grid category-content <?php echo $first ? 'active' : ''; ?>">
+                    <?php if ($books->num_rows > 0): ?>
+                        <?php while ($row = $books->fetch_assoc()): ?>
+                            <div class="curated-book-card">
+                                <a href="product.php?id=<?php echo $row['id']; ?>">
+                                    <div class="curated-book-image">
+                                        <img src="<?php echo strpos($row['image'], 'http') === 0 ? htmlspecialchars($row['image']) : BASE_URL . htmlspecialchars($row['image']); ?>"
+                                            alt="<?php echo htmlspecialchars($row['title']); ?>">
+                                    </div>
+                                    <div class="curated-book-price">
+                                        Rs. <?php echo htmlspecialchars(number_format($row['price'])); ?>
+                                    </div>
+                                </a>
+                            </div>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <div style="padding: 2rem; color: var(--text-light);">
+                            No books found in this curated category yet.
+                        </div>
+                    <?php endif; ?>
+                </div>
+                <?php $first = false; endforeach; ?>
+        </div>
+    </div>
+</div>
+
+<script>
+    function switchCategory(catId, btn) {
+        // Update chips
+        document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        // Update content
+        document.querySelectorAll('.category-content').forEach(c => c.classList.remove('active'));
+        document.getElementById(catId).classList.add('active');
+    }
+</script>
 
 <?php require_once '../includes/footer.php'; ?>

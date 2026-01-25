@@ -50,7 +50,7 @@ if (isset($_SESSION['cart'])) {
                     </li>
                 <?php else: ?>
                     <li style="display: flex; gap: 1rem; align-items: center;">
-                        <a href="<?php echo BASE_URL; ?>frontend/login.php" class="btn btn-light"
+                        <a href="<?php echo BASE_URL; ?>frontend/login.php" class="btn btn-outline"
                             style="padding: 0.6rem 1.5rem;">Log In</a>
                         <a href="<?php echo BASE_URL; ?>frontend/register.php" class="btn btn-primary"
                             style="padding: 0.6rem 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
