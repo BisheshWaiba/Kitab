@@ -32,8 +32,8 @@ $books = $conn->query("SELECT * FROM books ORDER BY id DESC");
                             <?php echo $book['id']; ?>
                         </td>
                         <td>
-                            <img src="<?php echo htmlspecialchars($book['image']); ?>"
-                                style="width: 40px; height: 60px; object-fit: cover;">
+                            <img src="<?php echo strpos($book['image'], 'http') === 0 ? htmlspecialchars($book['image']) : BASE_URL . htmlspecialchars($book['image']); ?>"
+                                style="width: 40px; height: 60px; object-fit: cover; border-radius: 4px;">
                         </td>
                         <td>
                             <?php echo htmlspecialchars($book['title']); ?>
