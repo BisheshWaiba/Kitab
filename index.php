@@ -29,8 +29,8 @@ foreach ($curated_cats as $cat) {
             <h1>Discover Your Next <br><span class="text-accent">Favorite Book</span></h1>
             <p>Explore thousands of titles from fiction to tech. Free shipping on orders over Rs. 2,000.</p>
             <div style="display:flex; gap:1rem;">
-                <a href="frontend/shop.php" class="btn btn-primary btn-lg">Shop Now</a>
-                <a href="frontend/register.php" class="btn btn-outline btn-lg">Join KITAB</a>
+                <a href="<?php echo BASE_URL; ?>frontend/shop.php" class="btn btn-primary btn-lg">Shop Now</a>
+                <a href="<?php echo BASE_URL; ?>frontend/register.php" class="btn btn-outline btn-lg">Join KITAB</a>
             </div>
         </div>
         <div class="hero-image">
@@ -47,61 +47,61 @@ foreach ($curated_cats as $cat) {
             <i class="fas fa-chevron-left"></i>
         </button>
         <div class="genre-scroll-container genre-scroll-wrapper" id="genreScroll">
-            <a href="frontend/shop.php?category=Fiction" class="genre-item">
+            <a href="<?php echo BASE_URL; ?>frontend/shop.php?category=Fiction" class="genre-item">
                 <div class="genre-icon genre-fiction">
                     <i class="fas fa-magic"></i>
                 </div>
                 <span>Fiction</span>
             </a>
-            <a href="frontend/shop.php?category=Business" class="genre-item">
+            <a href="<?php echo BASE_URL; ?>frontend/shop.php?category=Business" class="genre-item">
                 <div class="genre-icon genre-business">
                     <i class="fas fa-chart-line"></i>
                 </div>
                 <span>Business</span>
             </a>
-            <a href="frontend/shop.php?category=Tech" class="genre-item">
+            <a href="<?php echo BASE_URL; ?>frontend/shop.php?category=Tech" class="genre-item">
                 <div class="genre-icon genre-tech">
                     <i class="fas fa-laptop-code"></i>
                 </div>
                 <span>Tech</span>
             </a>
-            <a href="frontend/shop.php?category=Science" class="genre-item">
+            <a href="<?php echo BASE_URL; ?>frontend/shop.php?category=Science" class="genre-item">
                 <div class="genre-icon genre-science">
                     <i class="fas fa-flask"></i>
                 </div>
                 <span>Science</span>
             </a>
-            <a href="frontend/shop.php?category=History" class="genre-item">
+            <a href="<?php echo BASE_URL; ?>frontend/shop.php?category=History" class="genre-item">
                 <div class="genre-icon genre-history">
                     <i class="fas fa-landmark"></i>
                 </div>
                 <span>History</span>
             </a>
-            <a href="frontend/shop.php?category=Biography" class="genre-item">
+            <a href="<?php echo BASE_URL; ?>frontend/shop.php?category=Biography" class="genre-item">
                 <div class="genre-icon genre-biography">
                     <i class="fas fa-user"></i>
                 </div>
                 <span>Biography</span>
             </a>
-            <a href="frontend/shop.php?category=Self-Help" class="genre-item">
+            <a href="<?php echo BASE_URL; ?>frontend/shop.php?category=Self-Help" class="genre-item">
                 <div class="genre-icon genre-self-help">
                     <i class="fas fa-heart"></i>
                 </div>
                 <span>Self-Help</span>
             </a>
-            <a href="frontend/shop.php?category=Mystery" class="genre-item">
+            <a href="<?php echo BASE_URL; ?>frontend/shop.php?category=Mystery" class="genre-item">
                 <div class="genre-icon genre-mystery">
                     <i class="fas fa-search"></i>
                 </div>
                 <span>Mystery</span>
             </a>
-            <a href="frontend/shop.php?category=Romance" class="genre-item">
+            <a href="<?php echo BASE_URL; ?>frontend/shop.php?category=Romance" class="genre-item">
                 <div class="genre-icon genre-romance">
                     <i class="fas fa-heart-broken"></i>
                 </div>
                 <span>Romance</span>
             </a>
-            <a href="frontend/shop.php?category=Fantasy" class="genre-item">
+            <a href="<?php echo BASE_URL; ?>frontend/shop.php?category=Fantasy" class="genre-item">
                 <div class="genre-icon genre-fantasy">
                     <i class="fas fa-dragon"></i>
                 </div>
@@ -125,7 +125,7 @@ foreach ($curated_cats as $cat) {
                 <h2 class="section-title-blue">Best Sellers</h2>
                 <p>Books everyone is reading right now</p>
             </div>
-            <a href="frontend/shop.php" class="btn btn-outline">View All</a>
+            <a href="<?php echo BASE_URL; ?>frontend/shop.php" class="btn btn-outline">View All</a>
         </div>
 
         <div class="grid books-grid">
@@ -143,7 +143,7 @@ foreach ($curated_cats as $cat) {
                             <span class="price">Rs.
                                 <?php echo htmlspecialchars(number_format($row['price'])); ?></span>
                         </div>
-                        <a href="frontend/product.php?id=<?php echo $row['id']; ?>"
+                        <a href="<?php echo BASE_URL; ?>frontend/product.php?id=<?php echo $row['id']; ?>"
                             class="btn btn-block btn-outline mt-2">ADD TO
                             CART</a>
                     </div>
@@ -161,7 +161,7 @@ foreach ($curated_cats as $cat) {
                 <h2 class="section-title-blue">New Arrivals</h2>
                 <p>Fresh from the press</p>
             </div>
-            <a href="frontend/shop.php" class="btn btn-outline">View All</a>
+            <a href="<?php echo BASE_URL; ?>frontend/shop.php" class="btn btn-outline">View All</a>
         </div>
 
         <div class="grid books-grid">
@@ -179,7 +179,7 @@ foreach ($curated_cats as $cat) {
                             <span class="price">Rs.
                                 <?php echo htmlspecialchars(number_format($row['price'])); ?></span>
                         </div>
-                        <a href="frontend/product.php?id=<?php echo $row['id']; ?>"
+                        <a href="<?php echo BASE_URL; ?>frontend/product.php?id=<?php echo $row['id']; ?>"
                             class="btn btn-block btn-outline mt-2">ADD TO
                             CART</a>
                     </div>
@@ -213,7 +213,7 @@ foreach ($curated_cats as $cat) {
                     <?php if ($books->num_rows > 0): ?>
                         <?php while ($row = $books->fetch_assoc()): ?>
                             <div class="curated-book-card">
-                                <a href="frontend/product.php?id=<?php echo $row['id']; ?>">
+                                <a href="<?php echo BASE_URL; ?>frontend/product.php?id=<?php echo $row['id']; ?>">
                                     <div class="curated-book-image">
                                         <img src="<?php echo strpos($row['image'], 'http') === 0 ? htmlspecialchars($row['image']) : BASE_URL . htmlspecialchars($row['image']); ?>"
                                             alt="<?php echo htmlspecialchars($row['title']); ?>">

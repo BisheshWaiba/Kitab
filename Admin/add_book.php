@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <main class="main-content">
     <header class="admin-header">
         <h1>Add New Book</h1>
-        <a href="books.php" class="btn-admin btn-back">
+        <a href="<?php echo BASE_URL; ?>admin/books.php" class="btn-admin btn-back">
             <i class="fas fa-arrow-left"></i> Back to List
         </a>
     </header>
@@ -71,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         <?php if ($success): ?>
             <div class="alert-success">
-                <?php echo $success; ?> <a href="books.php" class="alert-link">View Books</a>
+                <?php echo $success; ?> <a href="<?php echo BASE_URL; ?>admin/books.php" class="alert-link">View Books</a>
             </div>
         <?php endif; ?>
 

@@ -21,27 +21,31 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <div class="sidebar-logo">KITAB Admin</div>
         <ul class="sidebar-menu">
             <li>
-                <a href="index.php" class="<?php echo $current_page == 'index.php' ? 'active' : ''; ?>">
+                <a href="<?php echo BASE_URL; ?>admin/index.php"
+                    class="<?php echo $current_page == 'index.php' ? 'active' : ''; ?>">
                     <i class="fas fa-th-large"></i> Dashboard
                 </a>
             </li>
             <li>
-                <a href="books.php" class="<?php echo $current_page == 'books.php' ? 'active' : ''; ?>">
+                <a href="<?php echo BASE_URL; ?>admin/books.php"
+                    class="<?php echo $current_page == 'books.php' ? 'active' : ''; ?>">
                     <i class="fas fa-book"></i> Books
                 </a>
             </li>
             <li>
-                <a href="users.php" class="<?php echo $current_page == 'users.php' ? 'active' : ''; ?>">
+                <a href="<?php echo BASE_URL; ?>admin/users.php"
+                    class="<?php echo $current_page == 'users.php' ? 'active' : ''; ?>">
                     <i class="fas fa-users"></i> Users
                 </a>
             </li>
             <li>
-                <a href="orders.php" class="<?php echo $current_page == 'orders.php' ? 'active' : ''; ?>">
+                <a href="<?php echo BASE_URL; ?>admin/orders.php"
+                    class="<?php echo $current_page == 'orders.php' ? 'active' : ''; ?>">
                     <i class="fas fa-shopping-bag"></i> Orders
                 </a>
             </li>
             <li class="nav-link-separator">
-                <a href="../frontend/index.php">
+                <a href="<?php echo BASE_URL; ?>index.php">
                     <i class="fas fa-home"></i> View Website
                 </a>
             </li>

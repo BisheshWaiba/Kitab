@@ -7,7 +7,7 @@ $books = $conn->query("SELECT * FROM books ORDER BY id DESC");
 <main class="main-content">
     <header class="admin-header">
         <h1>Book Management</h1>
-        <a href="add_book.php" class="btn-admin btn-admin-primary add-book-link">
+        <a href="<?php echo BASE_URL; ?>admin/add_book.php" class="btn-admin btn-admin-primary add-book-link">
             <i class="fas fa-plus"></i> Add New Book
         </a>
     </header>
