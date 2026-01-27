@@ -116,17 +116,8 @@ foreach ($curated_cats as $cat) {
     </div>
 </div>
 
-<script>
-    function scrollGenres(direction) {
-        const container = document.getElementById('genreScroll');
-        const scrollAmount = 300;
-        if (direction === 'left') {
-            container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-        } else {
-            container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-        }
-    }
-</script>
+
+
 
 <!-- Best Sellers -->
 <div class="book-section bg-light">
@@ -246,16 +237,7 @@ foreach ($curated_cats as $cat) {
     </div>
 </div>
 
-<script>
-    function switchCategory(catId, btn) {
-        // Update chips
-        document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
 
-        // Update content
-        document.querySelectorAll('.category-content').forEach(c => c.classList.remove('active'));
-        document.getElementById(catId).classList.add('active');
-    }
-</script>
+
 
 <?php require_once 'includes/footer.php'; ?>
