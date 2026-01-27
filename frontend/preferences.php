@@ -78,7 +78,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             max-width: 1000px;
             background: #ffffff;
             border-radius: 24px;
-            padding: 3rem;
+            padding: 3rem 3rem 4rem;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.05);
             /* Soft drop shadow */
             margin: 2rem;
@@ -227,7 +227,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             cursor: pointer;
             transition: var(--transition);
             display: block;
-            margin: 0 auto;
+            margin: 2rem auto 0;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         .btn-submit:hover {
