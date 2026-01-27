@@ -1,6 +1,6 @@
 # XAMPP/PHP common ignores
 /uploads/*
-/database/*.sql
+# /database/*.sql
 .DS_Store
 Thumbs.db
 
