@@ -1,5 +1,13 @@
 <?php
+session_start();
 require_once dirname(dirname(__DIR__)) . '/config/db.php';
+
+// Security Check
+if (!isset($_SESSION['user_id']) || (isset($_SESSION['user_role']) && $_SESSION['user_role'] !== 'admin')) {
+    header("Location: " . BASE_URL . "frontend/login.php");
+    exit();
+}
+
 $current_page = basename($_SERVER['PHP_SELF']);
 ?>
 <!DOCTYPE html>
@@ -44,9 +52,20 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <i class="fas fa-shopping-bag"></i> Orders
                 </a>
             </li>
+            <li>
+                <a href="<?php echo BASE_URL; ?>admin/profile.php"
+                    class="<?php echo $current_page == 'profile.php' ? 'active' : ''; ?>">
+                    <i class="fas fa-user-circle"></i> Profile
+                </a>
+            </li>
             <li class="nav-link-separator">
                 <a href="<?php echo BASE_URL; ?>index.php">
                     <i class="fas fa-home"></i> View Website
+                </a>
+            </li>
+            <li>
+                <a href="<?php echo BASE_URL; ?>frontend/logout.php" style="color: #ef4444;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
                 </a>
             </li>
         </ul>

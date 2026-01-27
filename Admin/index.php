@@ -14,7 +14,7 @@ $recent_orders = $conn->query("SELECT * FROM orders ORDER BY created_at DESC LIM
     <header class="admin-header">
         <h1>Dashboard Overview</h1>
         <div class="admin-user">
-            <span>Welcome, Admin</span>
+            <span>Welcome, <?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Admin'); ?></span>
         </div>
     </header>
 
