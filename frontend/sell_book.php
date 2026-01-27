@@ -1,3 +1,4 @@
+<?php
 mysqli_report(MYSQLI_REPORT_OFF);
 require_once '../config/db.php';
 require_once '../includes/header.php';
@@ -10,58 +11,55 @@ if (!isset($_SESSION['user_id'])) {
 $error = '';
 $success = '';
 
+// Check if tables have necessary columns (ensure manual run first, but just in case)
+// We assume fix_sell_columns.php was run.
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // 1. SELF-HEALING: Check and create missing columns automatically
-    $columns_needed = [
-        'publisher' => 'VARCHAR(255) DEFAULT NULL',
-        'pages' => 'INT DEFAULT NULL',
-        'isbn' => 'VARCHAR(50) DEFAULT NULL',
-        'seller_id' => 'INT DEFAULT NULL'
-    ];
-
-    foreach ($columns_needed as $col => $def) {
-        $check = $conn->query("SHOW COLUMNS FROM books LIKE '$col'");
-        if ($check && $check->num_rows == 0) {
-            $conn->query("ALTER TABLE books ADD $col $def");
-        }
-    }
-
-    // 2. Process Form Data
     $title = $conn->real_escape_string($_POST['title']);
     $author = $conn->real_escape_string($_POST['author']);
     $price = floatval($_POST['price']);
     $category = $conn->real_escape_string($_POST['category']);
     $description = $conn->real_escape_string($_POST['description']);
-    $publisher = $conn->real_escape_string($_POST['publisher']);
-    $pages = intval($_POST['pages']);
-    $isbn = $conn->real_escape_string($_POST['isbn']);
+
+    // Optional fields
+    $publisher = isset($_POST['publisher']) ? $conn->real_escape_string($_POST['publisher']) : '';
+    $pages = isset($_POST['pages']) ? intval($_POST['pages']) : 0;
+    $isbn = isset($_POST['isbn']) ? $conn->real_escape_string($_POST['isbn']) : '';
+
     $seller_id = $_SESSION['user_id'];
 
-    // 3. Handle Helper Image Upload
-    $image = "https://placehold.co/400x600?text=" . urlencode($title); // Default placeholder
+    // Image Upload
+    $image = "https://placehold.co/400x600?text=" . urlencode($title); // Default
 
     if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
-        $target_dir = "uploads/books/";
+        $target_dir = "../uploads/books/";
         if (!file_exists($target_dir)) {
             mkdir($target_dir, 0777, true);
         }
+
         $file_extension = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
         $new_filename = "book_" . $seller_id . "_" . time() . "." . $file_extension;
-        $target_file = $target_dir . $new_filename;
+        $target_file = $target_dir . $new_filename; // Relative to this script
 
         if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
-            $image = $target_file;
+            // Store DB path as "uploads/books/filename.ext" relative to root
+            $image = "uploads/books/" . $new_filename;
+        } else {
+            $error = "Failed to upload image.";
         }
     }
 
-    // 4. Insert into Database
-    $sql = "INSERT INTO books (title, author, description, price, image, category, publisher, pages, isbn, seller_id) 
-            VALUES ('$title', '$author', '$description', $price, '$image', '$category', '$publisher', $pages, '$isbn', $seller_id)";
+    if (empty($error)) {
+        // Insert
+        // Note: IF seller_id doesn't exist in DB schema, this will fail. ensure schema is updated.
+        $sql = "INSERT INTO books (title, author, description, price, image, category, publisher, pages, isbn, seller_id, created_at) 
+                VALUES ('$title', '$author', '$description', $price, '$image', '$category', '$publisher', $pages, '$isbn', $seller_id, NOW())";
 
-    if ($conn->query($sql) === TRUE) {
-        $success = "Book listed successfully!";
-    } else {
-        $error = "Error: " . $conn->error;
+        if ($conn->query($sql) === TRUE) {
+            $success = "Book listed successfully! It is now visible in the shop.";
+        } else {
+            $error = "Database Error: " . $conn->error;
+        }
     }
 }
 ?>
@@ -106,13 +104,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class="form-group">
                     <label>Category *</label>
                     <select name="category" class="form-control" required>
-                        <option value="Fiction">Fiction</option>
-                        <option value="Non-Fiction">Non-Fiction</option>
-                        <option value="Science Fiction">Science Fiction</option>
-                        <option value="Adventure">Adventure</option>
-                        <option value="Self-Help">Self-Help</option>
-                        <option value="History">History</option>
-                        <option value="Children">Children</option>
+                        <option value="">Select Category</option>
+                        <?php
+                        // Fetch categories dynamically
+                        $cat_sql = "SELECT DISTINCT name FROM categories ORDER BY name ASC";
+                        $cat_result = $conn->query($cat_sql);
+                        if ($cat_result) {
+                            while ($cat = $cat_result->fetch_assoc()) {
+                                echo '<option value="' . htmlspecialchars($cat['name']) . '">' . htmlspecialchars($cat['name']) . '</option>';
+                            }
+                        } else {
+                            // Fallback if table issues
+                            echo '<option value="Fiction">Fiction</option>';
+                            echo '<option value="Non-Fiction">Non-Fiction</option>';
+                        }
+                        ?>
                     </select>
                 </div>
             </div>
@@ -130,7 +136,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <h3
                 style="margin-top:2rem; margin-bottom:1rem; font-size:1.2rem; border-bottom:1px solid #e2e8f0; padding-bottom:0.5rem;">
-                Additional Details</h3>
+                Additional Details
+            </h3>
 
             <div class="grid" style="grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
                 <div class="form-group">
@@ -152,4 +159,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 </div>
 
-<?php require_once 'includes/footer.php'; ?>
+<?php require_once '../includes/footer.php'; ?>

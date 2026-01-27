@@ -32,7 +32,7 @@ if (isset($_POST['place_order'])) {
     $email = $conn->real_escape_string($_POST['email']);
 
     // Insert Order
-    $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'NULL';
+    $user_id = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : null;
 
     // Self-healing: Ensure required columns exist in orders table
     $check_name = $conn->query("SHOW COLUMNS FROM orders LIKE 'name'");
@@ -50,8 +50,13 @@ if (isset($_POST['place_order'])) {
         $conn->query("ALTER TABLE orders ADD address TEXT AFTER email");
     }
 
-    $sql_order = "INSERT INTO orders (user_id, name, email, address, total) VALUES ($user_id, '$name', '$email', '$address',
-$total_price)";
+    // Build SQL query with proper NULL handling
+    if ($user_id === null) {
+        $sql_order = "INSERT INTO orders (user_id, name, email, address, total) VALUES (NULL, '$name', '$email', '$address', $total_price)";
+    } else {
+        $sql_order = "INSERT INTO orders (user_id, name, email, address, total) VALUES ($user_id, '$name', '$email', '$address', $total_price)";
+    }
+
     if ($conn->query($sql_order)) {
         $order_id = $conn->insert_id;
 
