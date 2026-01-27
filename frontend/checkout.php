@@ -34,10 +34,20 @@ if (isset($_POST['place_order'])) {
     // Insert Order
     $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : 'NULL';
 
-    // Auto-create email column if missing (Self-Healing)
-    $check = $conn->query("SHOW COLUMNS FROM orders LIKE 'email'");
-    if ($check->num_rows == 0) {
+    // Self-healing: Ensure required columns exist in orders table
+    $check_name = $conn->query("SHOW COLUMNS FROM orders LIKE 'name'");
+    if ($check_name && $check_name->num_rows == 0) {
+        $conn->query("ALTER TABLE orders ADD name VARCHAR(255) AFTER user_id");
+    }
+
+    $check_email = $conn->query("SHOW COLUMNS FROM orders LIKE 'email'");
+    if ($check_email && $check_email->num_rows == 0) {
         $conn->query("ALTER TABLE orders ADD email VARCHAR(255) AFTER name");
+    }
+
+    $check_address = $conn->query("SHOW COLUMNS FROM orders LIKE 'address'");
+    if ($check_address && $check_address->num_rows == 0) {
+        $conn->query("ALTER TABLE orders ADD address TEXT AFTER email");
     }
 
     $sql_order = "INSERT INTO orders (user_id, name, email, address, total) VALUES ($user_id, '$name', '$email', '$address',
