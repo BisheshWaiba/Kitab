@@ -7,9 +7,10 @@ $books = $conn->query("SELECT * FROM books ORDER BY id DESC");
 <main class="main-content">
     <header class="admin-header">
         <h1>Book Management</h1>
-        <button class="btn-admin btn-admin-primary">
+        <a href="add_book.php" class="btn-admin btn-admin-primary"
+            style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
             <i class="fas fa-plus"></i> Add New Book
-        </button>
+        </a>
     </header>
 
     <div class="admin-card">
