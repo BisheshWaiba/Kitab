@@ -28,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // 2. PROCESS UPLOAD
     if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] == 0) {
-        $target_dir = "uploads/";
+        $target_dir = dirname(__DIR__) . "/uploads/profiles/";
         if (!file_exists($target_dir)) {
             mkdir($target_dir, 0777, true);
         }
@@ -37,7 +37,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $target_file = $target_dir . $new_filename;
 
         if (move_uploaded_file($_FILES["profile_pic"]["tmp_name"], $target_file)) {
-            $conn->query("UPDATE users SET profile_picture = '$target_file' WHERE id = $user_id");
+            // Store relative path from project root
+            $db_path = "uploads/profiles/" . $new_filename;
+            $conn->query("UPDATE users SET profile_picture = '$db_path' WHERE id = $user_id");
         }
     }
 
@@ -217,26 +219,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         .btn-submit {
-            background: var(--primary);
+            background: #3b82f6;
             color: white;
             border: none;
-            padding: 1rem 3rem;
+            padding: 0.75rem 2rem;
             border-radius: 12px;
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.3s ease;
             display: block;
             margin: 2rem auto 0;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: auto;
+            max-width: 250px;
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
         }
 
         .btn-submit:hover {
-            background: var(--accent);
+            background: #2563eb;
             transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.4);
         }
 
         .error-banner {
