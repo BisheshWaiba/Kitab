@@ -57,58 +57,50 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <main class="main-content">
     <header class="admin-header">
         <h1>Add New Book</h1>
-        <a href="books.php" class="btn-admin" style="background: #e2e8f0; color: #475569; text-decoration: none;">
+        <a href="books.php" class="btn-admin btn-back">
             <i class="fas fa-arrow-left"></i> Back to List
         </a>
     </header>
 
     <div class="admin-card" style="max-width: 800px;">
         <?php if ($error): ?>
-            <div style="background: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+            <div class="alert-error">
                 <?php echo $error; ?>
             </div>
         <?php endif; ?>
 
         <?php if ($success): ?>
-            <div style="background: #dcfce7; color: #166534; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-                <?php echo $success; ?> <a href="books.php"
-                    style="color: inherit; font-weight: bold; text-decoration: underline;">View Books</a>
+            <div class="alert-success">
+                <?php echo $success; ?> <a href="books.php" class="alert-link">View Books</a>
             </div>
         <?php endif; ?>
 
         <form method="POST" enctype="multipart/form-data">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <div class="form-grid">
                 <div class="form-group" style="margin-bottom: 1rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #475569;">Book
+                    <label class="form-label">Book
                         Title</label>
-                    <input type="text" name="title" required class="form-control"
-                        style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;"
+                    <input type="text" name="title" required class="form-control form-input"
                         placeholder="Enter book title">
                 </div>
 
                 <div class="form-group" style="margin-bottom: 1rem;">
-                    <label
-                        style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #475569;">Author</label>
-                    <input type="text" name="author" required class="form-control"
-                        style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;"
-                        placeholder="Author name">
+                    <label class="form-label">Author</label>
+                    <input type="text" name="author" required class="form-control form-input" placeholder="Author name">
                 </div>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <div class="form-grid">
                 <div class="form-group" style="margin-bottom: 1rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #475569;">Price
+                    <label class="form-label">Price
                         (Rs.)</label>
-                    <input type="number" name="price" required min="0" class="form-control"
-                        style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;"
+                    <input type="number" name="price" required min="0" class="form-control form-input"
                         placeholder="0.00">
                 </div>
 
                 <div class="form-group" style="margin-bottom: 1rem;">
-                    <label
-                        style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #475569;">Category</label>
-                    <select name="category" required
-                        style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;">
+                    <label class="form-label">Category</label>
+                    <select name="category" required class="form-input">
                         <option value="Fiction">Fiction</option>
                         <option value="Non-Fiction">Non-Fiction</option>
                         <option value="Business">Business</option>
@@ -124,21 +116,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
 
             <div class="form-group" style="margin-bottom: 1rem;">
-                <label
-                    style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #475569;">Description</label>
-                <textarea name="description" rows="4"
-                    style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px;"
-                    placeholder="Book summary..."></textarea>
+                <label class="form-label">Description</label>
+                <textarea name="description" rows="4" class="form-input" placeholder="Book summary..."></textarea>
             </div>
 
             <div class="form-group" style="margin-bottom: 2rem;">
-                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #475569;">Cover
+                <label class="form-label">Cover
                     Image</label>
-                <input type="file" name="image" required accept="image/*"
-                    style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 8px; background: white;">
+                <input type="file" name="image" required accept="image/*" class="form-input form-input-white">
             </div>
 
-            <button type="submit" class="btn-admin btn-admin-primary" style="padding: 0.75rem 2rem; font-size: 1rem;">
+            <button type="submit" class="btn-admin btn-admin-primary btn-save">
                 <i class="fas fa-save"></i> Save Book
             </button>
         </form>

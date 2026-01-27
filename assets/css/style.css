@@ -799,6 +799,92 @@ img {
   font-size: 0.95rem;
 }
 
+/* Refactored Inline Styles */
+.text-accent {
+  color: var(--accent);
+}
+
+.hero-img-styled {
+  box-shadow: var(--shadow-lg);
+  border-radius: 12px;
+}
+
+.section-spacing {
+  margin-bottom: 4rem;
+}
+
+.relative {
+  position: relative;
+}
+
+.genre-scroll-wrapper {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  gap: 1rem;
+  scroll-behavior: smooth;
+}
+
+/* Genre Colors */
+.genre-fiction {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+
+.genre-business {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.genre-tech {
+  background: #f3e8ff;
+  color: #9333ea;
+}
+
+.genre-science {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.genre-history {
+  background: #ffedd5;
+  color: #ea580c;
+}
+
+.genre-biography {
+  background: #fef3c7;
+  color: #ca8a04;
+}
+
+.genre-self-help {
+  background: #ddd6fe;
+  color: #7c3aed;
+}
+
+.genre-mystery {
+  background: #e0e7ff;
+  color: #4f46e5;
+}
+
+.genre-romance {
+  background: #fce7f3;
+  color: #db2777;
+}
+
+.genre-fantasy {
+  background: #f0fdfa;
+  color: #0d9488;
+}
+
+/* Curated Section */
+.curated-empty {
+  padding: 2rem;
+  color: var(--text-light);
+}
+
+
 .filter-chip:hover {
   background: #e2e8f0;
 }

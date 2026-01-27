@@ -26,7 +26,7 @@ foreach ($curated_cats as $cat) {
 <div class="hero">
     <div class="container hero-container">
         <div class="hero-content">
-            <h1>Discover Your Next <br><span style="color:var(--accent)">Favorite Book</span></h1>
+            <h1>Discover Your Next <br><span class="text-accent">Favorite Book</span></h1>
             <p>Explore thousands of titles from fiction to tech. Free shipping on orders over Rs. 2,000.</p>
             <div style="display:flex; gap:1rem;">
                 <a href="frontend/shop.php" class="btn btn-primary btn-lg">Shop Now</a>
@@ -34,77 +34,75 @@ foreach ($curated_cats as $cat) {
             </div>
         </div>
         <div class="hero-image">
-            <img src="<?php echo BASE_URL; ?>assets/images/hero_bookstore.jpg" alt="Bookstore"
-                style="box-shadow:var(--shadow-lg); border-radius:12px;">
+            <img src="<?php echo BASE_URL; ?>assets/images/hero_bookstore.jpg" alt="Bookstore" class="hero-img-styled">
         </div>
     </div>
 </div>
 
 <!-- Genre Carousel -->
-<div class="container" style="margin-bottom: 4rem;">
+<div class="container section-spacing">
     <h2 class="section-title-blue">Genres</h2>
-    <div style="position: relative;">
+    <div class="relative">
         <button onclick="scrollGenres('left')" class="genre-scroll-btn genre-scroll-left">
             <i class="fas fa-chevron-left"></i>
         </button>
-        <div class="genre-scroll-container" id="genreScroll"
-            style="display: flex; flex-direction: row; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; gap: 1rem; scroll-behavior: smooth;">
+        <div class="genre-scroll-container genre-scroll-wrapper" id="genreScroll">
             <a href="frontend/shop.php?category=Fiction" class="genre-item">
-                <div class="genre-icon" style="background:#e0f2fe; color:#0284c7;">
+                <div class="genre-icon genre-fiction">
                     <i class="fas fa-magic"></i>
                 </div>
                 <span>Fiction</span>
             </a>
             <a href="frontend/shop.php?category=Business" class="genre-item">
-                <div class="genre-icon" style="background:#dcfce7; color:#16a34a;">
+                <div class="genre-icon genre-business">
                     <i class="fas fa-chart-line"></i>
                 </div>
                 <span>Business</span>
             </a>
             <a href="frontend/shop.php?category=Tech" class="genre-item">
-                <div class="genre-icon" style="background:#f3e8ff; color:#9333ea;">
+                <div class="genre-icon genre-tech">
                     <i class="fas fa-laptop-code"></i>
                 </div>
                 <span>Tech</span>
             </a>
             <a href="frontend/shop.php?category=Science" class="genre-item">
-                <div class="genre-icon" style="background:#fee2e2; color:#dc2626;">
+                <div class="genre-icon genre-science">
                     <i class="fas fa-flask"></i>
                 </div>
                 <span>Science</span>
             </a>
             <a href="frontend/shop.php?category=History" class="genre-item">
-                <div class="genre-icon" style="background:#ffedd5; color:#ea580c;">
+                <div class="genre-icon genre-history">
                     <i class="fas fa-landmark"></i>
                 </div>
                 <span>History</span>
             </a>
             <a href="frontend/shop.php?category=Biography" class="genre-item">
-                <div class="genre-icon" style="background:#fef3c7; color:#ca8a04;">
+                <div class="genre-icon genre-biography">
                     <i class="fas fa-user"></i>
                 </div>
                 <span>Biography</span>
             </a>
             <a href="frontend/shop.php?category=Self-Help" class="genre-item">
-                <div class="genre-icon" style="background:#ddd6fe; color:#7c3aed;">
+                <div class="genre-icon genre-self-help">
                     <i class="fas fa-heart"></i>
                 </div>
                 <span>Self-Help</span>
             </a>
             <a href="frontend/shop.php?category=Mystery" class="genre-item">
-                <div class="genre-icon" style="background:#e0e7ff; color:#4f46e5;">
+                <div class="genre-icon genre-mystery">
                     <i class="fas fa-search"></i>
                 </div>
                 <span>Mystery</span>
             </a>
             <a href="frontend/shop.php?category=Romance" class="genre-item">
-                <div class="genre-icon" style="background:#fce7f3; color:#db2777;">
+                <div class="genre-icon genre-romance">
                     <i class="fas fa-heart-broken"></i>
                 </div>
                 <span>Romance</span>
             </a>
             <a href="frontend/shop.php?category=Fantasy" class="genre-item">
-                <div class="genre-icon" style="background:#f0fdfa; color:#0d9488;">
+                <div class="genre-icon genre-fantasy">
                     <i class="fas fa-dragon"></i>
                 </div>
                 <span>Fantasy</span>
@@ -227,7 +225,7 @@ foreach ($curated_cats as $cat) {
                             </div>
                         <?php endwhile; ?>
                     <?php else: ?>
-                        <div style="padding: 2rem; color: var(--text-light);">
+                        <div class="curated-empty">
                             No books found in this curated category yet.
                         </div>
                     <?php endif; ?>

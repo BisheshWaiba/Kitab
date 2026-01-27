@@ -40,7 +40,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     <i class="fas fa-shopping-bag"></i> Orders
                 </a>
             </li>
-            <li style="margin-top: 2rem; border-top: 1px solid #334155; padding-top: 1rem;">
+            <li class="nav-link-separator">
                 <a href="../frontend/index.php">
                     <i class="fas fa-home"></i> View Website
                 </a>

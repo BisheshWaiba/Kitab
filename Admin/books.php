@@ -7,8 +7,7 @@ $books = $conn->query("SELECT * FROM books ORDER BY id DESC");
 <main class="main-content">
     <header class="admin-header">
         <h1>Book Management</h1>
-        <a href="add_book.php" class="btn-admin btn-admin-primary"
-            style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+        <a href="add_book.php" class="btn-admin btn-admin-primary add-book-link">
             <i class="fas fa-plus"></i> Add New Book
         </a>
     </header>
@@ -34,7 +33,7 @@ $books = $conn->query("SELECT * FROM books ORDER BY id DESC");
                         </td>
                         <td>
                             <img src="<?php echo strpos($book['image'], 'http') === 0 ? htmlspecialchars($book['image']) : BASE_URL . htmlspecialchars($book['image']); ?>"
-                                style="width: 40px; height: 60px; object-fit: cover; border-radius: 4px;">
+                                class="book-thumb">
                         </td>
                         <td>
                             <?php echo htmlspecialchars($book['title']); ?>
@@ -49,9 +48,8 @@ $books = $conn->query("SELECT * FROM books ORDER BY id DESC");
                             <?php echo number_format($book['price']); ?>
                         </td>
                         <td>
-                            <button class="btn-admin"
-                                style="background: #f1f5f9; color: #475569; margin-right: 0.5rem;">Edit</button>
-                            <button class="btn-admin" style="background: #fee2e2; color: #991b1b;">Delete</button>
+                            <button class="btn-admin btn-edit">Edit</button>
+                            <button class="btn-admin btn-delete">Delete</button>
                         </td>
                     </tr>
                 <?php endwhile; ?>
