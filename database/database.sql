@@ -1,8 +1,8 @@
 -- Database: kitab_db
 
-DROP DATABASE IF EXISTS kitab_db;
-CREATE DATABASE kitab_db;
-USE kitab_db;
+DROP DATABASE IF EXISTS `25123794`;
+CREATE DATABASE `25123794`;
+USE `25123794`;
 
 -- Users Table
 CREATE TABLE users (
