@@ -2,7 +2,7 @@
 $host = 'localhost';
 $user = 'root';
 $pass = ''; // Default XAMPP password
-$db_name = 'kitab_db';
+$db_name = '25123794';
 
 define('BASE_URL', 'http://localhost:8000/');
 
