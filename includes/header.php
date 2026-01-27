@@ -23,7 +23,7 @@ if (isset($_SESSION['cart'])) {
 
     <header class="navbar">
         <div class="container nav-container">
-            <a href="<?php echo BASE_URL; ?>frontend/index.php" class="logo">KITAB.</a>
+            <a href="<?php echo BASE_URL; ?>index.php" class="logo">KITAB.</a>
 
             <form action="<?php echo BASE_URL; ?>frontend/shop.php" method="GET" class="search-form">
                 <input type="text" name="search" placeholder="Search books..."
@@ -32,7 +32,7 @@ if (isset($_SESSION['cart'])) {
             </form>
 
             <ul class="nav-links">
-                <li><a href="<?php echo BASE_URL; ?>frontend/index.php">Home</a></li>
+                <li><a href="<?php echo BASE_URL; ?>index.php">Home</a></li>
                 <li><a href="<?php echo BASE_URL; ?>frontend/shop.php">Shop</a></li>
                 <li>
                     <a href="<?php echo BASE_URL; ?>frontend/cart.php" class="nav-cart">
