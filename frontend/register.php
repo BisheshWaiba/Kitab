@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $conn->real_escape_string($_POST['name']);
     $email = $conn->real_escape_string($_POST['email']);
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-    $role = isset($_POST['role']) && in_array($_POST['role'], ['admin', 'user']) ? $_POST['role'] : 'user';
+    $role = 'user'; // All new registrations are regular users
 
     // Check if email exists
     $check = "SELECT id FROM users WHERE email = '$email'";
@@ -62,13 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <label>Email Address</label>
                 <input type="email" name="email" class="form-control" required>
             </div>
-            <div class="form-group">
-                <label>Role</label>
-                <select name="role" class="form-control">
-                    <option value="user">User</option>
-                    <option value="admin">Admin</option>
-                </select>
-            </div>
+
             <div class="form-group">
                 <label>Password</label>
                 <input type="password" name="password" class="form-control" required>
