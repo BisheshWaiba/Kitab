@@ -4,7 +4,7 @@ $user = 'root';
 $pass = ''; // Default XAMPP password
 $db_name = '25123794';
 
-define('BASE_URL', 'http://localhost:8000/');
+define('BASE_URL', 'http://localhost/KITAB/');
 
 $conn = new mysqli($host, $user, $pass, $db_name);
 
