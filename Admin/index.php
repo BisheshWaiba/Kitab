@@ -8,106 +8,71 @@ $total_revenue = $conn->query("SELECT SUM(total) as sum FROM orders")->fetch_ass
 
 // Fetch Recent Orders
 $recent_orders = $conn->query("SELECT * FROM orders ORDER BY created_at DESC LIMIT 5");
+
+$stats = [
+    'Total Books' => $total_books,
+    'Total Users' => $total_users,
+    'Total Orders' => $total_orders,
+    'Revenue' => 'Rs. ' . number_format($total_revenue),
+];
 ?>
 
-<main class="main-content">
-    <header class="admin-header">
-        <h1>Dashboard Overview</h1>
-        <div class="admin-user">
-            <span>Welcome, <?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Admin'); ?></span>
-        </div>
-    </header>
-
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-icon icon-blue">
-                <i class="fas fa-book"></i>
-            </div>
-            <div class="stat-info">
-                <h3>Total Books</h3>
-                <div class="value">
-                    <?php echo $total_books; ?>
-                </div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon icon-purple">
-                <i class="fas fa-users"></i>
-            </div>
-            <div class="stat-info">
-                <h3>Total Users</h3>
-                <div class="value">
-                    <?php echo $total_users; ?>
-                </div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon icon-orange">
-                <i class="fas fa-shopping-bag"></i>
-            </div>
-            <div class="stat-info">
-                <h3>Total Orders</h3>
-                <div class="value">
-                    <?php echo $total_orders; ?>
-                </div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon icon-green">
-                <i class="fas fa-rupee-sign"></i>
-            </div>
-            <div class="stat-info">
-                <h3>Revenue</h3>
-                <div class="value">Rs.
-                    <?php echo number_format($total_revenue); ?>
-                </div>
-            </div>
-        </div>
+<main class="k-admin__main">
+    <div class="k-admin__bar">
+        <h1 class="k-h1">Dashboard Overview</h1>
+        <span class="k-admin__welcome">Welcome, <?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Admin'); ?></span>
     </div>
 
-    <div class="admin-card">
-        <div class="card-header">
-            <h2>Recent Orders</h2>
-            <a href="orders.php" class="btn-admin btn-admin-primary">View All</a>
-        </div>
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>Order ID</th>
-                    <th>Customer</th>
-                    <th>Total</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php while ($order = $recent_orders->fetch_assoc()): ?>
-                    <tr>
-                        <td>#
-                            <?php echo $order['id']; ?>
-                        </td>
-                        <td>
-                            <?php echo htmlspecialchars($order['name']); ?>
-                        </td>
-                        <td>Rs.
-                            <?php echo number_format($order['total']); ?>
-                        </td>
-                        <td>
-                            <span class="status-pills status-success">Completed</span>
-                        </td>
-                        <td>
-                            <?php echo date('M d, Y', strtotime($order['created_at'])); ?>
-                        </td>
-                    </tr>
-                <?php endwhile; ?>
-                <?php if ($recent_orders->num_rows == 0): ?>
-                    <tr>
-                        <td colspan="5" style="text-align: center; padding: 2rem; color: #64748b;">No orders found.</td>
-                    </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
+    <div class="k-stats">
+        <?php foreach ($stats as $label => $value): ?>
+            <div class="k-card k-stat">
+                <h2 class="k-stat__label"><?php echo $label; ?></h2>
+                <div class="k-stat__value"><?php echo $value; ?></div>
+            </div>
+        <?php endforeach; ?>
     </div>
+
+    <section class="k-card k-admincard">
+        <div class="k-admincard__head">
+            <h2 class="k-h3">Recent Orders</h2>
+            <a href="orders.php" class="k-btn k-btn--primary k-btn--sm">View All</a>
+        </div>
+        <div class="k-tablecard">
+            <table class="k-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php while ($order = $recent_orders->fetch_assoc()): ?>
+                        <?php
+                        $status = strtolower((string) $order['status']);
+                        if (!in_array($status, ['pending', 'processing', 'shipped', 'delivered', 'cancelled'], true)) {
+                            $status = 'pending';
+                        }
+                        ?>
+                        <tr>
+                            <td class="k-num k-num--strong">#<?php echo (int) $order['id']; ?></td>
+                            <td><?php echo htmlspecialchars((string) $order['name'] !== '' ? (string) $order['name'] : '—'); ?></td>
+                            <td class="k-num">Rs. <?php echo number_format($order['total']); ?></td>
+                            <td><span class="k-pill k-pill--<?php echo $status; ?>"><?php echo ucfirst($status); ?></span></td>
+                            <td class="k-muted"><?php echo date('M d, Y', strtotime($order['created_at'])); ?></td>
+                        </tr>
+                    <?php endwhile; ?>
+                    <?php if ($recent_orders->num_rows == 0): ?>
+                        <tr>
+                            <td colspan="5" class="k-table__empty">No orders found.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </section>
 </main>
 
 </body>

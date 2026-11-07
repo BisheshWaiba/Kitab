@@ -1,8 +1,8 @@
-// Profile setup: photo picker with live preview
-document.querySelectorAll('[data-avatar]').forEach(function (box) {
+// Image pickers (profile setup, sell a book): choose button with live preview
+document.querySelectorAll('[data-upload]').forEach(function (box) {
     var input = box.querySelector('input[type="file"]');
-    var pick = box.querySelector('[data-avatar-pick]');
-    var preview = box.querySelector('[data-avatar-preview]');
+    var pick = box.querySelector('[data-upload-pick]');
+    var preview = box.querySelector('[data-upload-preview]');
     var img = preview.querySelector('img');
 
     pick.addEventListener('click', function () {

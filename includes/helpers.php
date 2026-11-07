@@ -1,6 +1,39 @@
 <?php
 // Shared markup helpers for the redesigned pages. Needs BASE_URL (config/db.php).
 
+// Validate and store an uploaded image under uploads/<subdir>/.
+// Returns [relative path or null, error message or ''].
+// Only real JPG/PNG/GIF/WebP files are accepted (checked by content, not by name); the saved extension
+// comes from the detected type, so a script can never be stored under an executable extension.
+function k_upload_image(array $file, string $subdir, string $prefix, int $max_bytes = 2097152): array
+{
+    if (($file['error'] ?? UPLOAD_ERR_NO_FILE) == UPLOAD_ERR_NO_FILE) {
+        return [null, ''];
+    }
+
+    $types = [IMAGETYPE_JPEG => 'jpg', IMAGETYPE_PNG => 'png', IMAGETYPE_GIF => 'gif', IMAGETYPE_WEBP => 'webp'];
+
+    if ($file['error'] == UPLOAD_ERR_INI_SIZE || $file['error'] == UPLOAD_ERR_FORM_SIZE || $file['size'] > $max_bytes) {
+        return [null, 'That image is too large. Please choose one under ' . round($max_bytes / 1048576) . ' MB.'];
+    }
+
+    $info = $file['error'] == UPLOAD_ERR_OK ? @getimagesize($file['tmp_name']) : false;
+    if (!$info || !isset($types[$info[2]])) {
+        return [null, 'Please upload a JPG, PNG, GIF or WebP image.'];
+    }
+
+    $dir = dirname(__DIR__) . '/uploads/' . $subdir . '/';
+    if (!file_exists($dir)) {
+        mkdir($dir, 0777, true);
+    }
+    $name = $prefix . '_' . time() . '_' . bin2hex(random_bytes(3)) . '.' . $types[$info[2]];
+    if (!move_uploaded_file($file['tmp_name'], $dir . $name)) {
+        return [null, 'Sorry, the image could not be saved. Please try again.'];
+    }
+
+    return ['uploads/' . $subdir . '/' . $name, ''];
+}
+
 // Cover image, or a titled placeholder when a book has none.
 function k_cover(array $b, string $class = 'k-cover', bool $lazy = true): void
 {

@@ -1,6 +1,7 @@
 <?php
 mysqli_report(MYSQLI_REPORT_OFF); // Disable auto-exceptions
 require_once '../config/db.php';
+require_once '../includes/helpers.php';
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
@@ -35,37 +36,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $genres_list = array_values(array_intersect(array_keys($genre_options), $posted_genres));
     $saved_genres = $genres_list; // keep the choices on screen if something below fails
 
-    // 1. VALIDATE UPLOAD (before anything is saved)
-    $new_picture = null;
-    if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] != UPLOAD_ERR_NO_FILE) {
-        $file = $_FILES['profile_pic'];
-        $allowed_types = [
-            IMAGETYPE_JPEG => 'jpg',
-            IMAGETYPE_PNG => 'png',
-            IMAGETYPE_GIF => 'gif',
-            IMAGETYPE_WEBP => 'webp',
-        ];
-        $image_info = $file['error'] == UPLOAD_ERR_OK ? @getimagesize($file['tmp_name']) : false;
-
-        if ($file['error'] == UPLOAD_ERR_INI_SIZE || $file['error'] == UPLOAD_ERR_FORM_SIZE || $file['size'] > 2 * 1024 * 1024) {
-            $error_message = 'That photo is too large. Please choose an image under 2 MB.';
-        } elseif (!$image_info || !isset($allowed_types[$image_info[2]])) {
-            $error_message = 'Please upload a JPG, PNG, GIF or WebP image.';
-        } else {
-            // 2. SAVE UPLOAD (the extension comes from the detected image type, never from the file name)
-            $target_dir = dirname(__DIR__) . "/uploads/profiles/";
-            if (!file_exists($target_dir)) {
-                mkdir($target_dir, 0777, true);
-            }
-            $new_filename = "user_" . $user_id . "_" . time() . "." . $allowed_types[$image_info[2]];
-            if (move_uploaded_file($file['tmp_name'], $target_dir . $new_filename)) {
-                // Store relative path from project root
-                $new_picture = "uploads/profiles/" . $new_filename;
-            } else {
-                $error_message = 'Sorry, the photo could not be saved. Please try again.';
-            }
-        }
-    }
+    // 1. VALIDATE + SAVE UPLOAD (before anything else is saved)
+    [$new_picture, $error_message] = k_upload_image($_FILES['profile_pic'] ?? ['error' => UPLOAD_ERR_NO_FILE], 'profiles', 'user_' . $user_id);
 
     if ($error_message === '') {
         // 3. ENSURE COLUMNS EXIST (Self-Healing)
@@ -137,9 +109,9 @@ if ($saved_picture !== '') {
                 </div>
             <?php endif; ?>
 
-            <div class="k-avatar-upload" data-avatar>
+            <div class="k-avatar-upload" data-upload>
                 <div class="k-avatar-upload__preview<?php echo $picture_url !== '' ? ' has-image' : ''; ?>"
-                    data-avatar-preview>
+                    data-upload-preview>
                     <img class="k-avatar-upload__img" alt="Your profile photo"
                         <?php echo $picture_url !== '' ? 'src="' . htmlspecialchars($picture_url) . '"' : ''; ?>>
                     <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -148,7 +120,7 @@ if ($saved_picture !== '') {
                         <circle cx="12" cy="13" r="3.6" />
                     </svg>
                 </div>
-                <button type="button" class="k-btn k-btn--outline k-btn--sm" data-avatar-pick>Upload Photo</button>
+                <button type="button" class="k-btn k-btn--outline k-btn--sm" data-upload-pick>Upload Photo</button>
                 <input type="file" id="profile_pic" name="profile_pic" accept="image/jpeg,image/png,image/gif,image/webp"
                     hidden>
             </div>
