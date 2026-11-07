@@ -6,6 +6,11 @@ if (isset($_SESSION['cart'])) {
         $cart_count += $quantity;
     }
 }
+
+$current_page = basename($_SERVER['SCRIPT_NAME']);
+$nav_home = $current_page === 'index.php';
+$nav_shop = in_array($current_page, ['shop.php', 'product.php'], true);
+$user_initial = isset($_SESSION['user_name']) ? strtoupper(mb_substr($_SESSION['user_name'], 0, 1)) : '';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -14,50 +19,62 @@ if (isset($_SESSION['cart'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KITAB - Premium Book Store</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/style.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/genre.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/kitab.css">
 </head>
 
 <body>
 
-    <header class="navbar">
-        <div class="container nav-container">
-            <a href="<?php echo BASE_URL; ?>index.php" class="logo">KITAB.</a>
+    <div class="k-announce">Free shipping on orders over Rs. 2,000</div>
 
-            <form action="<?php echo BASE_URL; ?>frontend/shop.php" method="GET" class="search-form">
-                <input type="text" name="search" placeholder="Search books..."
+    <header class="k-nav">
+        <div class="k-nav__inner">
+            <a href="<?php echo BASE_URL; ?>index.php" class="k-logo">KITAB<span>.</span></a>
+
+            <form action="<?php echo BASE_URL; ?>frontend/shop.php" method="GET" class="k-search" role="search">
+                <button type="submit" class="k-search__btn" aria-label="Search">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="11" cy="11" r="7" />
+                        <path d="m20 20-3.5-3.5" />
+                    </svg>
+                </button>
+                <input type="text" name="search" placeholder="Search books..." aria-label="Search books"
                     value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
-                <button type="submit"><i class="fas fa-search"></i></button>
             </form>
 
-            <ul class="nav-links">
-                <li><a href="<?php echo BASE_URL; ?>index.php">Home</a></li>
-                <li><a href="<?php echo BASE_URL; ?>frontend/shop.php">Shop</a></li>
-                <li>
-                    <a href="<?php echo BASE_URL; ?>frontend/cart.php" class="nav-cart">
-                        <i class="fas fa-shopping-cart"></i>
-                        <?php if ($cart_count > 0): ?>
-                            <span class="cart-count"><?php echo $cart_count; ?></span>
-                        <?php endif; ?>
-                    </a>
-                </li>
+            <nav class="k-links" aria-label="Main">
+                <a href="<?php echo BASE_URL; ?>index.php"
+                    class="k-link<?php echo $nav_home ? ' is-active' : ''; ?>">Home</a>
+                <a href="<?php echo BASE_URL; ?>frontend/shop.php"
+                    class="k-link<?php echo $nav_shop ? ' is-active' : ''; ?>">Shop</a>
+                <a href="<?php echo BASE_URL; ?>frontend/cart.php" class="k-cart" aria-label="Cart<?php echo $cart_count > 0 ? ', ' . $cart_count . ' items' : ''; ?>">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 4h2.2l2.1 10.2a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1L20.5 8H6.2" />
+                        <circle cx="9.5" cy="19.5" r="1.4" />
+                        <circle cx="17" cy="19.5" r="1.4" />
+                    </svg>
+                    <?php if ($cart_count > 0): ?>
+                        <span class="k-cart__badge"><?php echo $cart_count; ?></span>
+                    <?php endif; ?>
+                </a>
                 <?php if (isset($_SESSION['user_id'])): ?>
-                    <li>
-                        <a href="<?php echo BASE_URL; ?>frontend/profile.php" class="nav-cart" style="font-size: 1.3rem;">
-                            <i class="fas fa-user-circle"></i>
-                        </a>
-                    </li>
+                    <a href="<?php echo BASE_URL; ?>frontend/profile.php" class="k-avatar" aria-label="My account">
+                        <?php echo htmlspecialchars($user_initial); ?>
+                    </a>
                 <?php else: ?>
-                    <li style="display: flex; gap: 1rem; align-items: center;">
-                        <a href="<?php echo BASE_URL; ?>frontend/login.php" class="btn btn-outline"
-                            style="padding: 0.6rem 1.5rem;">Log In</a>
-                        <a href="<?php echo BASE_URL; ?>frontend/register.php" class="btn btn-primary"
-                            style="padding: 0.6rem 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-                            <i class="far fa-user"></i> Sign Up
-                        </a>
-                    </li>
+                    <div class="k-auth">
+                        <a href="<?php echo BASE_URL; ?>frontend/login.php" class="k-btn k-btn--outline k-btn--sm">Log In</a>
+                        <a href="<?php echo BASE_URL; ?>frontend/register.php" class="k-btn k-btn--primary k-btn--sm">Sign Up</a>
+                    </div>
                 <?php endif; ?>
-            </ul>
+            </nav>
         </div>
     </header>

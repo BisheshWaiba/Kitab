@@ -1,29 +1,21 @@
-<footer class="minimal-footer">
-    <div class="container footer-minimal-container">
-        <!-- Logo Section -->
-        <div class="footer-logo-section">
-            <h2 class="footer-text-logo">KITAB</h2>
-        </div>
+<footer class="k-footer">
+    <div class="k-footer__inner">
+        <div class="k-footer__top">
+            <div class="k-footer__logo">KITAB<span>.</span></div>
 
-        <!-- Links Grid Section -->
-        <div class="footer-links-minimal">
-            <div class="footer-min-col">
-                <ul>
-                    <li><a href="shop.php">Books</a></li>
+            <div class="k-footer__cols">
+                <ul class="k-footer__col">
+                    <li><a href="<?php echo BASE_URL; ?>frontend/shop.php">Books</a></li>
                     <li><a href="#">Authors</a></li>
                     <li><a href="#">Collections</a></li>
                     <li><a href="#">Events</a></li>
                 </ul>
-            </div>
-            <div class="footer-min-col">
-                <ul>
+                <ul class="k-footer__col">
                     <li><a href="#">Legal warning</a></li>
                     <li><a href="#">Giveaway terms and conditions</a></li>
                     <li><a href="#">Legal bases of the draws</a></li>
                 </ul>
-            </div>
-            <div class="footer-min-col">
-                <ul>
+                <ul class="k-footer__col">
                     <li><a href="#">Return policy</a></li>
                     <li><a href="#">Cookies policy</a></li>
                     <li><a href="#">Privacy policy</a></li>
@@ -31,13 +23,12 @@
             </div>
         </div>
 
-        <!-- Right Section: Copyright & Social -->
-        <div class="footer-right-minimal">
-            <p class="copyright-text">KITAB. All rights reserved</p>
-            <div class="social-icons-minimal">
-                <a href="#"><i class="fab fa-instagram"></i></a>
-                <a href="#"><i class="fab fa-x-twitter"></i></a>
-                <a href="#"><i class="fab fa-facebook-f"></i></a>
+        <div class="k-footer__bottom">
+            <span>KITAB. All rights reserved</span>
+            <div class="k-footer__social">
+                <a href="#">Instagram</a>
+                <a href="#">X</a>
+                <a href="#">Facebook</a>
             </div>
         </div>
     </div>

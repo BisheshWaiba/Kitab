@@ -1,22 +1,19 @@
-function scrollGenres(direction) {
-    const container = document.getElementById('genreScroll');
-    const scrollAmount = 300;
-    if (direction === 'left') {
-        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-    } else {
-        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-    }
-}
+// Home page: "Our picks" category tabs
+document.querySelectorAll('.k-chip[data-target]').forEach(function (chip) {
+    chip.addEventListener('click', function () {
+        document.querySelectorAll('.k-chip[data-target]').forEach(function (c) {
+            c.classList.remove('is-active');
+            c.setAttribute('aria-pressed', 'false');
+        });
+        document.querySelectorAll('.k-picks__panel').forEach(function (p) {
+            p.classList.remove('is-active');
+        });
 
-function switchCategory(catId, btn) {
-    // Update chips
-    document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-
-    // Update content
-    document.querySelectorAll('.category-content').forEach(c => c.classList.remove('active'));
-    const content = document.getElementById(catId);
-    if (content) {
-        content.classList.add('active');
-    }
-}
+        chip.classList.add('is-active');
+        chip.setAttribute('aria-pressed', 'true');
+        var panel = document.getElementById(chip.dataset.target);
+        if (panel) {
+            panel.classList.add('is-active');
+        }
+    });
+});
