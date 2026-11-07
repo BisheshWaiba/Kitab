@@ -28,7 +28,7 @@ $book = $result->fetch_assoc();
 // Handle Add to Cart
 if (isset($_POST['add_to_cart'])) {
     $book_id = $book['id'];
-    $quantity = intval($_POST['quantity']);
+    $quantity = max(1, min(100, intval($_POST['quantity'])));
 
     if (!isset($_SESSION['cart'])) {
         $_SESSION['cart'] = [];

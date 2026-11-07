@@ -1,12 +1,16 @@
 <?php
 require_once '../config/db.php';
-require_once '../includes/header.php';
+require_once '../includes/helpers.php';
+// Session first: the order is processed before the header is output, so its cart badge is up to date.
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 $cart_items = [];
 $total_price = 0;
 
 if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
-    $ids = implode(',', array_keys($_SESSION['cart']));
+    $ids = implode(',', array_map('intval', array_keys($_SESSION['cart'])));
     if (!empty($ids)) {
         $sql = "SELECT * FROM books WHERE id IN ($ids)";
         $result = $conn->query($sql);
@@ -75,75 +79,80 @@ $price)";
         $order_placed = true;
     }
 }
+
+require_once '../includes/header.php';
 ?>
 
-<div class="container" style="padding: 4rem 2rem;">
-    <h1>Checkout</h1>
+<div class="k-page k-page--stack">
+    <h1 class="k-h1">Checkout</h1>
 
     <?php if ($order_placed): ?>
-        <div class="success-message" style="text-align:center; padding:3rem; background:#f0fdf4; border-radius:12px;">
-            <div style="font-size:3rem; color:#16a34a; margin-bottom:1rem;"><i class="fas fa-check-circle"></i></div>
-            <h2>Order Placed Successfully!</h2>
+        <div class="k-card k-success">
+            <div class="k-success__icon" aria-hidden="true">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m5 12.5 4.5 4.5L19 7.5" />
+                </svg>
+            </div>
+            <h2 class="k-h3">Order Placed Successfully!</h2>
             <p>Thank you, <?php echo htmlspecialchars($name); ?>. Your order #<?php echo $order_id; ?> has been received.
             </p>
-            <a href="shop.php" class="btn btn-primary" style="margin-top:1rem;">Continue Shopping</a>
+            <a href="shop.php" class="k-btn k-btn--primary">Continue Shopping</a>
         </div>
     <?php else: ?>
-        <div class="checkout-grid">
-            <div class="card">
-                <h3>Billing Details</h3>
-                <form method="POST">
-                    <div class="form-group">
-                        <label>Full Name</label>
-                        <input type="text" name="name" class="form-control" required placeholder="Ram Lama">
-                    </div>
-                    <div class="form-group">
-                        <label>Email Address</label>
-                        <input type="email" name="email" class="form-control" required placeholder="ram@gmail.com">
-                    </div>
-                    <div class="form-group">
-                        <label>Phone Number</label>
-                        <input type="tel" name="phone" class="form-control" required placeholder="+977 98XXXXXXXX">
-                    </div>
-                    <div class="form-group">
-                        <label>Shipping Address</label>
-                        <textarea name="address" class="form-control" rows="4" required
-                            placeholder="Maitidevi, Kathmandu"></textarea>
-                    </div>
+        <div class="k-checkout">
+            <form method="POST" class="k-card k-checkout__form">
+                <h2 class="k-h3">Billing Details</h2>
 
-                    <h3>Payment</h3>
-                    <div class="payment-method">
-                        <div class="form-group">
-                            <label><input type="radio" name="payment" checked> Cash on Delivery</label>
-                        </div>
+                <div class="k-fields">
+                    <div class="k-field">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" name="name" class="k-input" required placeholder="Ram Lama">
                     </div>
+                    <div class="k-field">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" class="k-input" required placeholder="ram@gmail.com">
+                    </div>
+                </div>
+                <div class="k-field">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" class="k-input" required placeholder="+977 98XXXXXXXX">
+                </div>
+                <div class="k-field">
+                    <label for="address">Shipping Address</label>
+                    <textarea id="address" name="address" class="k-input k-textarea" rows="3" required
+                        placeholder="Maitidevi, Kathmandu"></textarea>
+                </div>
 
-                    <button type="submit" name="place_order" class="btn btn-primary btn-block">Place Order (Rs.
-                        <?php echo number_format($total_price); ?>)</button>
-                </form>
-            </div>
+                <h2 class="k-h3 k-h3--spaced">Payment</h2>
+                <label class="k-radio">
+                    <input type="radio" name="payment" checked>
+                    Cash on Delivery
+                </label>
 
-            <div class="card">
-                <h3>Order Summary</h3>
-                <div class="order-items">
+                <button type="submit" name="place_order" class="k-btn k-btn--primary k-btn--block">Place Order (Rs.
+                    <?php echo number_format($total_price); ?>)</button>
+            </form>
+
+            <aside class="k-summary">
+                <h2 class="k-h3">Order Summary</h2>
+                <ul class="k-sumitems">
                     <?php foreach ($cart_items as $item): ?>
-                        <div
-                            style="display:flex; justify-content:space-between; margin-bottom:1rem; border-bottom:1px dashed #e2e8f0; padding-bottom:0.5rem;">
-                            <div>
-                                <strong><?php echo htmlspecialchars($item['title']); ?></strong>
-                                <br>
-                                <small>x<?php echo $item['qty']; ?></small>
+                        <li class="k-sumitem">
+                            <?php k_cover($item, 'k-thumb', false); ?>
+                            <div class="k-sumitem__text">
+                                <div class="k-sumitem__title"><?php echo htmlspecialchars($item['title']); ?></div>
+                                <div class="k-sumitem__qty">Qty <?php echo (int) $item['qty']; ?></div>
                             </div>
-                            <span>Rs. <?php echo number_format($item['price'] * $item['qty']); ?></span>
-                        </div>
+                            <div class="k-sumitem__price">Rs. <?php echo number_format($item['price'] * $item['qty']); ?></div>
+                        </li>
                     <?php endforeach; ?>
+                </ul>
+                <div class="k-summary__row k-summary__row--total">
+                    <span class="k-summary__label">Total</span>
+                    <span class="k-summary__amount">Rs. <?php echo number_format($total_price); ?></span>
                 </div>
-                <div
-                    style="display:flex; justify-content:space-between; font-size:1.2rem; font-weight:700; color:var(--primary); margin-top:1rem;">
-                    <span>Total</span>
-                    <span>Rs. <?php echo number_format($total_price); ?></span>
-                </div>
-            </div>
+            </aside>
         </div>
     <?php endif; ?>
 </div>
