@@ -1,5 +1,6 @@
 <?php
 require_once '../config/db.php';
+require_once '../includes/helpers.php';
 require_once '../includes/header.php';
 
 if (!isset($_GET['id'])) {
@@ -12,8 +13,11 @@ $sql = "SELECT * FROM books WHERE id = $id";
 $result = $conn->query($sql);
 
 if ($result->num_rows == 0) {
-    echo "<div class='container'>
-    <p>Book not found.</p>
+    echo "<div class='k-page'>
+    <div class='k-empty'>
+        <p>Book not found.</p>
+        <a href='shop.php' class='k-btn k-btn--outline'>Back to Shop</a>
+    </div>
 </div>";
     require_once '../includes/footer.php';
     exit();
@@ -41,79 +45,88 @@ if (isset($_POST['add_to_cart'])) {
 <script>window.location.href = 'cart.php';</script>";
     exit();
 }
+
+$description = trim((string) ($book['description'] ?? ''));
 ?>
 
-<div class="container product-container">
-    <div class="product-grid">
-        <div class="product-image">
-            <img src="<?php echo strpos($book['image'], 'http') === 0 ? htmlspecialchars($book['image']) : BASE_URL . htmlspecialchars($book['image']); ?>"
-                alt="<?php echo htmlspecialchars($book['title']); ?>">
-        </div>
-        <div class="product-details">
-            <span class="category"><?php echo htmlspecialchars($book['category']); ?></span>
-            <h1><?php echo htmlspecialchars($book['title']); ?></h1>
-            <p class="author">by <?php echo htmlspecialchars($book['author']); ?></p>
-            <p class="price">Rs. <?php echo htmlspecialchars(number_format($book['price'])); ?></p>
-
-            <div class="description">
-                <p><?php echo nl2br(htmlspecialchars($book['description'])); ?></p>
-            </div>
-
-            <div class="product-specs">
-                <h3>Product Details</h3>
-                <ul class="specs-list">
-                    <li><strong>Publisher:</strong> <?php echo htmlspecialchars($book['publisher'] ?? 'N/A'); ?></li>
-                    <li><strong>Language:</strong> <?php echo htmlspecialchars($book['language'] ?? 'English'); ?></li>
-                    <li><strong>Pages:</strong> <?php echo htmlspecialchars($book['pages'] ?? 'N/A'); ?></li>
-                    <li><strong>ISBN:</strong> <?php echo htmlspecialchars($book['isbn'] ?? 'N/A'); ?></li>
-                </ul>
-            </div>
-
-            <form method="POST" class="add-to-cart-form" style="display:flex; gap:1rem; align-items:flex-end;">
-                <div class="form-group" style="margin-bottom:0;">
-                    <label for="quantity">Quantity</label>
-                    <input type="number" id="quantity" name="quantity" value="1" min="1" max="100" class="form-control"
-                        style="width:100px;">
-                </div>
-                <button type="submit" name="add_to_cart" class="btn btn-primary btn-lg">Add to Cart</button>
-            </form>
-        </div>
+<section class="k-product">
+    <div class="k-product__media">
+        <?php k_cover($book, 'k-product__cover', false); ?>
     </div>
 
-    <!-- Related Products -->
-    <?php
-    $current_id = $book['id'];
-    $cat = $conn->real_escape_string($book['category']);
-    $sql_related = "SELECT * FROM books WHERE category = '$cat' AND id != $current_id LIMIT 3";
-    $result_related = $conn->query($sql_related);
+    <div class="k-product__info">
+        <span class="k-product__cat"><?php echo htmlspecialchars($book['category']); ?></span>
+        <h1 class="k-product__title"><?php echo htmlspecialchars($book['title']); ?></h1>
+        <p class="k-product__author">by <?php echo htmlspecialchars($book['author']); ?></p>
+        <p class="k-product__price">Rs. <?php echo htmlspecialchars(number_format($book['price'])); ?></p>
 
-    if ($result_related->num_rows > 0):
-        ?>
-        <div class="related-products">
-            <h2 class="section-title-blue">You May Also Like</h2>
-            <div class="grid books-grid">
-                <?php while ($row = $result_related->fetch_assoc()): ?>
-                    <div class="card book-card">
-                        <div class="book-image">
-                            <img src="<?php echo strpos($row['image'], 'http') === 0 ? htmlspecialchars($row['image']) : BASE_URL . htmlspecialchars($row['image']); ?>"
-                                alt="<?php echo htmlspecialchars($row['title']); ?>">
-                        </div>
-                        <div class="book-info">
-                            <span class="category"><?php echo htmlspecialchars($row['category']); ?></span>
-                            <h3><?php echo htmlspecialchars($row['title']); ?></h3>
-                            <p class="author">by <?php echo htmlspecialchars($row['author']); ?></p>
-                            <div class="book-footer">
-                                <span class="price">Rs.
-                                    <?php echo htmlspecialchars(number_format($row['price'])); ?></span>
-                            </div>
-                            <a href="product.php?id=<?php echo $row['id']; ?>" class="btn btn-block btn-outline mt-2">View
-                                Details</a>
-                        </div>
-                    </div>
-                <?php endwhile; ?>
-            </div>
+        <?php if ($description !== ''): ?>
+            <p class="k-product__desc"><?php echo nl2br(htmlspecialchars($description)); ?></p>
+        <?php endif; ?>
+
+        <div class="k-specs">
+            <h2 class="k-specs__title">Product Details</h2>
+            <dl>
+                <div>
+                    <dt>Publisher</dt>
+                    <dd><?php echo htmlspecialchars($book['publisher'] ?: 'N/A'); ?></dd>
+                </div>
+                <div>
+                    <dt>Language</dt>
+                    <dd><?php echo htmlspecialchars($book['language'] ?? 'English'); ?></dd>
+                </div>
+                <div>
+                    <dt>Pages</dt>
+                    <dd><?php echo htmlspecialchars($book['pages'] ?: 'N/A'); ?></dd>
+                </div>
+                <div>
+                    <dt>ISBN</dt>
+                    <dd><?php echo htmlspecialchars($book['isbn'] ?: 'N/A'); ?></dd>
+                </div>
+            </dl>
         </div>
-    <?php endif; ?>
-</div>
+
+        <form method="POST" class="k-buy">
+            <div class="k-qty">
+                <label for="quantity">Quantity</label>
+                <div class="k-qty__box" data-qty>
+                    <button type="button" class="k-qty__btn" data-step="-1" aria-label="Decrease quantity">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                            <path d="M5 12h14" />
+                        </svg>
+                    </button>
+                    <input type="number" id="quantity" name="quantity" value="1" min="1" max="100">
+                    <button type="button" class="k-qty__btn" data-step="1" aria-label="Increase quantity">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                            <path d="M12 5v14M5 12h14" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <button type="submit" name="add_to_cart" class="k-btn k-btn--primary">Add to Cart</button>
+        </form>
+    </div>
+</section>
+
+<!-- Related Products -->
+<?php
+$current_id = $book['id'];
+$cat = $conn->real_escape_string($book['category']);
+$sql_related = "SELECT * FROM books WHERE category = '$cat' AND id != $current_id LIMIT 3";
+$result_related = $conn->query($sql_related);
+
+if ($result_related->num_rows > 0):
+    ?>
+    <section class="k-related">
+        <h2 class="k-h2">You May Also Like</h2>
+        <div class="k-grid">
+            <?php while ($row = $result_related->fetch_assoc()): ?>
+                <?php k_book_card($row); ?>
+            <?php endwhile; ?>
+        </div>
+    </section>
+<?php endif; ?>
 
 <?php require_once '../includes/footer.php'; ?>

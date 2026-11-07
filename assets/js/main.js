@@ -1,3 +1,16 @@
+// Product page: quantity stepper
+document.querySelectorAll('[data-qty]').forEach(function (box) {
+    var input = box.querySelector('input');
+    box.querySelectorAll('[data-step]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var min = parseInt(input.min, 10) || 1;
+            var max = parseInt(input.max, 10) || 100;
+            var next = (parseInt(input.value, 10) || min) + parseInt(btn.dataset.step, 10);
+            input.value = Math.min(max, Math.max(min, next));
+        });
+    });
+});
+
 // Home page: "Our picks" category tabs
 document.querySelectorAll('.k-chip[data-target]').forEach(function (chip) {
     chip.addEventListener('click', function () {
