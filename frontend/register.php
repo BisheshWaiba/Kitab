@@ -1,5 +1,6 @@
 <?php
 require_once '../config/db.php';
+require_once '../includes/helpers.php';
 require_once '../includes/header.php';
 
 $error = '';
@@ -11,10 +12,11 @@ if (isset($_SESSION['user_id'])) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = $conn->real_escape_string($_POST['name']);
-    $email = $conn->real_escape_string($_POST['email']);
+    $raw_name = trim($_POST['name']);
+    $name = $conn->real_escape_string($raw_name);
+    $email = $conn->real_escape_string(trim($_POST['email']));
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-    $role = 'user'; // All new registrations are regular users
+    $role = 'customer'; // All new registrations are regular customers (the users.role column allows customer or admin)
 
     // Check if email exists
     $check = "SELECT id FROM users WHERE email = '$email'";
@@ -25,8 +27,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($conn->query($sql) === TRUE) {
             // Auto login
             $user_id = $conn->insert_id;
+            session_regenerate_id(true);
             $_SESSION['user_id'] = $user_id;
-            $_SESSION['user_name'] = $name;
+            $_SESSION['user_name'] = $raw_name;
             $_SESSION['user_role'] = $role;
 
             // Redirect based on role
@@ -37,41 +40,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             exit();
         } else {
-            $error = "Error: " . $conn->error;
+            $error = "Something went wrong creating your account. Please try again.";
         }
     }
 }
 ?>
 
-<div class="auth-container">
-    <div class="auth-box">
-        <h2 style="text-align:center; margin-bottom:1.5rem;">Create Account</h2>
-        <?php if ($error): ?>
-            <div
-                style="background:#fee2e2; color:#b91c1c; padding:0.75rem; border-radius:8px; margin-bottom:1.5rem; text-align:center;">
-                <?php echo $error; ?>
-            </div>
-        <?php endif; ?>
+<div class="k-authpage">
+    <?php k_auth_art($conn, 4, true); ?>
 
-        <form method="POST">
-            <div class="form-group">
-                <label>Full Name</label>
-                <input type="text" name="name" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label>Email Address</label>
-                <input type="email" name="email" class="form-control" required>
-            </div>
+    <div class="k-authpage__main">
+        <form method="POST" class="k-authpage__form">
+            <h1 class="k-h1">Create Account</h1>
 
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" name="password" class="form-control" required>
+            <?php if ($error): ?>
+                <div class="k-alert k-alert--error" role="alert"><?php echo htmlspecialchars($error); ?></div>
+            <?php endif; ?>
+
+            <div class="k-field">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" class="k-input" required autocomplete="name"
+                    value="<?php echo htmlspecialchars($_POST['name'] ?? ''); ?>">
             </div>
-            <button type="submit" class="btn btn-primary btn-block">Register</button>
+            <div class="k-field">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" class="k-input" required autocomplete="email"
+                    value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
+            </div>
+            <div class="k-field">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="k-input" required
+                    autocomplete="new-password">
+            </div>
+            <button type="submit" class="k-btn k-btn--primary k-btn--block">Register</button>
+
+            <p class="k-authpage__switch">
+                Already have an account? <a href="login.php">Login here</a>
+            </p>
         </form>
-        <p style="text-align:center; margin-top:1.5rem; font-size:0.9rem;">
-            Already have an account? <a href="login.php" style="color:var(--accent); font-weight:600;">Login here</a>
-        </p>
     </div>
 </div>
 

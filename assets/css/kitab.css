@@ -722,6 +722,8 @@ body {
 .k-auth-art__cols { display: flex; gap: 28px; align-items: flex-start; }
 .k-auth-art__col { display: flex; flex-direction: column; gap: 28px; }
 .k-auth-art__col:nth-child(2) { margin-top: 64px; }
+.k-auth-art--flip .k-auth-art__col:nth-child(1) { margin-top: 64px; }
+.k-auth-art--flip .k-auth-art__col:nth-child(2) { margin-top: 0; }
 .k-auth-cover { width: 170px; max-width: none; box-shadow: 0 1px 2px rgba(20, 22, 28, .2), 0 16px 30px -10px rgba(20, 22, 28, .4); }
 
 .k-authpage__main {
