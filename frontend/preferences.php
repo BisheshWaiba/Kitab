@@ -8,53 +8,101 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-$user_id = $_SESSION['user_id'];
+$user_id = (int) $_SESSION['user_id'];
 $error_message = '';
 
+// value stored in the database => label shown on the page
+$genre_options = [
+    'Arts' => 'Arts & Photography',
+    'Business' => 'Business & Investing',
+    'Fiction' => 'Fiction & Literature',
+    'Languages' => 'Foreign Languages',
+    'History' => 'History & Social Science',
+    'Kids' => 'Kids & Teens',
+    'Wellness' => 'Lifestyle & Wellness',
+    'Graphic Novels' => 'Manga & Graphic Novels',
+];
+
+// Current settings, so this page also works as "Settings" without wiping what is already saved
+$current = $conn->query("SELECT profile_picture, favorite_genres FROM users WHERE id = $user_id");
+$current = $current ? $current->fetch_assoc() : null;
+$saved_genres = $current && !empty($current['favorite_genres']) ? explode(',', $current['favorite_genres']) : [];
+$saved_picture = $current['profile_picture'] ?? '';
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // 1. ENSURE COLUMNS EXIST (Self-Healing)
-    $columns = [
-        'favorite_genres' => 'TEXT',
-        'profile_picture' => 'VARCHAR(255) DEFAULT NULL'
-    ];
+    // Genres: only accept the options this page offers
+    $posted_genres = isset($_POST['genres']) && is_array($_POST['genres']) ? $_POST['genres'] : [];
+    $genres_list = array_values(array_intersect(array_keys($genre_options), $posted_genres));
+    $saved_genres = $genres_list; // keep the choices on screen if something below fails
 
-    foreach ($columns as $col => $def) {
-        $check = $conn->query("SHOW COLUMNS FROM users LIKE '$col'");
-        if ($check && $check->num_rows == 0) {
-            // Column missing, try to add it
-            $conn->query("ALTER TABLE users ADD $col $def");
+    // 1. VALIDATE UPLOAD (before anything is saved)
+    $new_picture = null;
+    if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] != UPLOAD_ERR_NO_FILE) {
+        $file = $_FILES['profile_pic'];
+        $allowed_types = [
+            IMAGETYPE_JPEG => 'jpg',
+            IMAGETYPE_PNG => 'png',
+            IMAGETYPE_GIF => 'gif',
+            IMAGETYPE_WEBP => 'webp',
+        ];
+        $image_info = $file['error'] == UPLOAD_ERR_OK ? @getimagesize($file['tmp_name']) : false;
+
+        if ($file['error'] == UPLOAD_ERR_INI_SIZE || $file['error'] == UPLOAD_ERR_FORM_SIZE || $file['size'] > 2 * 1024 * 1024) {
+            $error_message = 'That photo is too large. Please choose an image under 2 MB.';
+        } elseif (!$image_info || !isset($allowed_types[$image_info[2]])) {
+            $error_message = 'Please upload a JPG, PNG, GIF or WebP image.';
+        } else {
+            // 2. SAVE UPLOAD (the extension comes from the detected image type, never from the file name)
+            $target_dir = dirname(__DIR__) . "/uploads/profiles/";
+            if (!file_exists($target_dir)) {
+                mkdir($target_dir, 0777, true);
+            }
+            $new_filename = "user_" . $user_id . "_" . time() . "." . $allowed_types[$image_info[2]];
+            if (move_uploaded_file($file['tmp_name'], $target_dir . $new_filename)) {
+                // Store relative path from project root
+                $new_picture = "uploads/profiles/" . $new_filename;
+            } else {
+                $error_message = 'Sorry, the photo could not be saved. Please try again.';
+            }
         }
     }
 
-    // 2. PROCESS UPLOAD
-    if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] == 0) {
-        $target_dir = dirname(__DIR__) . "/uploads/profiles/";
-        if (!file_exists($target_dir)) {
-            mkdir($target_dir, 0777, true);
-        }
-        $file_extension = pathinfo($_FILES["profile_pic"]["name"], PATHINFO_EXTENSION);
-        $new_filename = "user_" . $user_id . "_" . time() . "." . $file_extension;
-        $target_file = $target_dir . $new_filename;
+    if ($error_message === '') {
+        // 3. ENSURE COLUMNS EXIST (Self-Healing)
+        $columns = [
+            'favorite_genres' => 'TEXT',
+            'profile_picture' => 'VARCHAR(255) DEFAULT NULL'
+        ];
 
-        if (move_uploaded_file($_FILES["profile_pic"]["tmp_name"], $target_file)) {
-            // Store relative path from project root
-            $db_path = "uploads/profiles/" . $new_filename;
-            $conn->query("UPDATE users SET profile_picture = '$db_path' WHERE id = $user_id");
+        foreach ($columns as $col => $def) {
+            $check = $conn->query("SHOW COLUMNS FROM users LIKE '$col'");
+            if ($check && $check->num_rows == 0) {
+                // Column missing, try to add it
+                $conn->query("ALTER TABLE users ADD $col $def");
+            }
+        }
+
+        if ($new_picture !== null) {
+            $conn->query("UPDATE users SET profile_picture = '" . $conn->real_escape_string($new_picture) . "' WHERE id = $user_id");
+            $saved_picture = $new_picture;
+        }
+
+        // 4. PROCESS GENRES
+        $genres = $conn->real_escape_string(implode(',', $genres_list));
+        $sql = "UPDATE users SET favorite_genres = '$genres' WHERE id = $user_id";
+
+        if ($conn->query($sql) === TRUE) {
+            header("Location: ../index.php");
+            exit();
+        } else {
+            $error_message = 'Something went wrong saving your profile. Please try again.';
         }
     }
+}
 
-    // 3. PROCESS GENRES
-    $genres = isset($_POST['genres']) ? implode(',', $_POST['genres']) : '';
-    $genres = $conn->real_escape_string($genres);
-
-    $sql = "UPDATE users SET favorite_genres = '$genres' WHERE id = $user_id";
-
-    if ($conn->query($sql) === TRUE) {
-        header("Location: index.php");
-        exit();
-    } else {
-        $error_message = "Database Error: " . $conn->error;
-    }
+$picture_url = '';
+if ($saved_picture !== '') {
+    $picture_url = strpos($saved_picture, 'http') === 0 ? $saved_picture : BASE_URL . $saved_picture;
 }
 ?>
 <!DOCTYPE html>
@@ -64,295 +112,62 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personalize Your Experience - KITAB</title>
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        body {
-            background-color: #f8fafc;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .pref-container {
-            width: 100%;
-            max-width: 1000px;
-            background: #ffffff;
-            border-radius: 24px;
-            padding: 3rem 3rem 4rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.05);
-            /* Soft drop shadow */
-            margin: 2rem;
-        }
-
-        .pref-header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        .pref-header h2 {
-            font-size: 2rem;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-            position: relative;
-            display: inline-block;
-        }
-
-        /* Highlight effect like in the image */
-        .highlight {
-            background: linear-gradient(120deg, #dbeafe 0%, #dbeafe 100%);
-            background-repeat: no-repeat;
-            background-size: 100% 40%;
-            background-position: 0 80%;
-        }
-
-        .pref-header p {
-            color: var(--text-light);
-            font-size: 1.1rem;
-        }
-
-        .avatar-upload {
-            position: relative;
-            max-width: 150px;
-            margin: 0 auto 3rem;
-            text-align: center;
-        }
-
-        .avatar-preview {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: 4px solid #f1f5f9;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            background-size: cover;
-            background-position: center;
-            background-image: url('https://ui-avatars.com/api/?name=User&background=eff6ff&color=3b82f6');
-            margin: 0 auto;
-        }
-
-        .upload-btn-wrapper {
-            margin-top: 1rem;
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-        }
-
-        .btn-upload {
-            border: 1px solid #cbd5e1;
-            color: var(--text-dark);
-            background-color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .upload-btn-wrapper input[type=file] {
-            font-size: 100px;
-            position: absolute;
-            left: 0;
-            top: 0;
-            opacity: 0;
-            cursor: pointer;
-        }
-
-        .genre-grid-select {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 3rem;
-        }
-
-        .genre-option {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
-            padding: 2rem 1.5rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1.25rem;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .genre-option:hover {
-            border-color: #cbd5e1;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
-        }
-
-        .genre-option input {
-            position: absolute;
-            opacity: 0;
-            cursor: pointer;
-            height: 0;
-            width: 0;
-        }
-
-        .genre-option.selected {
-            border-color: var(--accent);
-            background: #eff6ff;
-            /* light blue bg */
-            box-shadow: 0 0 0 2px var(--accent) inset;
-        }
-
-        .icon-box {
-            font-size: 2rem;
-            color: #94a3b8;
-            transition: color 0.2s;
-        }
-
-        .genre-option.selected .icon-box {
-            color: var(--accent);
-        }
-
-        .genre-label {
-            font-weight: 600;
-            color: var(--text-dark);
-            font-size: 0.95rem;
-        }
-
-        .btn-submit {
-            background: #3b82f6;
-            color: white;
-            border: none;
-            padding: 0.75rem 2rem;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: block;
-            margin: 2rem auto 0;
-            width: auto;
-            max-width: 250px;
-            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
-        }
-
-        .btn-submit:hover {
-            background: #2563eb;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.4);
-        }
-
-        .error-banner {
-            background-color: #fee2e2;
-            color: #b91c1c;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/style.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/kitab.css">
 </head>
 
 <body>
 
-    <div class="pref-container">
-        <div class="pref-header">
-            <h2>Setup your <span class="highlight">Profile</span></h2>
-            <p>Add a photo and select your favorite genres</p>
-        </div>
+    <div class="k-setup">
+        <a href="<?php echo BASE_URL; ?>index.php" class="k-logo">KITAB<span>.</span></a>
 
-        <?php if ($error_message): ?>
-            <div class="error-banner">
-                <?php echo htmlspecialchars($error_message); ?>
+        <form method="POST" enctype="multipart/form-data" class="k-card k-setup__card">
+            <div class="k-setup__head">
+                <h1 class="k-h1">Setup your <em>Profile</em></h1>
+                <p>Add a photo and select your favorite genres</p>
             </div>
-        <?php endif; ?>
 
-        <form method="POST" enctype="multipart/form-data">
-            <div class="avatar-upload">
-                <div class="avatar-preview" id="imagePreview"></div>
-                <div class="upload-btn-wrapper">
-                    <button type="button" class="btn-upload" onclick="document.getElementById('profile_pic').click()"><i
-                            class="fas fa-camera"></i> Upload Photo</button>
-                    <input type="file" id="profile_pic" name="profile_pic" onchange="readURL(this);">
+            <?php if ($error_message): ?>
+                <div class="k-alert k-alert--error k-setup__alert" role="alert">
+                    <?php echo htmlspecialchars($error_message); ?>
                 </div>
+            <?php endif; ?>
+
+            <div class="k-avatar-upload" data-avatar>
+                <div class="k-avatar-upload__preview<?php echo $picture_url !== '' ? ' has-image' : ''; ?>"
+                    data-avatar-preview>
+                    <img class="k-avatar-upload__img" alt="Your profile photo"
+                        <?php echo $picture_url !== '' ? 'src="' . htmlspecialchars($picture_url) . '"' : ''; ?>>
+                    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M4 8h3l1.6-2.4h6.8L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z" />
+                        <circle cx="12" cy="13" r="3.6" />
+                    </svg>
+                </div>
+                <button type="button" class="k-btn k-btn--outline k-btn--sm" data-avatar-pick>Upload Photo</button>
+                <input type="file" id="profile_pic" name="profile_pic" accept="image/jpeg,image/png,image/gif,image/webp"
+                    hidden>
             </div>
 
-            <div class="genre-grid-select">
-                <label class="genre-option">
-                    <input type="checkbox" name="genres[]" value="Arts">
-                    <div class="icon-box"><i class="fas fa-palette"></i></div>
-                    <span class="genre-label">Arts & Photography</span>
-                </label>
-
-                <label class="genre-option">
-                    <input type="checkbox" name="genres[]" value="Business">
-                    <div class="icon-box"><i class="fas fa-briefcase"></i></div>
-                    <span class="genre-label">Business & Investing</span>
-                </label>
-
-                <label class="genre-option">
-                    <input type="checkbox" name="genres[]" value="Fiction">
-                    <div class="icon-box"><i class="fas fa-theater-masks"></i></div>
-                    <span class="genre-label">Fiction & Literature</span>
-                </label>
-
-                <label class="genre-option">
-                    <input type="checkbox" name="genres[]" value="Languages">
-                    <div class="icon-box"><i class="fas fa-language"></i></div>
-                    <span class="genre-label">Foreign Languages</span>
-                </label>
-
-                <label class="genre-option">
-                    <input type="checkbox" name="genres[]" value="History">
-                    <div class="icon-box"><i class="fas fa-landmark"></i></div>
-                    <span class="genre-label">History & Social Science</span>
-                </label>
-
-                <label class="genre-option">
-                    <input type="checkbox" name="genres[]" value="Kids">
-                    <div class="icon-box"><i class="fas fa-child"></i></div>
-                    <span class="genre-label">Kids & Teens</span>
-                </label>
-
-                <label class="genre-option">
-                    <input type="checkbox" name="genres[]" value="Wellness">
-                    <div class="icon-box"><i class="fas fa-running"></i></div>
-                    <span class="genre-label">Lifestyle & Wellness</span>
-                </label>
-
-                <label class="genre-option">
-                    <input type="checkbox" name="genres[]" value="Graphic Novels">
-                    <div class="icon-box"><i class="fas fa-book-reader"></i></div>
-                    <span class="genre-label">Manga & Graphic Novels</span>
-                </label>
+            <div class="k-tiles">
+                <?php foreach ($genre_options as $value => $label): ?>
+                    <label class="k-tile">
+                        <input type="checkbox" name="genres[]" value="<?php echo htmlspecialchars($value); ?>"
+                            <?php echo in_array($value, $saved_genres, true) ? 'checked' : ''; ?>>
+                        <span><?php echo htmlspecialchars($label); ?></span>
+                    </label>
+                <?php endforeach; ?>
             </div>
 
-            <button type="submit" class="btn-submit">Continue</button>
+            <button type="submit" class="k-btn k-btn--primary k-btn--block">Continue</button>
         </form>
     </div>
 
-    <script>
-        document.querySelectorAll('.genre-option input').forEach(input => {
-            input.addEventListener('change', function () {
-                if (this.checked) {
-                    this.parentElement.classList.add('selected');
-                } else {
-                    this.parentElement.classList.remove('selected');
-                }
-            });
-        });
-
-        function readURL(input) {
-            if (input.files && input.files[0]) {
-                var reader = new FileReader();
-                reader.onload = function (e) {
-                    document.getElementById('imagePreview').style.backgroundImage = 'url(' + e.target.result + ')';
-                    document.getElementById('imagePreview').style.display = 'block';
-                }
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-    </script>
-
+    <script src="<?php echo BASE_URL; ?>assets/js/main.js"></script>
 </body>
 
 </html>

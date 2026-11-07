@@ -1,3 +1,27 @@
+// Profile setup: photo picker with live preview
+document.querySelectorAll('[data-avatar]').forEach(function (box) {
+    var input = box.querySelector('input[type="file"]');
+    var pick = box.querySelector('[data-avatar-pick]');
+    var preview = box.querySelector('[data-avatar-preview]');
+    var img = preview.querySelector('img');
+
+    pick.addEventListener('click', function () {
+        input.click();
+    });
+    input.addEventListener('change', function () {
+        var file = input.files && input.files[0];
+        if (!file) {
+            return;
+        }
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            img.src = e.target.result;
+            preview.classList.add('has-image');
+        };
+        reader.readAsDataURL(file);
+    });
+});
+
 // Product page: quantity stepper
 document.querySelectorAll('[data-qty]').forEach(function (box) {
     var input = box.querySelector('input');
