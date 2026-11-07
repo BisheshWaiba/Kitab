@@ -1,4 +1,6 @@
 <?php
+// Buffer output so pages can still redirect with header() after including this file.
+ob_start();
 session_start();
 $cart_count = 0;
 if (isset($_SESSION['cart'])) {
