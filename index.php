@@ -1,7 +1,6 @@
 <?php
 require_once 'config/db.php';
 require_once 'includes/helpers.php';
-$body_class = 'k-home'; // scopes the Home-only touches (selection color, scrollbar, control accent)
 require_once 'includes/header.php';
 
 // Hero shelf: the first seven books that have a cover
@@ -29,8 +28,8 @@ foreach ($curated_cats as $cat) {
 $genres = ['Fiction', 'Business', 'Tech', 'Science', 'History', 'Biography', 'Self-Help', 'Mystery', 'Romance', 'Fantasy'];
 
 $book_sections = [
-    ['title' => 'Best Sellers', 'sub' => 'Books everyone is reading right now', 'books' => $result_best, 'band' => true],
-    ['title' => 'New Arrivals', 'sub' => 'Fresh from the press', 'books' => $result_new, 'band' => false],
+    ['title' => 'Best Sellers', 'sub' => 'Books everyone is reading right now', 'books' => $result_best, 'white' => true],
+    ['title' => 'New Arrivals', 'sub' => 'Fresh from the press', 'books' => $result_new, 'white' => false],
 ];
 ?>
 
@@ -73,7 +72,7 @@ $book_sections = [
 
 <!-- Best Sellers, New Arrivals -->
 <?php foreach ($book_sections as $section): ?>
-    <section class="<?php echo $section['band'] ? 'k-section--band' : ''; ?>">
+    <section class="<?php echo $section['white'] ? 'k-section--white' : ''; ?>">
         <div class="k-section__inner">
             <div class="k-section__head">
                 <div>
@@ -87,9 +86,9 @@ $book_sections = [
                     </svg>
                 </a>
             </div>
-            <div class="k-grid k-grid--shelf">
+            <div class="k-grid">
                 <?php while ($row = $section['books']->fetch_assoc()): ?>
-                    <?php k_book_card($row, true); ?>
+                    <?php k_book_card($row); ?>
                 <?php endwhile; ?>
             </div>
         </div>

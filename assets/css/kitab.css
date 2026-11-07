@@ -27,11 +27,6 @@ body {
   color: var(--k-ink);
 }
 
-/* Home page only: browser surfaces that would otherwise ship with defaults */
-.k-home { accent-color: var(--k-accent); }
-.k-home::selection, .k-home ::selection { background: var(--k-accent); color: #fff; }
-html:has(.k-home) { scrollbar-color: #B8BAC4 var(--k-paper); }
-
 /* ---------- Buttons ---------- */
 .k-btn {
   display: inline-flex;
@@ -330,9 +325,6 @@ html:has(.k-home) { scrollbar-color: #B8BAC4 var(--k-paper); }
   text-transform: uppercase;
   color: var(--k-accent);
 }
-/* Home page only: category beside the author */
-.k-book__catline { color: var(--k-ink-2); }
-.k-book__sep { margin: 0 6px; color: #A2A5B2; }
 
 .k-book__title {
   display: -webkit-box;
@@ -452,7 +444,7 @@ html:has(.k-home) { scrollbar-color: #B8BAC4 var(--k-paper); }
 }
 
 /* ---------- Home: genres ---------- */
-.k-genres { max-width: 1280px; margin: 0 auto; padding: 88px 40px 96px; box-sizing: border-box; }
+.k-genres { max-width: 1280px; margin: 0 auto; padding: 88px 40px 88px; box-sizing: border-box; }
 
 .k-genres__list {
   display: flex;
@@ -477,10 +469,10 @@ html:has(.k-home) { scrollbar-color: #B8BAC4 var(--k-paper); }
   color: var(--k-ink);
   transition: background-color .15s, border-color .15s, color .15s;
 }
-.k-genre:hover { background: var(--k-ink); border-color: var(--k-ink); color: #fff; }
+.k-genre:hover { background: var(--k-accent-tint); border-color: var(--k-accent); color: var(--k-accent); }
 
 /* ---------- Home: book sections ---------- */
-.k-section--band { background: var(--k-band); border-top: 1px solid var(--k-line); border-bottom: 1px solid var(--k-line); }
+.k-section--white { background: var(--k-white); border-top: 1px solid var(--k-line); border-bottom: 1px solid var(--k-line); }
 
 .k-section__inner {
   max-width: 1280px;
@@ -518,59 +510,10 @@ html:has(.k-home) { scrollbar-color: #B8BAC4 var(--k-paper); }
   gap: 36px 28px;
 }
 
-/* Shelf variant (Home): covers stand on a plank instead of sitting in tinted boxes.
-   Columns have no gap; each card carries its own padding so the plank runs unbroken along a row. */
-.k-grid--shelf { grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 64px 0; margin: 0 -14px; }
-.k-grid--shelf .k-book { padding: 0 14px; gap: 0; }
-.k-grid--shelf .k-book__cover {
-  position: relative;
-  justify-content: flex-start;
-  align-items: flex-end;
-  margin-bottom: 12px;
-  padding: 0;
-  background: none;
-  border-radius: 0;
-}
-.k-grid--shelf .k-cover {
-  max-width: 212px;
-  border-radius: 2px 2px 0 0;
-  box-shadow: 0 1px 2px rgba(20, 22, 28, .28), 0 14px 22px -12px rgba(20, 22, 28, .4);
-  transition: transform .45s var(--k-ease), box-shadow .45s var(--k-ease);
-}
-.k-grid--shelf .k-cover--empty { border-radius: 2px 2px 0 0; }
-.k-grid--shelf .k-book__cover::after {
-  content: "";
-  position: absolute;
-  left: -14px;
-  right: -14px;
-  bottom: -12px;
-  height: 12px;
-  background: linear-gradient(#3A3D47, #15171C);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .14), 0 10px 14px -8px rgba(20, 22, 28, .4);
-}
-.k-grid--shelf .k-book__cover:hover .k-cover {
-  transform: translateY(-10px) rotate(-1.2deg);
-  box-shadow: 0 1px 2px rgba(20, 22, 28, .28), 0 26px 30px -14px rgba(20, 22, 28, .45);
-}
-.k-grid--shelf .k-book__info { margin-top: 32px; padding: 0; }
-.k-grid--shelf .k-book__foot { margin-top: auto; padding: 18px 0 0; }
-
 /* ---------- Home: our picks ---------- */
-.k-picks { position: relative; overflow: hidden; background: var(--k-ink); color: var(--k-paper); }
-/* a soft light from above-right, like a lit display table */
-.k-picks::before {
-  content: "";
-  position: absolute;
-  top: -30%;
-  right: -8%;
-  width: 62%;
-  aspect-ratio: 1;
-  background: radial-gradient(closest-side, rgba(255, 255, 255, .075), transparent);
-  pointer-events: none;
-}
+.k-picks { background: var(--k-ink); color: var(--k-paper); }
 
 .k-picks__inner {
-  position: relative;
   max-width: 1280px;
   margin: 0 auto;
   padding: 96px 40px;
@@ -602,9 +545,8 @@ html:has(.k-home) { scrollbar-color: #B8BAC4 var(--k-paper); }
 
 .k-picks__panel {
   display: none;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 212px));
-  justify-content: start;
-  gap: 40px 28px;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 28px 24px;
   align-items: start;
 }
 .k-picks__panel.is-active { display: grid; }
@@ -1411,10 +1353,7 @@ select.k-input { appearance: auto; }
   .k-bookshelf { margin-top: 44px; }
   .k-bookshelf__row { padding: 0 20px; gap: 10px; }
   .k-bookshelf__book:nth-child(n+5) { display: none; }
-  .k-genres { padding: 56px 20px 64px; }
-  .k-grid--shelf { margin: 0 -10px; }
-  .k-grid--shelf .k-book { padding: 0 10px; }
-  .k-grid--shelf .k-book__cover::after { left: -10px; right: -10px; }
+  .k-genres { padding: 56px 20px 56px; }
   .k-section__inner { padding: 56px 20px 64px; gap: 32px; }
   .k-picks__inner { grid-template-columns: minmax(0, 1fr); padding: 64px 20px; gap: 40px; }
   .k-footer__inner { padding: 56px 20px 28px; gap: 40px; }
@@ -1430,19 +1369,11 @@ select.k-input { appearance: auto; }
 
 @media (max-width: 560px) {
   .k-bookshelf__book:nth-child(n+4) { display: none; }
-
-  /* two books per shelf row on phones */
-  .k-grid--shelf { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 48px 0; }
-  .k-grid--shelf .k-cover { max-width: 100%; }
-  .k-grid--shelf .k-book__info { margin-top: 28px; }
-  .k-grid--shelf .k-book__title { font-size: 17px; }
-  .k-grid--shelf .k-book__foot { flex-direction: column; align-items: stretch; gap: 10px; padding-top: 14px; }
-  .k-grid--shelf .k-book__foot .k-btn { width: 100%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .k-btn, .k-genre, .k-chip, .k-cover, .k-search, .k-bookshelf__book, .k-bookshelf__img { transition: none; }
   .k-bookshelf__book { animation: none; }
-  .k-book__cover:hover .k-cover, .k-pick:hover .k-cover, .k-grid--shelf .k-book__cover:hover .k-cover { transform: none; }
+  .k-book__cover:hover .k-cover, .k-pick:hover .k-cover { transform: none; }
   .k-bookshelf__book:hover { translate: none; }
 }

@@ -33,7 +33,7 @@ $user_initial = isset($_SESSION['user_name']) ? strtoupper(mb_substr($_SESSION['
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/kitab.css">
 </head>
 
-<body<?php echo !empty($body_class) ? ' class="' . htmlspecialchars($body_class) . '"' : ''; ?>>
+<body>
 
     <div class="k-announce">Free shipping on orders over Rs. 2,000</div>
 
