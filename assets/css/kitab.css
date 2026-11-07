@@ -215,7 +215,7 @@ body {
 .k-footer__inner {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 72px 40px 36px;
+  padding: 72px 40px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -247,20 +247,6 @@ body {
 }
 .k-footer__col a { display: inline-block; padding: 6px 0; }
 .k-footer a:hover { color: var(--k-ink); text-decoration: underline; text-underline-offset: 3px; }
-
-.k-footer__bottom {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  padding-top: 28px;
-  border-top: 1px solid var(--k-line);
-  font-size: 14px;
-  color: var(--k-muted);
-}
-.k-footer__social { display: flex; gap: 24px; }
-.k-footer__social a { display: inline-block; padding: 8px 0; color: var(--k-ink-2); }
 
 /* ---------- Shared section bits ---------- */
 .k-h2 {
@@ -1356,7 +1342,7 @@ select.k-input { appearance: auto; }
   .k-genres { padding: 56px 20px 56px; }
   .k-section__inner { padding: 56px 20px 64px; gap: 32px; }
   .k-picks__inner { grid-template-columns: minmax(0, 1fr); padding: 64px 20px; gap: 40px; }
-  .k-footer__inner { padding: 56px 20px 28px; gap: 40px; }
+  .k-footer__inner { padding: 56px 20px; gap: 40px; }
   .k-h2 { font-size: 32px; }
   .k-picks__title { font-size: 38px; }
 }

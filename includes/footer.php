@@ -22,15 +22,6 @@
                 </ul>
             </div>
         </div>
-
-        <div class="k-footer__bottom">
-            <span>KITAB. All rights reserved</span>
-            <div class="k-footer__social">
-                <a href="#">Instagram</a>
-                <a href="#">X</a>
-                <a href="#">Facebook</a>
-            </div>
-        </div>
     </div>
     <script src="<?php echo BASE_URL; ?>assets/js/main.js"></script>
 </footer>
