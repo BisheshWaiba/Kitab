@@ -79,9 +79,8 @@ function k_book_card(array $b): void
             <?php k_cover($b); ?>
         </a>
         <div class="k-book__info">
-            <span class="k-book__cat"><?php echo htmlspecialchars($b['category']); ?></span>
             <a class="k-book__title" href="<?php echo $href; ?>"><?php echo htmlspecialchars($b['title']); ?></a>
-            <span class="k-book__author">by <?php echo htmlspecialchars($b['author']); ?></span>
+            <span class="k-book__author">by <?php echo htmlspecialchars($b['author']); ?><?php if ((string) $b['category'] !== ''): ?><span class="k-book__sep" aria-hidden="true">&middot;</span><span class="k-book__cat"><?php echo htmlspecialchars($b['category']); ?></span><?php endif; ?></span>
         </div>
         <div class="k-book__foot">
             <span class="k-book__price">Rs. <?php echo number_format((float) $b['price']); ?></span>

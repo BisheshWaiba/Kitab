@@ -3,8 +3,8 @@ require_once 'config/db.php';
 require_once 'includes/helpers.php';
 require_once 'includes/header.php';
 
-// Hero shelf: the first three books that have a cover
-$hero_books = $conn->query("SELECT id, title, image FROM books WHERE image IS NOT NULL AND image <> '' ORDER BY id ASC LIMIT 3");
+// Hero shelf: the first seven books that have a cover
+$hero_books = $conn->query("SELECT id, title, image FROM books WHERE image IS NOT NULL AND image <> '' ORDER BY id ASC LIMIT 7");
 
 // Fetch Best Sellers (Random)
 $sql_best = "SELECT * FROM books ORDER BY RAND() LIMIT 4";
@@ -28,30 +28,33 @@ foreach ($curated_cats as $cat) {
 $genres = ['Fiction', 'Business', 'Tech', 'Science', 'History', 'Biography', 'Self-Help', 'Mystery', 'Romance', 'Fantasy'];
 
 $book_sections = [
-    ['title' => 'Best Sellers', 'sub' => 'Books everyone is reading right now', 'books' => $result_best, 'white' => true],
-    ['title' => 'New Arrivals', 'sub' => 'Fresh from the press', 'books' => $result_new, 'white' => false],
+    ['title' => 'Best Sellers', 'sub' => 'Books everyone is reading right now', 'books' => $result_best, 'band' => true],
+    ['title' => 'New Arrivals', 'sub' => 'Fresh from the press', 'books' => $result_new, 'band' => false],
 ];
 ?>
 
 <!-- Hero -->
 <section class="k-hero">
     <div class="k-hero__inner">
-        <div class="k-hero__copy">
-            <h1>Discover Your Next <em>Favorite Book</em></h1>
+        <h1>Discover Your Next <em>Favorite Book</em></h1>
+        <div class="k-hero__side">
             <p>Explore thousands of titles from fiction to tech. Free shipping on orders over Rs. 2,000.</p>
             <div class="k-hero__cta">
                 <a href="<?php echo BASE_URL; ?>frontend/shop.php" class="k-btn k-btn--primary k-btn--lg">Shop Now</a>
                 <a href="<?php echo BASE_URL; ?>frontend/register.php" class="k-btn k-btn--outline k-btn--lg">Join KITAB</a>
             </div>
         </div>
-        <div class="k-shelf">
-            <div class="k-shelf__books">
-                <?php while ($b = $hero_books->fetch_assoc()): ?>
-                    <?php k_cover($b, 'k-shelf__book', false); ?>
-                <?php endwhile; ?>
-            </div>
-            <div class="k-shelf__board"></div>
+    </div>
+    <div class="k-bookshelf">
+        <div class="k-bookshelf__row">
+            <?php while ($b = $hero_books->fetch_assoc()): ?>
+                <a class="k-bookshelf__book" href="<?php echo BASE_URL; ?>frontend/product.php?id=<?php echo (int) $b['id']; ?>"
+                    aria-label="<?php echo htmlspecialchars($b['title']); ?>">
+                    <?php k_cover($b, 'k-bookshelf__img', false); ?>
+                </a>
+            <?php endwhile; ?>
         </div>
+        <div class="k-bookshelf__plank"></div>
     </div>
 </section>
 
@@ -69,7 +72,7 @@ $book_sections = [
 
 <!-- Best Sellers, New Arrivals -->
 <?php foreach ($book_sections as $section): ?>
-    <section class="<?php echo $section['white'] ? 'k-section--white' : ''; ?>">
+    <section class="<?php echo $section['band'] ? 'k-section--band' : ''; ?>">
         <div class="k-section__inner">
             <div class="k-section__head">
                 <div>
@@ -83,7 +86,7 @@ $book_sections = [
                     </svg>
                 </a>
             </div>
-            <div class="k-grid">
+            <div class="k-grid k-grid--shelf">
                 <?php while ($row = $section['books']->fetch_assoc()): ?>
                     <?php k_book_card($row); ?>
                 <?php endwhile; ?>
