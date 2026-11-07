@@ -1,7 +1,11 @@
 <?php
 require_once '../config/db.php';
 require_once '../includes/helpers.php';
-require_once '../includes/header.php';
+// The book is looked up (and add-to-cart handled) before the header is output, so the tab title
+// and the cart badge in the header are correct. That needs the session started first.
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 if (!isset($_GET['id'])) {
     header("Location: shop.php");
@@ -13,6 +17,8 @@ $sql = "SELECT * FROM books WHERE id = $id";
 $result = $conn->query($sql);
 
 if ($result->num_rows == 0) {
+    $page_title = 'Book not found';
+    require_once '../includes/header.php';
     echo "<div class='k-page'>
     <div class='k-empty'>
         <p>Book not found.</p>
@@ -40,13 +46,13 @@ if (isset($_POST['add_to_cart'])) {
         $_SESSION['cart'][$book_id] = $quantity;
     }
 
-    // Refresh to update header cart count
-    echo "
-<script>window.location.href = 'cart.php';</script>";
+    header("Location: cart.php");
     exit();
 }
 
 $description = trim((string) ($book['description'] ?? ''));
+$page_title = $book['title'];
+require_once '../includes/header.php';
 ?>
 
 <section class="k-product">
@@ -112,9 +118,10 @@ $description = trim((string) ($book['description'] ?? ''));
 
 <!-- Related Products -->
 <?php
-$current_id = $book['id'];
-$cat = $conn->real_escape_string($book['category']);
-$sql_related = "SELECT * FROM books WHERE category = '$cat' AND id != $current_id LIMIT 3";
+// Same-category books first; when there are fewer than three, fill up with other books
+$current_id = (int) $book['id'];
+$cat = $conn->real_escape_string((string) $book['category']);
+$sql_related = "SELECT * FROM books WHERE id != $current_id ORDER BY (category = '$cat') DESC, RAND() LIMIT 3";
 $result_related = $conn->query($sql_related);
 
 if ($result_related->num_rows > 0):
