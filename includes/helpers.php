@@ -14,6 +14,29 @@ function k_cover(array $b, string $class = 'k-cover', bool $lazy = true): void
         . ($lazy ? ' loading="lazy"' : '') . '>';
 }
 
+// Decorative covers beside the login/register forms. $offset chooses which books.
+function k_auth_art(mysqli $conn, int $offset = 0): void
+{
+    $rows = $conn->query("SELECT id, title, image FROM books WHERE image IS NOT NULL AND image <> '' ORDER BY id ASC LIMIT 4 OFFSET " . $offset);
+    $books = $rows ? $rows->fetch_all(MYSQLI_ASSOC) : [];
+    if (!$books) {
+        return;
+    }
+    ?>
+    <div class="k-auth-art" aria-hidden="true">
+        <div class="k-auth-art__cols">
+            <?php foreach (array_chunk($books, 2) as $column): ?>
+                <div class="k-auth-art__col">
+                    <?php foreach ($column as $b) {
+                        k_cover($b, 'k-cover k-auth-cover', false);
+                    } ?>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <?php
+}
+
 function k_book_card(array $b): void
 {
     $href = BASE_URL . 'frontend/product.php?id=' . (int) $b['id'];
