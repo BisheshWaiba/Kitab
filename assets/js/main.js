@@ -1,3 +1,18 @@
+// Shop: on phones the category chips scroll sideways, so bring the chosen one into view
+function showActiveCategory() {
+    var activeCategory = document.querySelector('.k-cats .is-active');
+    if (activeCategory && activeCategory.scrollIntoView) {
+        activeCategory.scrollIntoView({ block: 'nearest', inline: 'center' });
+    }
+}
+if (document.querySelector('.k-cats')) {
+    // Run again once the page and web fonts have settled, because the chips change width when the font loads
+    window.addEventListener('load', showActiveCategory);
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(showActiveCategory);
+    }
+}
+
 // Image pickers (profile setup, sell a book): choose button with live preview
 document.querySelectorAll('[data-upload]').forEach(function (box) {
     var input = box.querySelector('input[type="file"]');

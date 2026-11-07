@@ -23,8 +23,9 @@ if (!empty($where_clauses)) {
 $sql = "SELECT * FROM books $where_sql ORDER BY created_at DESC";
 $result = $conn->query($sql);
 
-$has_search = isset($_GET['search']);
-$has_category = !empty($_GET['category']);
+// Category types shown above the books
+$cat_result = $conn->query("SELECT DISTINCT category FROM books WHERE category IS NOT NULL AND category <> '' ORDER BY category ASC");
+$active_category = $_GET['category'] ?? '';
 ?>
 
 <section class="k-pagehead">
@@ -36,18 +37,23 @@ $has_category = !empty($_GET['category']);
 
 <div class="k-shop">
     <main class="k-shop__main">
-        <?php if ($has_search || $has_category): ?>
-            <div class="k-filters">
-                <?php if ($has_search): ?>
-                    <p class="k-results">Search results for
-                        "<strong><?php echo htmlspecialchars($_GET['search']); ?></strong>"</p>
-                <?php endif; ?>
-                <?php if ($has_category): ?>
-                    <p class="k-results">Showing <strong><?php echo htmlspecialchars($_GET['category']); ?></strong>
-                        <span aria-hidden="true">&middot;</span>
-                        <a href="shop.php" class="k-results__clear">Show all books</a></p>
-                <?php endif; ?>
-            </div>
+        <nav aria-label="Book categories">
+            <ul class="k-cats">
+                <li><a href="shop.php" class="k-genre<?php echo $active_category === '' ? ' is-active' : ''; ?>"
+                        <?php echo $active_category === '' ? 'aria-current="page"' : ''; ?>>All</a></li>
+                <?php while ($cat = $cat_result->fetch_assoc()): ?>
+                    <?php $is_active = ($active_category === $cat['category']); ?>
+                    <li><a href="shop.php?category=<?php echo urlencode($cat['category']); ?>"
+                            class="k-genre<?php echo $is_active ? ' is-active' : ''; ?>"
+                            <?php echo $is_active ? 'aria-current="page"' : ''; ?>><?php echo htmlspecialchars($cat['category']); ?></a>
+                    </li>
+                <?php endwhile; ?>
+            </ul>
+        </nav>
+
+        <?php if (isset($_GET['search'])): ?>
+            <p class="k-results">Search results for
+                "<strong><?php echo htmlspecialchars($_GET['search']); ?></strong>"</p>
         <?php endif; ?>
 
         <?php if ($result->num_rows > 0): ?>
