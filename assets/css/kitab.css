@@ -11,9 +11,10 @@
   --k-ink-2: #454A57;
   --k-muted: #5C6170;
   --k-line: #E2E2DB;
-  --k-accent: #2A3B9E;
-  --k-accent-dark: #1F2C7A;
-  --k-accent-tint: #E8EAF8;
+  --k-accent: #0E6B65;
+  --k-accent-dark: #0A524D;
+  --k-accent-tint: #E2F0EE;
+  --k-accent-wash: #EDF6F5;
   --k-gold: #F2B134;
   --k-red: #B3261E;
   --k-display: 'Fraunces', Georgia, serif;
@@ -954,7 +955,7 @@ select.k-input { appearance: auto; }
 }
 .k-tile input { width: 20px; height: 20px; margin: 0; flex: 0 0 auto; accent-color: var(--k-accent); }
 .k-tile:hover { border-color: #B8BAC4; }
-.k-tile:has(input:checked) { border-color: var(--k-accent); background: #F1F2FB; }
+.k-tile:has(input:checked) { border-color: var(--k-accent); background: var(--k-accent-wash); }
 .k-tile:has(input:focus-visible) { outline: 3px solid var(--k-accent); outline-offset: 2px; }
 
 @media (max-width: 640px) {
@@ -1094,12 +1095,12 @@ select.k-input { appearance: auto; }
 
 .k-pill { display: inline-block; padding: 5px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; }
 .k-pill--pending { background: #FCEFD0; color: #7A4A00; }
-.k-pill--processing { background: var(--k-accent-tint); color: var(--k-accent); }
+.k-pill--processing { background: #E8EAF8; color: #2A3B9E; } /* a status color, deliberately not tied to the brand color */
 .k-pill--shipped { background: #DCEBF7; color: #1B5280; }
 .k-pill--delivered { background: #DDF1E6; color: #17663F; }
 .k-pill--cancelled { background: #FBE3E1; color: #8C1D18; }
 .k-pill--admin { background: var(--k-accent-tint); color: var(--k-accent); }
-.k-pill--user { background: #DDF1E6; color: #17663F; }
+.k-pill--user { background: #ECECE6; color: #454A57; } /* neutral, so it never reads as the teal brand pill or the green "delivered" status */
 
 @media (max-width: 900px) {
   .k-hello__inner { padding: 40px 20px; }
@@ -1141,7 +1142,7 @@ select.k-input { appearance: auto; }
   cursor: pointer;
 }
 .k-radio input { width: 20px; height: 20px; margin: 0; accent-color: var(--k-accent); }
-.k-radio:has(input:checked) { border-color: var(--k-accent); background: #F1F2FB; }
+.k-radio:has(input:checked) { border-color: var(--k-accent); background: var(--k-accent-wash); }
 .k-radio:has(input:focus-visible) { outline: 3px solid var(--k-accent); outline-offset: 2px; }
 
 .k-sumitems { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 20px; }
