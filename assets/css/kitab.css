@@ -1066,6 +1066,8 @@ select.k-input { appearance: auto; }
 .k-pill--shipped { background: #DCEBF7; color: #1B5280; }
 .k-pill--delivered { background: #DDF1E6; color: #17663F; }
 .k-pill--cancelled { background: #FBE3E1; color: #8C1D18; }
+.k-pill--admin { background: var(--k-accent-tint); color: var(--k-accent); }
+.k-pill--user { background: #DDF1E6; color: #17663F; }
 
 @media (max-width: 900px) {
   .k-hello__inner { padding: 40px 20px; }
