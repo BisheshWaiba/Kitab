@@ -839,6 +839,7 @@ body {
 }
 .k-fields.k-fields--3 { grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr)); }
 .k-field__label { font-size: 14px; font-weight: 600; color: var(--k-ink); }
+.k-field__hint { font-weight: 400; color: var(--k-muted); }
 select.k-input { appearance: auto; }
 
 .k-alert--success { background: #DDF1E6; color: #17663F; }
