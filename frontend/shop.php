@@ -23,9 +23,8 @@ if (!empty($where_clauses)) {
 $sql = "SELECT * FROM books $where_sql ORDER BY created_at DESC";
 $result = $conn->query($sql);
 
-// Fetch Categories for Sidebar
-$cat_sql = "SELECT DISTINCT category FROM books ORDER BY category ASC";
-$cat_result = $conn->query($cat_sql);
+$has_search = isset($_GET['search']);
+$has_category = !empty($_GET['category']);
 ?>
 
 <section class="k-pagehead">
@@ -36,28 +35,19 @@ $cat_result = $conn->query($cat_sql);
 </section>
 
 <div class="k-shop">
-    <aside class="k-side">
-        <h2 class="k-side__title">Categories</h2>
-        <ul class="k-side__list">
-            <li><a href="shop.php" class="k-side__link<?php echo empty($_GET['category']) ? ' is-active' : ''; ?>"
-                    <?php echo empty($_GET['category']) ? 'aria-current="page"' : ''; ?>>All Categories</a></li>
-            <?php while ($cat = $cat_result->fetch_assoc()): ?>
-                <?php $is_active = (isset($_GET['category']) && $_GET['category'] == $cat['category']); ?>
-                <li>
-                    <a href="shop.php?category=<?php echo urlencode($cat['category']); ?>"
-                        class="k-side__link<?php echo $is_active ? ' is-active' : ''; ?>"
-                        <?php echo $is_active ? 'aria-current="page"' : ''; ?>>
-                        <?php echo htmlspecialchars($cat['category']); ?>
-                    </a>
-                </li>
-            <?php endwhile; ?>
-        </ul>
-    </aside>
-
     <main class="k-shop__main">
-        <?php if (isset($_GET['search'])): ?>
-            <p class="k-results">Search results for
-                "<strong><?php echo htmlspecialchars($_GET['search']); ?></strong>"</p>
+        <?php if ($has_search || $has_category): ?>
+            <div class="k-filters">
+                <?php if ($has_search): ?>
+                    <p class="k-results">Search results for
+                        "<strong><?php echo htmlspecialchars($_GET['search']); ?></strong>"</p>
+                <?php endif; ?>
+                <?php if ($has_category): ?>
+                    <p class="k-results">Showing <strong><?php echo htmlspecialchars($_GET['category']); ?></strong>
+                        <span aria-hidden="true">&middot;</span>
+                        <a href="shop.php" class="k-results__clear">Show all books</a></p>
+                <?php endif; ?>
+            </div>
         <?php endif; ?>
 
         <?php if ($result->num_rows > 0): ?>

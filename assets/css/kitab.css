@@ -569,40 +569,13 @@ body {
   align-items: flex-start;
 }
 
-.k-side { flex: 0 0 232px; position: sticky; top: 100px; display: flex; flex-direction: column; gap: 12px; }
+.k-shop__main { flex: 1 1 100%; min-width: 0; }
 
-.k-side__title {
-  margin: 0;
-  padding: 0 14px;
-  font-family: var(--k-body);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  color: var(--k-muted);
-}
-
-.k-side__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
-
-.k-side__link {
-  display: flex;
-  align-items: center;
-  height: 44px;
-  padding: 0 14px;
-  border-radius: 8px;
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--k-ink-2);
-  transition: background-color .15s, color .15s;
-}
-.k-side__link:hover { background: var(--k-band); color: var(--k-ink); }
-.k-side__link.is-active { background: var(--k-accent-tint); color: var(--k-accent); font-weight: 600; }
-.k-side__link:focus-visible { outline: 3px solid var(--k-accent); outline-offset: 2px; }
-
-.k-shop__main { flex: 999 1 640px; min-width: 0; }
-
-.k-results { margin: 0 0 28px; font-size: 16px; color: var(--k-ink-2); }
+.k-filters { display: flex; flex-direction: column; gap: 6px; margin: 0 0 28px; }
+.k-results { margin: 0; font-size: 16px; color: var(--k-ink-2); }
 .k-results strong { color: var(--k-ink); }
+.k-results__clear { font-weight: 600; color: var(--k-ink); text-decoration: underline; text-underline-offset: 3px; }
+.k-results__clear:focus-visible { outline: 3px solid var(--k-accent); outline-offset: 2px; }
 
 .k-empty {
   display: flex;
@@ -619,10 +592,6 @@ body {
 @media (max-width: 900px) {
   .k-pagehead__inner { padding: 40px 20px 32px; }
   .k-shop { padding: 32px 20px 64px; gap: 32px; }
-  .k-side { flex: 1 1 100%; position: static; }
-  .k-side__list { flex-direction: row; flex-wrap: wrap; gap: 8px; }
-  .k-side__link { height: 40px; padding: 0 16px; border: 1px solid var(--k-line); border-radius: 999px; background: var(--k-white); }
-  .k-side__link.is-active { border-color: var(--k-accent); }
 }
 
 /* ---------- Generic page wrapper ---------- */
