@@ -1,5 +1,6 @@
 <?php
 require_once '../config/db.php';
+require_once '../includes/helpers.php';
 require_once '../includes/header.php';
 
 if (!isset($_SESSION['user_id'])) {
@@ -7,7 +8,7 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-$user_id = $_SESSION['user_id'];
+$user_id = (int) $_SESSION['user_id'];
 $user_name = $_SESSION['user_name'];
 
 // Fetch Orders
@@ -27,112 +28,106 @@ if ($check_col->num_rows > 0) {
         }
     }
 }
+
+// Force reload user data to get latest profile pic
+$user = $conn->query("SELECT * FROM users WHERE id = $user_id")->fetch_assoc();
+$avatar_path = trim((string) ($user['profile_picture'] ?? ''));
+$avatar_url = $avatar_path === '' ? '' : (strpos($avatar_path, 'http') === 0 ? $avatar_path : BASE_URL . $avatar_path);
+$initial = strtoupper(mb_substr($user_name, 0, 1));
 ?>
 
-
-<div class="profile-header">
-    <div class="container">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div style="display:flex; align-items:center; gap:1.5rem;">
-                <!-- Dynamic Avatar -->
-                <?php
-                // Force reload user data to get latest profile pic
-                $user = $conn->query("SELECT * FROM users WHERE id = $user_id")->fetch_assoc();
-                $avatar_url = !empty($user['profile_picture']) ? $user['profile_picture'] : "https://ui-avatars.com/api/?name=" . urlencode($user_name) . "&background=random&color=fff&size=128";
-                ?>
-                <img src="<?php echo strpos($avatar_url, 'http') === 0 ? htmlspecialchars($avatar_url) : BASE_URL . htmlspecialchars($avatar_url); ?>"
-                    alt="Profile" class="profile-avatar" style="object-fit:cover; background: white;">
-                <div>
-                    <h1 style="color:white; margin:0; font-size:2rem;">Hello,
-                        <?php echo htmlspecialchars($user_name); ?>
-                    </h1>
-                    <p style="opacity:0.8; color:white; margin:0;">Welcome back to your dashboard</p>
-                </div>
-            </div>
-            <div style="display:flex; gap:1rem; align-items:center;">
-                <a href="preferences.php" class="btn"
-                    style="background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); backdrop-filter:blur(10px);">
-                    <i class="fas fa-cog" style="margin-right:0.5rem;"></i> Settings
-                </a>
-                <a href="sell_book.php" class="btn btn-light"
-                    style="font-weight:600; border:2px solid rgba(255,255,255,0.5);">
-                    <i class="fas fa-plus-circle" style="margin-right:0.5rem;"></i> Sell a Book
-                </a>
-                <a href="logout.php" class="btn"
-                    style="background:rgba(239,68,68,0.9); color:white; border:none; font-weight:600;">
-                    <i class="fas fa-sign-out-alt" style="margin-right:0.5rem;"></i> Logout
-                </a>
+<section class="k-hello">
+    <div class="k-hello__inner">
+        <div class="k-hello__who">
+            <?php if ($avatar_url !== ''): ?>
+                <img src="<?php echo htmlspecialchars($avatar_url); ?>" alt="" class="k-hello__avatar">
+            <?php else: ?>
+                <div class="k-hello__avatar" aria-hidden="true"><?php echo htmlspecialchars($initial); ?></div>
+            <?php endif; ?>
+            <div>
+                <h1>Hello, <?php echo htmlspecialchars($user_name); ?></h1>
+                <p>Welcome back to your dashboard</p>
             </div>
         </div>
+        <div class="k-hello__actions">
+            <a href="preferences.php" class="k-btn k-btn--ghost-light">Settings</a>
+            <a href="sell_book.php" class="k-btn k-btn--light">Sell a Book</a>
+            <a href="logout.php" class="k-btn k-btn--danger-light">Logout</a>
+        </div>
     </div>
-</div>
+</section>
 
-<div class="container" style="padding-bottom: 4rem;">
+<div class="k-account">
 
     <!-- My Listings Section -->
-    <div style="margin-bottom: 4rem;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
-            <h2>My Listings</h2>
-            <a href="sell_book.php" class="btn btn-primary btn-sm">Add New</a>
+    <section class="k-account__section">
+        <div class="k-account__head">
+            <h2 class="k-h2">My Listings</h2>
+            <a href="sell_book.php" class="k-btn k-btn--primary k-btn--sm">Add New</a>
         </div>
 
         <?php if (!empty($my_books)): ?>
-            <div class="grid books-grid">
+            <div class="k-grid">
                 <?php foreach ($my_books as $book): ?>
-                    <div class="card book-card">
-                        <div class="book-image" style="height: 200px;">
-                            <img src="<?php echo strpos($book['image'], 'http') === 0 ? htmlspecialchars($book['image']) : BASE_URL . htmlspecialchars($book['image']); ?>"
-                                alt="<?php echo htmlspecialchars($book['title']); ?>">
+                    <?php $book_href = 'product.php?id=' . (int) $book['id']; ?>
+                    <article class="k-book">
+                        <a class="k-book__cover" href="<?php echo $book_href; ?>" tabindex="-1" aria-hidden="true">
+                            <?php k_cover($book); ?>
+                        </a>
+                        <div class="k-book__info">
+                            <a class="k-book__title" href="<?php echo $book_href; ?>"><?php echo htmlspecialchars($book['title']); ?></a>
+                            <span class="k-book__price">Rs. <?php echo number_format($book['price']); ?></span>
                         </div>
-                        <div class="book-info">
-                            <h3 style="font-size:1rem;"><?php echo htmlspecialchars($book['title']); ?></h3>
-                            <p class="price" style="font-size:1rem;">Rs. <?php echo number_format($book['price']); ?></p>
-                            <div style="display:flex; gap:0.5rem; margin-top:auto;">
-                                <a href="product.php?id=<?php echo $book['id']; ?>" class="btn btn-outline"
-                                    style="flex:1; font-size:0.8rem; padding:0.4rem;">View</a>
-                                <!-- In a real app, delete would go here -->
-                            </div>
-                        </div>
-                    </div>
+                        <a href="<?php echo $book_href; ?>" class="k-btn k-btn--outline k-btn--sm">View</a>
+                    </article>
                 <?php endforeach; ?>
             </div>
         <?php else: ?>
-            <div
-                style="text-align:center; padding:2rem; background:#f8fafc; border-radius:12px; border:1px dashed #cbd5e1;">
-                <p style="color:var(--text-light);">You haven't listed any books for sale yet.</p>
-                <a href="sell_book.php" style="color:var(--accent); font-weight:600;">List your first book</a>
+            <div class="k-empty">
+                <p>You haven't listed any books for sale yet.</p>
+                <a href="sell_book.php" class="k-btn k-btn--outline">List your first book</a>
             </div>
         <?php endif; ?>
-    </div>
+    </section>
 
-    <h2>Order History</h2>
+    <section class="k-account__section">
+        <h2 class="k-h2">Order History</h2>
 
-    <?php if ($result_orders->num_rows > 0): ?>
-        <div class="grid" style="grid-template-columns: 1fr;">
-            <?php while ($order = $result_orders->fetch_assoc()): ?>
-                <div class="card order-card">
-                    <div
-                        style="display:flex; justify-content:space-between; margin-bottom:1rem; border-bottom:1px solid #f1f5f9; padding-bottom:0.5rem;">
-                        <div>
-                            <span style="font-weight:700; color:var(--primary);">Order #<?php echo $order['id']; ?></span>
-                            <span
-                                style="color:var(--text-light); margin-left:0.5rem; font-size:0.9rem;"><?php echo date('F j, Y', strtotime($order['created_at'])); ?></span>
+        <?php if ($result_orders->num_rows > 0): ?>
+            <div class="k-orders">
+                <?php while ($order = $result_orders->fetch_assoc()): ?>
+                    <?php
+                    $status = strtolower((string) $order['status']);
+                    if (!in_array($status, ['pending', 'processing', 'shipped', 'delivered', 'cancelled'], true)) {
+                        $status = 'pending';
+                    }
+                    ?>
+                    <article class="k-order">
+                        <div class="k-order__id">
+                            <div class="k-order__num">Order #<?php echo (int) $order['id']; ?></div>
+                            <div class="k-order__date"><?php echo date('F j, Y', strtotime($order['created_at'])); ?></div>
                         </div>
-                        <span class="order-status"><?php echo ucfirst($order['status']); ?></span>
-                    </div>
-                    <div>
-                        <p><strong>Total:</strong> Rs. <?php echo number_format($order['total']); ?></p>
-                        <p><strong>Shipping to:</strong> <?php echo htmlspecialchars($order['address']); ?></p>
-                    </div>
-                </div>
-            <?php endwhile; ?>
-        </div>
-    <?php else: ?>
-        <div style="text-align:center; padding:3rem; background:#f8fafc; border-radius:12px;">
-            <p>You haven't placed any orders yet.</p>
-            <a href="shop.php" class="btn btn-primary">Start Shopping</a>
-        </div>
-    <?php endif; ?>
+                        <div class="k-order__ship">
+                            <div class="k-order__label">Shipping to</div>
+                            <div class="k-order__value"><?php echo htmlspecialchars((string) $order['address']); ?></div>
+                        </div>
+                        <div class="k-order__total">
+                            <div class="k-order__label">Total</div>
+                            <div class="k-order__amount">Rs. <?php echo number_format($order['total']); ?></div>
+                        </div>
+                        <div class="k-order__status">
+                            <span class="k-pill k-pill--<?php echo $status; ?>"><?php echo ucfirst($status); ?></span>
+                        </div>
+                    </article>
+                <?php endwhile; ?>
+            </div>
+        <?php else: ?>
+            <div class="k-empty">
+                <p>You haven't placed any orders yet.</p>
+                <a href="shop.php" class="k-btn k-btn--primary">Start Shopping</a>
+            </div>
+        <?php endif; ?>
+    </section>
 </div>
 
 <?php require_once '../includes/footer.php'; ?>
