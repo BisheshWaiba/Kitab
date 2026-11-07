@@ -70,7 +70,8 @@ function k_auth_art(mysqli $conn, int $offset = 0, bool $flip = false): void
     <?php
 }
 
-function k_book_card(array $b): void
+// $shelf = the Home page variant (category sits beside the author); every other page keeps the label above the title
+function k_book_card(array $b, bool $shelf = false): void
 {
     $href = BASE_URL . 'frontend/product.php?id=' . (int) $b['id'];
     ?>
@@ -79,8 +80,14 @@ function k_book_card(array $b): void
             <?php k_cover($b); ?>
         </a>
         <div class="k-book__info">
-            <a class="k-book__title" href="<?php echo $href; ?>"><?php echo htmlspecialchars($b['title']); ?></a>
-            <span class="k-book__author">by <?php echo htmlspecialchars($b['author']); ?><?php if ((string) $b['category'] !== ''): ?><span class="k-book__sep" aria-hidden="true">&middot;</span><span class="k-book__cat"><?php echo htmlspecialchars($b['category']); ?></span><?php endif; ?></span>
+            <?php if ($shelf): ?>
+                <a class="k-book__title" href="<?php echo $href; ?>"><?php echo htmlspecialchars($b['title']); ?></a>
+                <span class="k-book__author">by <?php echo htmlspecialchars($b['author']); ?><?php if ((string) $b['category'] !== ''): ?><span class="k-book__sep" aria-hidden="true">&middot;</span><span class="k-book__catline"><?php echo htmlspecialchars($b['category']); ?></span><?php endif; ?></span>
+            <?php else: ?>
+                <span class="k-book__cat"><?php echo htmlspecialchars($b['category']); ?></span>
+                <a class="k-book__title" href="<?php echo $href; ?>"><?php echo htmlspecialchars($b['title']); ?></a>
+                <span class="k-book__author">by <?php echo htmlspecialchars($b['author']); ?></span>
+            <?php endif; ?>
         </div>
         <div class="k-book__foot">
             <span class="k-book__price">Rs. <?php echo number_format((float) $b['price']); ?></span>

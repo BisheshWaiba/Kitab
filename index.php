@@ -1,6 +1,7 @@
 <?php
 require_once 'config/db.php';
 require_once 'includes/helpers.php';
+$body_class = 'k-home'; // scopes the Home-only touches (selection color, scrollbar, control accent)
 require_once 'includes/header.php';
 
 // Hero shelf: the first seven books that have a cover
@@ -88,7 +89,7 @@ $book_sections = [
             </div>
             <div class="k-grid k-grid--shelf">
                 <?php while ($row = $section['books']->fetch_assoc()): ?>
-                    <?php k_book_card($row); ?>
+                    <?php k_book_card($row, true); ?>
                 <?php endwhile; ?>
             </div>
         </div>
