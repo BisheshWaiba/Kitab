@@ -746,6 +746,8 @@ body {
 .k-adminside__link:focus-visible { outline: 3px solid #fff; outline-offset: -3px; }
 
 .k-adminbody { font-family: var(--k-body); }
+/* The admin pages do not load style.css, so give plain links the same reset (zero specificity: any class still wins) */
+:where(.k-adminbody) a { color: inherit; text-decoration: none; }
 .k-admin__main {
   flex: 1;
   min-width: 0;
@@ -772,6 +774,9 @@ body {
 .k-muted { color: var(--k-ink-2); }
 .k-table__empty { padding: 40px 24px; text-align: center; color: var(--k-muted); }
 .k-table__empty a { font-weight: 600; color: var(--k-accent); text-decoration: underline; text-underline-offset: 3px; }
+
+/* Admin forms */
+.k-formstack { width: 100%; max-width: 760px; display: flex; flex-direction: column; gap: 24px; }
 
 /* Admin book list */
 .k-table--wide { min-width: 760px; }

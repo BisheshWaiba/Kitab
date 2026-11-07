@@ -1,138 +1,146 @@
 <?php include 'includes/header.php'; ?>
 
 <?php
+require_once dirname(__DIR__) . '/includes/helpers.php';
+
 $error = '';
 $success = '';
 
+// Categories come from the database (same list as the seller form); fall back to a basic set if that fails
+$categories = [];
+$cat_result = $conn->query("SELECT DISTINCT name FROM categories ORDER BY name ASC");
+if ($cat_result) {
+    while ($cat = $cat_result->fetch_assoc()) {
+        $categories[] = $cat['name'];
+    }
+}
+if (empty($categories)) {
+    $categories = ['Fiction', 'Non-Fiction', 'Business', 'Arts & Photography', 'Travel', 'Nature', 'Science', 'History', 'Biography', 'Self-Help'];
+}
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $title = $conn->real_escape_string($_POST['title']);
-    $author = $conn->real_escape_string($_POST['author']);
-    $price = floatval($_POST['price']);
-    $category = $conn->real_escape_string($_POST['category']);
-    $description = $conn->real_escape_string($_POST['description']);
+    $title = trim($_POST['title'] ?? '');
+    $author = trim($_POST['author'] ?? '');
+    $price = floatval($_POST['price'] ?? 0);
+    $category = $_POST['category'] ?? '';
+    $description = trim($_POST['description'] ?? '');
 
-    // Image Upload
     $image_path = '';
-    if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
-        $allowed = ['jpg', 'jpeg', 'png', 'webp'];
-        $filename = $_FILES['image']['name'];
-        $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-
-        if (in_array($ext, $allowed)) {
-            $new_filename = "book_" . time() . "." . $ext;
-            $upload_dir = "../uploads/books/";
-
-            // Create directory if not exists
-            if (!is_dir($upload_dir)) {
-                mkdir($upload_dir, 0777, true);
-            }
-
-            if (move_uploaded_file($_FILES['image']['tmp_name'], $upload_dir . $new_filename)) {
-                // Ensure the path assumes BASE_URL context or is root-relative correctly
-                // Storing as relative path from root for consistency
-                $image_path = "uploads/books/" . $new_filename;
-            } else {
-                $error = "Failed to upload image.";
-            }
-        } else {
-            $error = "Invalid file type. Only JPG, PNG, WEBP allowed.";
-        }
-    } else {
+    if ($title === '' || $author === '') {
+        $error = "Please enter a title and an author.";
+    } elseif ($price <= 0) {
+        $error = "Please enter a price greater than zero.";
+    } elseif (!in_array($category, $categories, true)) {
+        $error = "Please choose a category.";
+    } elseif (!isset($_FILES['image']) || $_FILES['image']['error'] == UPLOAD_ERR_NO_FILE) {
         $error = "Please upload a book cover image.";
+    } else {
+        // Image Upload (checked by content, stored under uploads/books/)
+        [$image_path, $error] = k_upload_image($_FILES['image'], 'books', 'book_admin');
     }
 
     if (empty($error)) {
-        $sql = "INSERT INTO books (title, author, price, category, description, image) VALUES ('$title', '$author', $price, '$category', '$description', '$image_path')";
+        $title_sql = $conn->real_escape_string($title);
+        $author_sql = $conn->real_escape_string($author);
+        $category_sql = $conn->real_escape_string($category);
+        $description_sql = $conn->real_escape_string($description);
+        $image_sql = $conn->real_escape_string($image_path);
+
+        $sql = "INSERT INTO books (title, author, price, category, description, image) VALUES ('$title_sql', '$author_sql', $price, '$category_sql', '$description_sql', '$image_sql')";
         if ($conn->query($sql)) {
             $success = "Book added successfully!";
-            // Optional: Redirect after success
-            // header("Location: books.php");
         } else {
-            $error = "Database Error: " . $conn->error;
+            $error = "Something went wrong saving the book. Please try again.";
         }
     }
 }
+
+// Keep what was typed when there is an error; start fresh after a successful save
+$old = $success ? [] : $_POST;
+$old_category = $old['category'] ?? '';
 ?>
 
-<main class="main-content">
-    <header class="admin-header">
-        <h1>Add New Book</h1>
-        <a href="<?php echo BASE_URL; ?>admin/books.php" class="btn-admin btn-back">
-            <i class="fas fa-arrow-left"></i> Back to List
+<main class="k-admin__main">
+    <div class="k-admin__bar">
+        <h1 class="k-h1">Add New Book</h1>
+        <a href="<?php echo BASE_URL; ?>admin/books.php" class="k-btn k-btn--outline">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M19 12H5M11 6l-6 6 6 6" />
+            </svg>
+            Back to List
         </a>
-    </header>
+    </div>
 
-    <div class="admin-card" style="max-width: 800px;">
+    <div class="k-formstack">
         <?php if ($error): ?>
-            <div class="alert-error">
-                <?php echo $error; ?>
-            </div>
+            <div class="k-alert k-alert--error" role="alert"><?php echo htmlspecialchars($error); ?></div>
         <?php endif; ?>
 
         <?php if ($success): ?>
-            <div class="alert-success">
-                <?php echo $success; ?> <a href="<?php echo BASE_URL; ?>admin/books.php" class="alert-link">View Books</a>
+            <div class="k-alert k-alert--success" role="status">
+                <?php echo htmlspecialchars($success); ?>
+                <a href="<?php echo BASE_URL; ?>admin/books.php">View Books</a>
             </div>
         <?php endif; ?>
 
-        <form method="POST" enctype="multipart/form-data">
-            <div class="form-grid">
-                <div class="form-group" style="margin-bottom: 1rem;">
-                    <label class="form-label">Book
-                        Title</label>
-                    <input type="text" name="title" required class="form-control form-input"
-                        placeholder="Enter book title">
+        <form method="POST" enctype="multipart/form-data" class="k-card k-formcard">
+            <div class="k-fields">
+                <div class="k-field">
+                    <label for="title">Book Title</label>
+                    <input type="text" id="title" name="title" required class="k-input" placeholder="Enter book title"
+                        value="<?php echo htmlspecialchars($old['title'] ?? ''); ?>">
                 </div>
-
-                <div class="form-group" style="margin-bottom: 1rem;">
-                    <label class="form-label">Author</label>
-                    <input type="text" name="author" required class="form-control form-input" placeholder="Author name">
+                <div class="k-field">
+                    <label for="author">Author</label>
+                    <input type="text" id="author" name="author" required class="k-input" placeholder="Author name"
+                        value="<?php echo htmlspecialchars($old['author'] ?? ''); ?>">
                 </div>
             </div>
 
-            <div class="form-grid">
-                <div class="form-group" style="margin-bottom: 1rem;">
-                    <label class="form-label">Price
-                        (Rs.)</label>
-                    <input type="number" name="price" required min="0" class="form-control form-input"
-                        placeholder="0.00">
+            <div class="k-fields">
+                <div class="k-field">
+                    <label for="price">Price (Rs.)</label>
+                    <input type="number" id="price" name="price" required min="0.01" step="0.01" class="k-input"
+                        placeholder="0.00" value="<?php echo htmlspecialchars($old['price'] ?? ''); ?>">
                 </div>
-
-                <div class="form-group" style="margin-bottom: 1rem;">
-                    <label class="form-label">Category</label>
-                    <select name="category" required class="form-input">
-                        <option value="Fiction">Fiction</option>
-                        <option value="Non-Fiction">Non-Fiction</option>
-                        <option value="Business">Business</option>
-                        <option value="Arts & Photography">Arts & Photography</option>
-                        <option value="Travel">Travel</option>
-                        <option value="Nature">Nature</option>
-                        <option value="Science">Science</option>
-                        <option value="History">History</option>
-                        <option value="Biography">Biography</option>
-                        <option value="Self-Help">Self-Help</option>
+                <div class="k-field">
+                    <label for="category">Category</label>
+                    <select id="category" name="category" required class="k-input">
+                        <?php foreach ($categories as $name): ?>
+                            <option value="<?php echo htmlspecialchars($name); ?>"
+                                <?php echo $old_category === $name ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($name); ?></option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
             </div>
 
-            <div class="form-group" style="margin-bottom: 1rem;">
-                <label class="form-label">Description</label>
-                <textarea name="description" rows="4" class="form-input" placeholder="Book summary..."></textarea>
+            <div class="k-field">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="4" class="k-input k-textarea"
+                    placeholder="Book summary..."><?php echo htmlspecialchars($old['description'] ?? ''); ?></textarea>
             </div>
 
-            <div class="form-group" style="margin-bottom: 2rem;">
-                <label class="form-label">Cover
-                    Image</label>
-                <input type="file" name="image" required accept="image/*" class="form-input form-input-white">
+            <div class="k-field">
+                <span class="k-field__label" id="cover-label">Cover Image</span>
+                <div class="k-dropzone" data-upload>
+                    <div class="k-dropzone__preview" data-upload-preview>
+                        <img alt="Cover preview">
+                    </div>
+                    <p class="k-dropzone__text">JPG, PNG, GIF or WebP, up to 2 MB.</p>
+                    <button type="button" class="k-btn k-btn--outline k-btn--sm" data-upload-pick>Choose Image</button>
+                    <input type="file" name="image" accept="image/jpeg,image/png,image/gif,image/webp" hidden
+                        aria-labelledby="cover-label">
+                </div>
             </div>
 
-            <button type="submit" class="btn-admin btn-admin-primary btn-save">
-                <i class="fas fa-save"></i> Save Book
-            </button>
+            <button type="submit" class="k-btn k-btn--primary k-btn--block">Save Book</button>
         </form>
     </div>
 </main>
 
+<script src="<?php echo BASE_URL; ?>assets/js/main.js"></script>
 </body>
 
 </html>
