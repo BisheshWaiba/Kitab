@@ -4,13 +4,13 @@
 $orders = $conn->query("SELECT * FROM orders ORDER BY created_at DESC");
 ?>
 
-<main class="main-content">
-    <header class="admin-header">
-        <h1>Order Monitoring</h1>
-    </header>
+<main class="k-admin__main">
+    <div class="k-admin__bar">
+        <h1 class="k-h1">Order Monitoring</h1>
+    </div>
 
-    <div class="admin-card">
-        <table class="admin-table">
+    <div class="k-tablecard">
+        <table class="k-table k-table--xwide">
             <thead>
                 <tr>
                     <th>Order ID</th>
@@ -24,33 +24,30 @@ $orders = $conn->query("SELECT * FROM orders ORDER BY created_at DESC");
             </thead>
             <tbody>
                 <?php while ($order = $orders->fetch_assoc()): ?>
+                    <?php
+                    $status = strtolower((string) $order['status']);
+                    if (!in_array($status, ['pending', 'processing', 'shipped', 'delivered', 'cancelled'], true)) {
+                        $status = 'pending';
+                    }
+                    // Readable payment method; an empty value means the default (cash on delivery)
+                    $payment = (string) ($order['payment_method'] ?? '');
+                    $payment_label = ($payment === '' || $payment === 'cash_on_delivery')
+                        ? 'Cash on Delivery'
+                        : ucwords(str_replace('_', ' ', $payment));
+                    ?>
                     <tr>
-                        <td>#
-                            <?php echo $order['id']; ?>
-                        </td>
-                        <td>
-                            <?php echo htmlspecialchars($order['name']); ?>
-                        </td>
-                        <td>
-                            <?php echo htmlspecialchars($order['email'] ?? 'N/A'); ?>
-                        </td>
-                        <td>Rs.
-                            <?php echo number_format($order['total']); ?>/
-                        </td>
-                        <td>
-                            <?php echo htmlspecialchars($order['payment_method'] ?? 'COD'); ?>
-                        </td>
-                        <td>
-                            <span class="status-pills status-pending">Processing</span>
-                        </td>
-                        <td>
-                            <?php echo date('M d, Y H:i', strtotime($order['created_at'])); ?>
-                        </td>
+                        <td class="k-num k-num--strong">#<?php echo (int) $order['id']; ?></td>
+                        <td><?php echo htmlspecialchars((string) $order['name'] !== '' ? (string) $order['name'] : '—'); ?></td>
+                        <td class="k-muted k-nowrap"><?php echo htmlspecialchars((string) $order['email'] !== '' ? (string) $order['email'] : '—'); ?></td>
+                        <td class="k-num k-num--strong">Rs. <?php echo number_format($order['total']); ?></td>
+                        <td class="k-muted"><?php echo htmlspecialchars($payment_label); ?></td>
+                        <td><span class="k-pill k-pill--<?php echo $status; ?>"><?php echo ucfirst($status); ?></span></td>
+                        <td class="k-num k-muted"><?php echo date('M d, Y H:i', strtotime($order['created_at'])); ?></td>
                     </tr>
                 <?php endwhile; ?>
                 <?php if ($orders->num_rows == 0): ?>
                     <tr>
-                        <td colspan="7" style="text-align: center; padding: 2rem; color: #64748b;">No orders found.</td>
+                        <td colspan="7" class="k-table__empty">No orders found.</td>
                     </tr>
                 <?php endif; ?>
             </tbody>

@@ -780,6 +780,9 @@ body {
 
 /* Admin book list */
 .k-table--wide { min-width: 760px; }
+.k-table--xwide { min-width: 900px; }
+.k-table--xwide td { padding-top: 18px; padding-bottom: 18px; }
+.k-nowrap { white-space: nowrap; }
 .k-table--wide td { padding-top: 12px; padding-bottom: 12px; }
 .k-thumb--sm { width: 48px; }
 .k-thumb--sm.k-cover--empty { font-size: 8px; padding: 3px; }
