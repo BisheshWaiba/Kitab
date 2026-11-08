@@ -125,6 +125,28 @@ document.querySelectorAll('[data-qty]').forEach(function (box) {
     });
 });
 
+// Cart: changing a quantity updates the cart after a short pause, so a few quick clicks make one update.
+// Without JavaScript the form has an "Update cart" button instead.
+document.querySelectorAll('form[data-cart-form]').forEach(function (form) {
+    var timer;
+    function soon() {
+        clearTimeout(timer);
+        timer = setTimeout(function () {
+            form.querySelectorAll('input[type="number"]').forEach(function (input) {
+                var n = parseInt(input.value, 10);
+                input.value = !n || n < 1 ? 1 : Math.min(n, 100); // an empty box must not remove the book
+            });
+            form.submit();
+        }, 450);
+    }
+    form.querySelectorAll('[data-step]').forEach(function (btn) {
+        btn.addEventListener('click', soon);
+    });
+    form.querySelectorAll('input[type="number"]').forEach(function (input) {
+        input.addEventListener('change', soon);
+    });
+});
+
 // Home page: "Our picks" category tabs
 document.querySelectorAll('.k-chip[data-target]').forEach(function (chip) {
     chip.addEventListener('click', function () {
