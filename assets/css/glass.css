@@ -488,6 +488,37 @@ body.is-glass {
   .gk-form { padding: 28px 22px; border-radius: 32px; }
 }
 
+/* ---------- Checkout steps: a thin "Cart > Details > Done" line (Cart and Checkout pages) ---------- */
+.gk-steps { margin-top: 28px; }
+.gk-steps ol { display: flex; align-items: center; max-width: 520px; margin: 0; padding: 0; list-style: none; }
+.gk-steps li { display: flex; align-items: center; font-size: 14px; font-weight: 600; color: var(--k-ink-2); white-space: nowrap; }
+.gk-steps li:not(:last-child) { flex: 1; }
+.gk-steps__item { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; color: inherit; }
+a.gk-steps__item:hover .gk-steps__label { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+a.gk-steps__item:focus-visible { outline: 3px solid var(--k-ink); outline-offset: 2px; border-radius: 999px; }
+.gk-steps__dot { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; font-size: 13px; font-variant-numeric: tabular-nums; color: var(--k-ink-2); background: rgba(255, 255, 255, .7); border: 1px solid rgba(17, 18, 20, .28); }
+.gk-steps li:not(:last-child)::after { content: ""; flex: 1; min-width: 16px; height: 2px; margin: 0 14px; border-radius: 1px; background: rgba(17, 18, 20, .14); }
+.gk-steps li.is-done .gk-steps__dot { color: #fff; background: var(--k-ink); border-color: var(--k-ink); }
+.gk-steps li.is-done:not(:last-child)::after { background: linear-gradient(var(--k-ink), var(--k-ink)) 0 0 / 100% 100% no-repeat, rgba(17, 18, 20, .14); }
+.gk-steps li.is-current { color: var(--k-ink); }
+.gk-steps li.is-current .gk-steps__dot { color: var(--k-ink); background: var(--k-gold); border-color: var(--k-gold); box-shadow: 0 0 0 4px rgba(242, 177, 52, .22); }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes gk-line { from { background-size: 0 100%, 100% 100%; } to { background-size: 100% 100%, 100% 100%; } }
+  .gk-steps li.is-done:not(:last-child)::after { animation: gk-line .8s var(--k-ease) .25s backwards; }
+  .gk-steps li.is-current .gk-steps__dot { animation: gk-pop .6s var(--k-ease) .5s backwards; }
+}
+@media (max-width: 480px) {
+  .gk-steps { margin-top: 20px; }
+  .gk-steps li { font-size: 13px; }
+  .gk-steps__item { gap: 8px; }
+  .gk-steps li:not(:last-child)::after { margin: 0 10px; }
+}
+@media (max-width: 360px) {
+  .gk-steps__item { gap: 6px; }
+  .gk-steps__dot { width: 24px; height: 24px; font-size: 12px; }
+  .gk-steps li:not(:last-child)::after { min-width: 10px; margin: 0 8px; }
+}
+
 /* ---------- Best sellers: books standing on a glass shelf ---------- */
 .hg-shelf { position: relative; padding: 48px 48px 0; border-radius: 36px; overflow: hidden; display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 2fr); gap: 40px; align-items: end; }
 .hg-shelf__copy { align-self: center; display: flex; flex-direction: column; align-items: flex-start; gap: 20px; padding-bottom: 48px; }

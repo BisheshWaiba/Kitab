@@ -228,6 +228,40 @@ function k_glass_tile(array $b): void
     <?php
 }
 
+// Thin "Cart > Details > Done" progress line shown on the Cart and Checkout pages: $current is 'cart', 'details' or 'done'.
+// Steps before the current one are finished (and "Cart" links back while the visitor is on Details); styles: assets/css/glass.css
+function k_checkout_steps(string $current): void
+{
+    $steps = ['cart' => 'Cart', 'details' => 'Details', 'done' => 'Done'];
+    $at = array_search($current, array_keys($steps), true);
+    $at = $at === false ? 0 : $at;
+    $last = count($steps) - 1;
+    $check = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>';
+    ?>
+    <nav class="gk-steps" aria-label="Checkout progress">
+        <ol>
+            <?php $i = 0; foreach ($steps as $key => $label): ?>
+                <?php
+                $is_current = $i === $at;
+                $is_done = $i < $at || ($is_current && $i === $last); // arriving at the last step means everything is finished
+                $classes = trim(($is_done ? 'is-done ' : '') . ($is_current ? 'is-current' : ''));
+                $link = $key === 'cart' && $current === 'details';
+                $dot = '<span class="gk-steps__dot" aria-hidden="true">' . ($is_done ? $check : $i + 1) . '</span>';
+                ?>
+                <li<?php echo $classes !== '' ? ' class="' . $classes . '"' : ''; ?><?php echo $is_current ? ' aria-current="step"' : ''; ?>>
+                    <?php if ($link): ?><a href="cart.php" class="gk-steps__item"><?php else: ?><span class="gk-steps__item"><?php endif; ?>
+                        <?php echo $dot; ?>
+                        <span class="gk-steps__label"><?php echo $label; ?></span>
+                        <?php if ($is_done && !$is_current): ?><span class="k-sr">(completed)</span><?php endif; ?>
+                    <?php echo $link ? '</a>' : '</span>'; ?>
+                </li>
+                <?php $i++; ?>
+            <?php endforeach; ?>
+        </ol>
+    </nav>
+    <?php
+}
+
 function k_book_card(array $b): void
 {
     $href = BASE_URL . 'frontend/product.php?id=' . (int) $b['id'];

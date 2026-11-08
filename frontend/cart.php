@@ -86,6 +86,7 @@ foreach ($cart_items as $b) {
 
 <section class="gc-head hg-wrap">
     <h1 class="hg-h1 gc-title">Shopping Cart</h1>
+    <?php if (!empty($cart_items)) { k_checkout_steps('cart'); } ?>
 </section>
 
 <div class="hg-wrap gc-main">

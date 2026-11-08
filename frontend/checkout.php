@@ -108,6 +108,7 @@ foreach ($cart_items as $b) {
 <section class="gs-head hg-wrap">
     <h1 class="hg-h1 gs-title">Checkout</h1>
     <p class="hg-lede">You pay in cash when your order arrives.</p>
+    <?php k_checkout_steps($order_placed ? 'done' : 'details'); ?>
 </section>
 
 <div class="hg-wrap gs-main">
