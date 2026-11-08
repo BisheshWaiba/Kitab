@@ -35,13 +35,14 @@ return [
                     'Profile details you choose to add, such as a profile photo and your favourite genres.',
                     'Order details: your name, email address, delivery address, the books you ordered and the order total.',
                     'Books you list for sale: the title, author, price, description, cover image and any other details you enter. These are shown publicly on the site.',
+                    'Reviews you write: your rating and comment. They are shown publicly on the book\'s page with your first name and the first letter of your last name.',
                     'Your wishlist and the books in your shopping cart.',
                     'Technical information your browser sends with every request, such as your IP address and browser type. Our web server may log it to keep the site secure and to fix faults.',
                 ]],
                 ['h' => 'How we use it', 'ul' => [
                     'To create and run your account and keep you signed in.',
                     'To process and deliver your orders, and to keep a record of them.',
-                    'To show your listings, wishlist and order history.',
+                    'To show your listings, your reviews, your wishlist and your order history.',
                     'To answer your messages.',
                     'To keep the site secure and to prevent misuse.',
                 ], 'after' => [
@@ -145,6 +146,9 @@ return [
                 ]],
                 ['h' => 'Books listed by members', 'p' => [
                     'Members can list books for sale. The member who lists a book is responsible for describing it accurately and for having the right to sell it and to use its cover image. We may remove a listing that is inaccurate, unlawful or breaks these rules.',
+                ]],
+                ['h' => 'Reviews', 'p' => [
+                    'Reviews should be honest and based on your own experience of the book. Please do not post anything abusive, unlawful or misleading, or advertising. You cannot review a book you listed yourself. You can edit or delete your own review at any time, and we may remove a review that breaks these rules.',
                 ]],
                 ['h' => 'Prices and availability', 'p' => [
                     'We work to keep prices and descriptions correct, but mistakes can happen. If we find a mistake in an order you have placed, we will contact you so you can confirm or cancel it before it ships.',
