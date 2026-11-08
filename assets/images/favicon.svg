@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>KITAB</title>
+  <defs><clipPath id="k"><rect x="13.00" y="11.00" width="34.00" height="42.00"/></clipPath></defs>
+  <rect width="64" height="64" rx="15" fill="#111214"/>
+  <g clip-path="url(#k)" fill="#fff">
+    <rect x="13.00" y="11.00" width="9.00" height="42.00"/>
+    <polygon points="25.50,35.83 46.50,9.83 39.50,4.17 18.50,30.17"/>
+    <polygon points="18.50,35.83 39.50,61.83 46.50,56.17 25.50,30.17"/>
+  </g>
+  <circle cx="50.50" cy="48.00" r="5.00" fill="#e8453c"/>
+</svg>

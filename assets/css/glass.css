@@ -447,6 +447,7 @@ body.is-glass {
 .gk-form .hg-h2,
 .gk-summary .hg-h2 { font-size: 28px; }
 .gk-form__sub { margin-top: 12px; }
+.gk-form__note { margin: -12px 0 0; font-size: 15px; line-height: 1.5; color: var(--hg-muted); }
 .gk-pay {
   display: flex;
   align-items: center;

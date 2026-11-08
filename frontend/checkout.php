@@ -59,6 +59,34 @@ if (isset($_POST['place_order'])) {
     }
 }
 
+// Saved details: a logged-in customer's form starts filled in from their account, and the delivery address from their
+// last order when the account has none. Every field can still be changed. (Not on a form that came back with messages:
+// that one keeps exactly what was typed.)
+$prefilled = false;
+if (!isset($_POST['place_order']) && isset($_SESSION['user_id'])) {
+    try {
+        $uid = (int) $_SESSION['user_id'];
+        $stmt = $conn->prepare("SELECT name, email, phone, address FROM users WHERE id = ?");
+        $stmt->bind_param("i", $uid);
+        $stmt->execute();
+        $saved = $stmt->get_result()->fetch_assoc() ?: [];
+        foreach ($old as $key => $unused) {
+            $old[$key] = trim((string) ($saved[$key] ?? ''));
+        }
+        if ($old['address'] === '') {
+            $stmt = $conn->prepare("SELECT address, shipping_address FROM orders
+                WHERE user_id = ? AND (COALESCE(address, '') <> '' OR COALESCE(shipping_address, '') <> '')
+                ORDER BY id DESC LIMIT 1");
+            $stmt->bind_param("i", $uid);
+            $stmt->execute();
+            $old['address'] = k_order_address($stmt->get_result()->fetch_assoc() ?: []);
+        }
+        $prefilled = implode('', $old) !== '';
+    } catch (Throwable $e) {
+        error_log('KITAB checkout: could not load the saved details: ' . $e->getMessage()); // the form just starts empty
+    }
+}
+
 // Handle Order Submission (only when every field is fine; otherwise the form comes back with the messages)
 if (isset($_POST['place_order']) && !$errors) {
     $name = $conn->real_escape_string($_POST['name']);
@@ -163,6 +191,9 @@ foreach ($cart_items as $b) {
         <div class="gk-grid">
             <form method="POST" class="gk-form hg-panel" data-validate>
                 <h2 class="hg-h2">Billing Details</h2>
+                <?php if ($prefilled): ?>
+                    <p class="gk-form__note">We filled this in from your account and your last order. Change anything that is different.</p>
+                <?php endif; ?>
 
                 <div class="k-fields">
                     <div class="k-field">

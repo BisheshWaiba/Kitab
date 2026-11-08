@@ -27,6 +27,7 @@ $user_initial = isset($_SESSION['user_name']) ? strtoupper(mb_substr($_SESSION['
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo isset($page_title) ? htmlspecialchars($page_title) . ' - KITAB' : 'KITAB - Premium Book Store'; ?></title>
+<?php require __DIR__ . '/favicon.php'; ?>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet"
