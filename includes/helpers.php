@@ -194,6 +194,40 @@ function k_wish_button(array $b, string $variant = 'icon'): void
     <?php
 }
 
+// Book tile for the glass Home page: a frosted card tinted by the book's own cover (styles: assets/css/home-glass.css)
+function k_glass_tile(array $b): void
+{
+    $id = (int) $b['id'];
+    $href = BASE_URL . 'frontend/product.php?id=' . $id;
+    $img = trim((string) ($b['image'] ?? ''));
+    $src = $img === '' ? '' : (strpos($img, 'http') === 0 ? $img : BASE_URL . $img);
+    $category = trim((string) ($b['category'] ?? ''));
+    ?>
+    <article class="hg-tile">
+        <?php if ($src !== ''): ?>
+            <img class="hg-tile__bg" src="<?php echo htmlspecialchars($src); ?>" alt="" loading="lazy">
+        <?php endif; ?>
+        <span class="hg-tile__frost"></span>
+        <i class="hg-shine"></i>
+        <a class="hg-tile__stage" href="<?php echo $href; ?>" tabindex="-1" aria-hidden="true">
+            <?php k_cover($b, 'hg-tile__cover'); ?>
+        </a>
+        <?php if ($category !== ''): ?>
+            <span class="hg-tile__tag"><?php echo htmlspecialchars($category); ?></span>
+        <?php endif; ?>
+        <?php k_wish_button($b); ?>
+        <div class="hg-tile__meta">
+            <a class="hg-tile__title" href="<?php echo $href; ?>"><?php echo htmlspecialchars($b['title']); ?></a>
+            <span class="hg-tile__author">by <?php echo htmlspecialchars($b['author']); ?></span>
+            <div class="hg-tile__foot">
+                <span class="hg-tile__price">Rs. <?php echo number_format((float) $b['price']); ?></span>
+                <a href="<?php echo $href; ?>" class="k-btn k-btn--primary k-btn--sm">Add to Cart</a>
+            </div>
+        </div>
+    </article>
+    <?php
+}
+
 function k_book_card(array $b): void
 {
     $href = BASE_URL . 'frontend/product.php?id=' . (int) $b['id'];

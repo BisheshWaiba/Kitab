@@ -35,9 +35,12 @@ $user_initial = isset($_SESSION['user_name']) ? strtoupper(mb_substr($_SESSION['
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/genre.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/kitab.css">
+    <?php if (!empty($extra_css)): // a page can add its own stylesheet (the Home page does) ?>
+        <link rel="stylesheet" href="<?php echo BASE_URL . htmlspecialchars($extra_css); ?>">
+    <?php endif; ?>
 </head>
 
-<body>
+<body<?php echo !empty($body_class) ? ' class="' . htmlspecialchars($body_class) . '"' : ''; ?>>
 
     <div class="k-announce">Free shipping on orders over Rs. 2,000</div>
 
