@@ -25,6 +25,14 @@ function k_stars(float $rating): string
     return '<span class="k-stars" style="--pct:' . $pct . '%" role="img" aria-label="' . $spoken . ' out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9733;</span>';
 }
 
+// The same five stars as k_stars(), drawn as an SVG mask (glass look: assets/css/glass.css)
+function k_glass_stars(float $rating): string
+{
+    $pct = round(max(0, min(5, $rating)) / 5 * 100, 1);
+    $spoken = rtrim(rtrim(number_format($rating, 1), '0'), '.');
+    return '<span class="hg-stars" style="--p:' . $pct . '%" role="img" aria-label="' . $spoken . ' out of 5 stars"></span>';
+}
+
 // One person, one review per book. Needs a unique index so two quick posts cannot both go in; it is added on first
 // use (and silently skipped if the table already holds duplicates, in which case the code below still copes).
 function k_reviews_ready(mysqli $conn): void

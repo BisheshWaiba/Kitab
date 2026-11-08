@@ -2,6 +2,11 @@
 require_once '../config/db.php';
 require_once '../includes/helpers.php';
 require_once '../includes/reviews.php';
+// The Product page has the glass look (from the design canvas): a body class and a stylesheet only the redesigned pages load
+$body_class = 'is-glass is-product';
+$extra_css = 'assets/css/glass.css';
+$legal = require '../includes/legal_pages.php'; // for the return period, so it is only ever written in one place
+$return_days = (int) $legal['site']['return_days'];
 // The book is looked up (and add-to-cart handled) before the header is output, so the tab title
 // and the cart badge in the header are correct. That needs the session started first.
 if (session_status() === PHP_SESSION_NONE) {
@@ -74,73 +79,126 @@ $page_title = $book['title'];
 require_once '../includes/header.php';
 ?>
 
-<section class="k-product">
-    <div class="k-product__media">
-        <?php k_cover($book, 'k-product__cover', false); ?>
+<?php
+$cover_img = trim((string) ($book['image'] ?? ''));
+$cover_url = $cover_img === '' ? '' : (strpos($cover_img, 'http') === 0 ? $cover_img : BASE_URL . $cover_img);
+$category = trim((string) ($book['category'] ?? ''));
+?>
+<!-- Light from the book: its own cover, blurred, behind the top of the page -->
+<div class="hg-ambient" aria-hidden="true">
+    <?php if ($cover_url !== ''): ?>
+        <img src="<?php echo htmlspecialchars($cover_url); ?>" alt="">
+        <img src="<?php echo htmlspecialchars($cover_url); ?>" alt="">
+    <?php endif; ?>
+</div>
+
+<section class="gp-product hg-wrap">
+    <div class="gp-stage">
+        <?php if ($cover_url !== ''): ?>
+            <img class="gp-stage__bg" src="<?php echo htmlspecialchars($cover_url); ?>" alt="">
+        <?php endif; ?>
+        <span class="gp-stage__frost"></span>
+        <?php k_cover($book, 'gp-stage__cover', false); ?>
+        <?php if ($category !== ''): ?>
+            <span class="hg-tile__tag gp-stage__tag"><?php echo htmlspecialchars($category); ?></span>
+        <?php endif; ?>
     </div>
 
-    <div class="k-product__info">
-        <span class="k-product__cat"><?php echo htmlspecialchars($book['category']); ?></span>
-        <h1 class="k-product__title"><?php echo htmlspecialchars($book['title']); ?></h1>
-        <p class="k-product__author">by <a href="shop.php?author=<?php echo urlencode(trim($book['author'])); ?>"><?php echo htmlspecialchars($book['author']); ?></a></p>
-        <p class="k-rating">
+    <div class="gp-buy hg-panel">
+        <h1 class="hg-h1 gp-title"><?php echo htmlspecialchars($book['title']); ?></h1>
+        <p class="gp-by">by <a href="shop.php?author=<?php echo urlencode(trim($book['author'])); ?>"><?php echo htmlspecialchars($book['author']); ?></a></p>
+        <p class="gp-rating">
             <?php if ($review_count > 0): ?>
-                <a href="#reviews"><?php echo k_stars($review_avg); ?>
+                <a href="#reviews"><?php echo k_glass_stars($review_avg); ?>
                     <span><?php echo number_format($review_avg, 1); ?> &middot; <?php echo $review_count . ($review_count === 1 ? ' review' : ' reviews'); ?></span></a>
             <?php else: ?>
-                <a href="#reviews" class="k-rating__none">No reviews yet</a>
+                <a href="#reviews" class="gp-rating__none">No reviews yet</a>
             <?php endif; ?>
         </p>
-        <p class="k-product__price">Rs. <?php echo htmlspecialchars(number_format($book['price'])); ?></p>
+        <p class="gp-price">Rs. <?php echo htmlspecialchars(number_format($book['price'])); ?></p>
 
         <?php if ($description !== ''): ?>
-            <p class="k-product__desc"><?php echo nl2br(htmlspecialchars($description)); ?></p>
+            <p class="gp-desc"><?php echo nl2br(htmlspecialchars($description)); ?></p>
         <?php endif; ?>
 
-        <div class="k-specs">
-            <h2 class="k-specs__title">Product Details</h2>
-            <dl>
-                <div>
-                    <dt>Publisher</dt>
-                    <dd><?php echo htmlspecialchars($book['publisher'] ?: 'N/A'); ?></dd>
-                </div>
-                <div>
-                    <dt>Language</dt>
-                    <dd><?php echo htmlspecialchars($book['language'] ?? 'English'); ?></dd>
-                </div>
-                <div>
-                    <dt>Pages</dt>
-                    <dd><?php echo htmlspecialchars($book['pages'] ?: 'N/A'); ?></dd>
-                </div>
-                <div>
-                    <dt>ISBN</dt>
-                    <dd><?php echo htmlspecialchars($book['isbn'] ?: 'N/A'); ?></dd>
-                </div>
-            </dl>
-        </div>
+        <dl class="gp-specs">
+            <div>
+                <dt>Publisher</dt>
+                <dd><?php echo htmlspecialchars($book['publisher'] ?: 'N/A'); ?></dd>
+            </div>
+            <div>
+                <dt>Language</dt>
+                <dd><?php echo htmlspecialchars($book['language'] ?? 'English'); ?></dd>
+            </div>
+            <div>
+                <dt>Pages</dt>
+                <dd><?php echo htmlspecialchars($book['pages'] ?: 'N/A'); ?></dd>
+            </div>
+            <div>
+                <dt>ISBN</dt>
+                <dd><?php echo htmlspecialchars($book['isbn'] ?: 'N/A'); ?></dd>
+            </div>
+        </dl>
 
-        <form method="POST" class="k-buy">
-            <div class="k-qty">
-                <label for="quantity">Quantity</label>
-                <div class="k-qty__box" data-qty>
-                    <button type="button" class="k-qty__btn" data-step="-1" aria-label="Decrease quantity">
+        <div class="gp-actions">
+            <form method="POST" class="gp-buyform">
+                <label class="k-sr" for="quantity">Quantity</label>
+                <div class="gp-qty" data-qty>
+                    <button type="button" class="gp-qty__btn" data-step="-1" aria-label="Decrease quantity">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" aria-hidden="true">
                             <path d="M5 12h14" />
                         </svg>
                     </button>
                     <input type="number" id="quantity" name="quantity" value="1" min="1" max="100">
-                    <button type="button" class="k-qty__btn" data-step="1" aria-label="Increase quantity">
+                    <button type="button" class="gp-qty__btn" data-step="1" aria-label="Increase quantity">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" aria-hidden="true">
                             <path d="M12 5v14M5 12h14" />
                         </svg>
                     </button>
                 </div>
-            </div>
-            <button type="submit" name="add_to_cart" class="k-btn k-btn--primary">Add to Cart</button>
-        </form>
-        <?php k_wish_button($book, 'button'); ?>
+                <button type="submit" name="add_to_cart" class="k-btn k-btn--primary">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 4h2.2l2.1 10.2a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1L20.5 8H6.2" />
+                        <circle cx="9.5" cy="19.5" r="1.4" />
+                        <circle cx="17" cy="19.5" r="1.4" />
+                    </svg>
+                    Add to Cart
+                </button>
+            </form>
+            <?php k_wish_button($book, 'button'); ?>
+        </div>
+
+        <ul class="gp-trust">
+            <li>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M3 7h11v9H3z" />
+                    <path d="M14 10h4l3 3v3h-7z" />
+                    <circle cx="7" cy="18" r="1.6" />
+                    <circle cx="17" cy="18" r="1.6" />
+                </svg>
+                Free shipping over Rs. 2,000
+            </li>
+            <li>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="3" y="6" width="18" height="12" rx="2" />
+                    <circle cx="12" cy="12" r="2.6" />
+                </svg>
+                Pay when it arrives
+            </li>
+            <li>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M4 8h10a5 5 0 0 1 0 10H8" />
+                    <path d="M8 4 4 8l4 4" />
+                </svg>
+                <a href="legal.php?page=returns">Return within <?php echo $return_days; ?> days</a>
+            </li>
+        </ul>
     </div>
 </section>
 
@@ -160,7 +218,7 @@ require_once '../includes/header.php';
                 <div class="k-card k-ratingbox">
                     <div class="k-ratingbox__score">
                         <span class="k-ratingbox__num"><?php echo number_format($review_avg, 1); ?></span>
-                        <?php echo k_stars($review_avg); ?>
+                        <?php echo k_glass_stars($review_avg); ?>
                         <span class="k-ratingbox__count">Based on <?php echo $review_count . ($review_count === 1 ? ' review' : ' reviews'); ?></span>
                     </div>
                     <ul class="k-bars">
@@ -205,7 +263,7 @@ require_once '../includes/header.php';
                             <?php for ($v = 5; $v >= 1; $v--): ?>
                                 <input type="radio" name="rating" id="rate<?php echo $v; ?>" value="<?php echo $v; ?>" required
                                     <?php echo $form_rating === $v ? 'checked' : ''; ?>>
-                                <label for="rate<?php echo $v; ?>"><span class="k-sr"><?php echo $v; ?> star<?php echo $v === 1 ? '' : 's'; ?></span><span aria-hidden="true">&#9733;</span></label>
+                                <label for="rate<?php echo $v; ?>"><span class="k-sr"><?php echo $v; ?> star<?php echo $v === 1 ? '' : 's'; ?></span><svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7 6.1 20.8l1.2-6.5L2.5 9.7l6.6-.9z" /></svg></label>
                             <?php endfor; ?>
                         </div>
                     </fieldset>
@@ -238,7 +296,7 @@ require_once '../includes/header.php';
                             <div class="k-review__head">
                                 <span class="k-review__who"><?php echo htmlspecialchars(k_review_name((string) $rv['name'])); ?></span>
                                 <?php if ($mine): ?><span class="k-tag">You</span><?php endif; ?>
-                                <?php echo k_stars((float) $rv['rating']); ?>
+                                <?php echo k_glass_stars((float) $rv['rating']); ?>
                                 <time class="k-review__date" datetime="<?php echo htmlspecialchars(date('Y-m-d', strtotime($rv['created_at']))); ?>"><?php echo date('F j, Y', strtotime($rv['created_at'])); ?></time>
                             </div>
                             <?php if (trim((string) $rv['comment']) !== ''): ?>
@@ -271,19 +329,19 @@ require_once '../includes/header.php';
 
 <!-- Related Products -->
 <?php
-// Same-category books first; when there are fewer than three, fill up with other books
+// Same-category books first; when there are fewer than four, fill up with other books
 $current_id = (int) $book['id'];
 $cat = $conn->real_escape_string((string) $book['category']);
-$sql_related = "SELECT * FROM books WHERE id != $current_id ORDER BY (category = '$cat') DESC, RAND() LIMIT 3";
+$sql_related = "SELECT * FROM books WHERE id != $current_id ORDER BY (category = '$cat') DESC, RAND() LIMIT 4";
 $result_related = $conn->query($sql_related);
 
 if ($result_related->num_rows > 0):
     ?>
-    <section class="k-related">
-        <h2 class="k-h2">You May Also Like</h2>
-        <div class="k-grid">
+    <section class="hg-wrap gp-related">
+        <h2 class="hg-h2">You May Also Like</h2>
+        <div class="hg-grid">
             <?php while ($row = $result_related->fetch_assoc()): ?>
-                <?php k_book_card($row); ?>
+                <?php k_glass_tile($row); ?>
             <?php endwhile; ?>
         </div>
     </section>
