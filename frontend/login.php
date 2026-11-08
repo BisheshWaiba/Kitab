@@ -4,6 +4,7 @@ require_once '../includes/helpers.php';
 require_once '../includes/header.php';
 
 $error = '';
+$notice = ($_GET['reset'] ?? '') === '1' ? 'Your password was updated. Log in with your new password.' : '';
 
 if (isset($_SESSION['user_id'])) {
     header("Location: profile.php");
@@ -46,6 +47,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <form method="POST" class="k-authpage__form">
             <h1 class="k-h1">Welcome Back</h1>
 
+            <?php if ($notice && !$error): ?>
+                <div class="k-alert k-alert--success" role="status"><?php echo htmlspecialchars($notice); ?></div>
+            <?php endif; ?>
+
             <?php if ($error): ?>
                 <div class="k-alert k-alert--error" role="alert"><?php echo htmlspecialchars($error); ?></div>
             <?php endif; ?>
@@ -56,7 +61,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
             </div>
             <div class="k-field">
-                <label for="password">Password</label>
+                <div class="k-field__split">
+                    <label for="password">Password</label>
+                    <a href="forgot_password.php" class="k-field__link">Forgot password?</a>
+                </div>
                 <input type="password" id="password" name="password" class="k-input" required
                     autocomplete="current-password">
             </div>

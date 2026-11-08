@@ -25,6 +25,13 @@ foreach ($segments as $index => $segment) {
 
 define('BASE_URL', $scheme . '://' . $httpHost . $publicRoot);
 
+// Emails the shop sends (password reset links)
+define('MAIL_FROM', 'KITAB <no-reply@kitab.example>'); // CHANGE: the "from" address of those emails
+// Public address of the site, for example 'https://kitab.example/'. Links in emails are built from it. Leave it empty
+// while you work on your own computer; set it once the site is online, so a link never depends on the Host header
+// of the request that asked for it.
+define('SITE_URL', '');
+
 $conn = new mysqli($host, $user, $pass, $db_name);
 
 if ($conn->connect_error) {
