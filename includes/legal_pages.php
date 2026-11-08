@@ -4,18 +4,15 @@
 // This is a DRAFT written from what the site actually does (see the Privacy policy for the data it keeps). It is not
 // legal advice: read it through, change anything that is not true for your shop, and have it checked before launch.
 //
-// Everything you are most likely to change is in 'site' below. Texts can use these tokens:
+// The shop's name, email, address and law come from site.php; the periods and the date are set below.
+// Texts can use these tokens:
 //   {site} {email} {address} {law} {return_days} {refund_days}
 //
 // A page is: title, lead (opening paragraph) and sections. A section is 'h' (heading) plus any of
 // 'p' (paragraphs), 'ul' (bullets), 'ol' (numbered steps) and 'after' (paragraphs below the list).
 
 return [
-    'site' => [
-        'name' => 'KITAB',
-        'email' => 'hello@kitab.example',  // CHANGE: the address customers should write to
-        'address' => 'Kathmandu, Nepal',   // CHANGE: where the shop is based
-        'law' => 'Nepal',                  // CHANGE: country whose law applies
+    'site' => (require __DIR__ . '/site.php') + [
         'return_days' => 7,                // days a customer has to return a book
         'refund_days' => 7,                // days we take to refund a returned book
         'updated' => '2026-11-08',         // CHANGE whenever you edit the wording
@@ -36,6 +33,7 @@ return [
                     'Order details: your name, email address, delivery address, the books you ordered and the order total.',
                     'Books you list for sale: the title, author, price, description, cover image and any other details you enter. These are shown publicly on the site.',
                     'Reviews you write: your rating and comment. They are shown publicly on the book\'s page with your first name and the first letter of your last name.',
+                    'Messages you send us through the Contact page: your name, email address and what you write. We keep them to answer you.',
                     'Your wishlist and the books in your shopping cart.',
                     'Technical information your browser sends with every request, such as your IP address and browser type. Our web server may log it to keep the site secure and to fix faults.',
                 ]],
@@ -43,7 +41,7 @@ return [
                     'To create and run your account and keep you signed in.',
                     'To process and deliver your orders, and to keep a record of them.',
                     'To show your listings, your reviews, your wishlist and your order history.',
-                    'To answer your messages.',
+                    'To answer the messages you send us.',
                     'To keep the site secure and to prevent misuse.',
                 ], 'after' => [
                     'We do not sell your personal information and we do not use it for advertising.',
@@ -54,7 +52,7 @@ return [
                     'We may also disclose information when the law requires it.',
                 ]],
                 ['h' => 'How long we keep it', 'p' => [
-                    'We keep your account until you ask us to delete it. Order records are kept for as long as we need them for accounting and legal reasons. Server logs are kept only for a short time.',
+                    'We keep your account until you ask us to delete it. Order records are kept for as long as we need them for accounting and legal reasons. Messages you send us are kept for as long as we need them to deal with your request. Server logs are kept only for a short time.',
                 ]],
                 ['h' => 'Cookies', 'p' => [
                     'We use one essential cookie to keep you signed in and to remember your cart. Everything about it is in our Cookies policy.',

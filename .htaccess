@@ -1,0 +1,8 @@
+# Apache: show the custom 404 page for addresses that do not exist.
+# (PHP's built-in server does the same through router.php.)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ 404.php [L]
+</IfModule>

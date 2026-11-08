@@ -4,7 +4,9 @@
 // How it works: asking for a reset stores a random token (only its SHA-256 hash is kept) and emails a link that holds
 // the token. The link works once, for RESET_MINUTES. Using it sets a new password and removes the token.
 
-const RESET_MINUTES = 60;        // how long an emailed link keeps working
+require_once __DIR__ . '/helpers.php'; // k_send_mail()
+
+const RESET_MINUTES = 60;       // how long an emailed link keeps working
 const RESET_COOLDOWN = 60;       // seconds before another link can be requested for the same account
 const RESET_MIN_PASSWORD = 8;    // shortest new password
 const RESET_MAX_PASSWORD = 72;   // longest password that bcrypt really uses (it ignores anything after that)
@@ -36,14 +38,6 @@ function k_reset_link(string $token): string
 {
     $base = SITE_URL !== '' ? rtrim(SITE_URL, '/') . '/' : BASE_URL;
     return $base . 'frontend/reset_password.php?token=' . $token;
-}
-
-// Plain-text email through PHP's mail(). Returns false when the server cannot send mail.
-function k_send_mail(string $to, string $subject, string $body): bool
-{
-    $to = str_replace(["\r", "\n"], '', $to);
-    $headers = "From: " . MAIL_FROM . "\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8";
-    return @mail($to, $subject, $body, $headers);
 }
 
 // Starts a reset for the account with this email, if there is one.

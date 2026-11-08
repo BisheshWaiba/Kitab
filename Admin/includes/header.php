@@ -9,8 +9,16 @@ $admin_nav = [
     'books.php' => ['Books', ['books.php', 'add_book.php', 'edit_book.php']],
     'users.php' => ['Users', ['users.php']],
     'orders.php' => ['Orders', ['orders.php']],
+    'messages.php' => ['Messages', ['messages.php']],
     'profile.php' => ['Profile', ['profile.php']],
 ];
+
+// Unread contact messages, shown next to "Messages" (the table is created by the first message, so it may not exist yet)
+$unread_messages = 0;
+try {
+    $unread_messages = (int) $conn->query("SELECT COUNT(*) FROM contact_messages WHERE is_read = 0")->fetch_row()[0];
+} catch (Throwable $e) {
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -41,7 +49,10 @@ $admin_nav = [
                     <li>
                         <a href="<?php echo BASE_URL; ?>admin/<?php echo $file; ?>"
                             class="k-adminside__link<?php echo $is_active ? ' is-active' : ''; ?>"
-                            <?php echo $is_active ? 'aria-current="page"' : ''; ?>><?php echo $label; ?></a>
+                            <?php echo $is_active ? 'aria-current="page"' : ''; ?>><?php echo $label; ?>
+                            <?php if ($file === 'messages.php' && $unread_messages > 0): ?>
+                                <span class="k-adminside__badge" aria-label="<?php echo $unread_messages; ?> unread"><?php echo $unread_messages; ?></span>
+                            <?php endif; ?></a>
                     </li>
                 <?php endforeach; ?>
             </ul>

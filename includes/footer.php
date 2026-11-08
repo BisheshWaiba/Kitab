@@ -8,6 +8,8 @@
                     <li><a href="<?php echo BASE_URL; ?>frontend/shop.php">Books</a></li>
                     <li><a href="<?php echo BASE_URL; ?>frontend/authors.php">Authors</a></li>
                     <li><a href="<?php echo BASE_URL; ?>frontend/collections.php">Collections</a></li>
+                    <li><a href="<?php echo BASE_URL; ?>frontend/about.php">About</a></li>
+                    <li><a href="<?php echo BASE_URL; ?>frontend/contact.php">Contact</a></li>
                     <li><a href="#">Events</a></li>
                 </ul>
                 <ul class="k-footer__col">

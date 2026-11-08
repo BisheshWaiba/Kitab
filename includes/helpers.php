@@ -18,6 +18,21 @@ function k_payment_label(?string $method): string
     return ucwords(str_replace('_', ' ', $method));
 }
 
+// Plain-text email through PHP's mail(). Returns false when the server cannot send mail (as on a plain XAMPP).
+// $reply_to, when given, is where a reply goes (used for contact messages, so replying answers the visitor).
+function k_send_mail(string $to, string $subject, string $body, ?string $reply_to = null): bool
+{
+    $one_line = fn(string $text): string => str_replace(["\r", "\n"], '', $text);
+    if (preg_match('/[^\x20-\x7E]/', $subject)) {
+        $subject = '=?UTF-8?B?' . base64_encode($one_line($subject)) . '?='; // names and accents in a subject
+    }
+    $headers = "From: " . MAIL_FROM . "\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8";
+    if ($reply_to !== null && filter_var($reply_to, FILTER_VALIDATE_EMAIL)) {
+        $headers .= "\r\nReply-To: " . $one_line($reply_to);
+    }
+    return @mail($one_line($to), $one_line($subject), $body, $headers);
+}
+
 // One-time token for forms that change data (needs an active session). Pair with k_csrf_valid() on the POST side.
 function k_csrf_token(): string
 {

@@ -18,6 +18,7 @@ $sql = "SELECT * FROM books WHERE id = $id";
 $result = $conn->query($sql);
 
 if ($result->num_rows == 0) {
+    http_response_code(404);
     $page_title = 'Book not found';
     require_once '../includes/header.php';
     echo "<div class='k-page'>
