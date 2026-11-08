@@ -91,17 +91,7 @@ foreach ($cart_items as $b) {
 
 <div class="hg-wrap gc-main">
     <?php if (empty($cart_items)): ?>
-        <div class="k-empty">
-            <svg class="k-empty__icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M3 4h2.2l2.1 10.2a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1L20.5 8H6.2" />
-                <circle cx="9.5" cy="19.5" r="1.4" />
-                <circle cx="17" cy="19.5" r="1.4" />
-            </svg>
-            <h2>Your cart is empty</h2>
-            <p>Looks like you haven't added any books yet.</p>
-            <a href="shop.php" class="k-btn k-btn--primary">Start Shopping</a>
-        </div>
+        <?php k_empty_state('cart', 'Your cart is empty', "Looks like you haven't added any books yet.", 'Start Shopping', 'shop.php'); ?>
     <?php else: ?>
         <div class="gc-cart">
             <div class="gc-left">

@@ -207,11 +207,10 @@ foreach ($books as $b) {
                 <?php k_glass_tile($row); ?>
             <?php endforeach; ?>
         </div>
+    <?php elseif ($filters_active): ?>
+        <?php k_empty_state('cart', 'No books found', 'Nothing matches your search or filters. Try something different, or start again.', 'Clear Filters', 'shop.php'); ?>
     <?php else: ?>
-        <div class="k-empty">
-            <p>No books found matching your criteria.</p>
-            <a href="shop.php" class="k-btn k-btn--outline">Clear Filters</a>
-        </div>
+        <?php k_empty_state('cart', 'No books yet', 'The shelves are being filled. Please check back soon.', 'Back to Home', BASE_URL . 'index.php'); ?>
     <?php endif; ?>
 </div>
 

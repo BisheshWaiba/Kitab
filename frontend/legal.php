@@ -75,10 +75,7 @@ require_once '../includes/header.php';
                 <p class="k-prose__contact">Questions about this page? Write to us at <?php echo $say('{email}'); ?>.</p>
             </article>
         <?php else: ?>
-            <div class="k-empty">
-                <p>We couldn't find that page.</p>
-                <a href="../index.php" class="k-btn k-btn--outline">Back to Home</a>
-            </div>
+            <?php k_empty_state('cart', 'Page not found', "We couldn't find that page. It may have moved, or the link is mistyped.", 'Back to Home', BASE_URL . 'index.php'); ?>
         <?php endif; ?>
     </main>
 </div>

@@ -83,10 +83,7 @@ $initial = strtoupper(mb_substr($user_name, 0, 1));
                 <?php endforeach; ?>
             </div>
         <?php else: ?>
-            <div class="k-empty">
-                <p>You haven't listed any books for sale yet.</p>
-                <a href="sell_book.php" class="k-btn k-btn--outline">List your first book</a>
-            </div>
+            <?php k_empty_state('cart', 'No books listed yet', 'Books you list for sale will show up here.', 'List Your First Book', 'sell_book.php', 3); ?>
         <?php endif; ?>
     </section>
 
@@ -123,10 +120,7 @@ $initial = strtoupper(mb_substr($user_name, 0, 1));
                 <?php endwhile; ?>
             </div>
         <?php else: ?>
-            <div class="k-empty">
-                <p>You haven't placed any orders yet.</p>
-                <a href="shop.php" class="k-btn k-btn--primary">Start Shopping</a>
-            </div>
+            <?php k_empty_state('cart', 'No orders yet', 'When you place an order, you can follow it here.', 'Start Shopping', 'shop.php', 3); ?>
         <?php endif; ?>
     </section>
 </div>

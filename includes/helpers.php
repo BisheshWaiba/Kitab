@@ -228,6 +228,28 @@ function k_glass_tile(array $b): void
     <?php
 }
 
+// The one empty state, used wherever a page or a list has nothing to show: a round icon (a heart for the wishlist, a cart
+// for everything else), a short friendly headline, one sentence of help and a single button. $level is the heading level
+// (2 on a page, 3 inside a section). All text is escaped here. Styles: .k-empty in assets/css/kitab.css.
+function k_empty_state(string $icon, string $title, string $hint, string $label, string $href, int $level = 2): void
+{
+    $shapes = [
+        'cart' => '<path d="M3 4h2.2l2.1 10.2a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1L20.5 8H6.2" /><circle cx="9.5" cy="19.5" r="1.4" /><circle cx="17" cy="19.5" r="1.4" />',
+        'heart' => '<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21.2l7.8-7.7 1-1.1a5.5 5.5 0 0 0 0-7.8z" />',
+    ];
+    $tag = 'h' . max(2, min(6, $level));
+    ?>
+    <div class="k-empty">
+        <span class="k-empty__badge" aria-hidden="true">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><?php echo $shapes[$icon] ?? $shapes['cart']; ?></svg>
+        </span>
+        <<?php echo $tag; ?> class="k-empty__title"><?php echo htmlspecialchars($title); ?></<?php echo $tag; ?>>
+        <p><?php echo htmlspecialchars($hint); ?></p>
+        <a href="<?php echo htmlspecialchars($href); ?>" class="k-btn k-btn--primary"><?php echo htmlspecialchars($label); ?></a>
+    </div>
+    <?php
+}
+
 // A full address (https://...) for a path on this site. Uses the public address from config/db.php (SITE_URL) once the
 // site is online, and the address the page was asked at until then.
 function k_site_url(string $path = ''): string

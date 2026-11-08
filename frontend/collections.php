@@ -52,10 +52,7 @@ while ($result && ($book = $result->fetch_assoc())) {
                 <?php endforeach; ?>
             </ul>
         <?php else: ?>
-            <div class="k-empty">
-                <p>There are no books in the store yet.</p>
-                <a href="shop.php" class="k-btn k-btn--outline">Go to Shop</a>
-            </div>
+            <?php k_empty_state('cart', 'No collections yet', 'Collections will appear here as soon as books are added to the store.', 'Back to Home', BASE_URL . 'index.php'); ?>
         <?php endif; ?>
     </main>
 </div>

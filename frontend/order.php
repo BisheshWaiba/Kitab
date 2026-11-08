@@ -27,10 +27,7 @@ if (!$order) {
     require_once '../includes/header.php';
     ?>
     <div class="k-page">
-        <div class="k-empty">
-            <p>We couldn't find that order.</p>
-            <a href="profile.php" class="k-btn k-btn--outline">Back to My Account</a>
-        </div>
+        <?php k_empty_state('cart', 'Order not found', "We couldn't find that order. Check the number, or open it from your order history.", 'Back to My Account', 'profile.php'); ?>
     </div>
     <?php
     require_once '../includes/footer.php';

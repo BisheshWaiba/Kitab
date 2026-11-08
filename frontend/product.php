@@ -26,12 +26,9 @@ if ($result->num_rows == 0) {
     http_response_code(404);
     $page_title = 'Book not found';
     require_once '../includes/header.php';
-    echo "<div class='k-page'>
-    <div class='k-empty'>
-        <p>Book not found.</p>
-        <a href='shop.php' class='k-btn k-btn--outline'>Back to Shop</a>
-    </div>
-</div>";
+    echo "<div class='k-page'>";
+    k_empty_state('cart', 'Book not found', 'It may have been removed, or the link is mistyped.', 'Browse Books', 'shop.php');
+    echo "</div>";
     require_once '../includes/footer.php';
     exit();
 }
