@@ -93,15 +93,20 @@ document.querySelectorAll('form[data-wish]').forEach(function (form) {
 
                 // On the wishlist page a removed book leaves the list
                 var list = document.querySelector('[data-wish-list]');
-                var card = form.closest('.k-book');
+                var card = form.closest('.k-book, .hg-tile');
                 if (list && card && !data.wished) {
-                    card.remove();
-                    var total = document.querySelector('[data-wish-total]');
-                    if (data.count === 0) {
-                        window.location.reload();
-                    } else if (total) {
-                        total.textContent = data.count + (data.count === 1 ? ' book' : ' books') + ' saved for later';
-                    }
+                    // the card fades out first, then leaves the list (straight away for people who asked for less motion)
+                    card.classList.add('is-leaving');
+                    var wait = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 280;
+                    setTimeout(function () {
+                        card.remove();
+                        var total = document.querySelector('[data-wish-total]');
+                        if (data.count === 0) {
+                            window.location.reload();
+                        } else if (total) {
+                            total.textContent = data.count + (data.count === 1 ? ' book' : ' books') + ' saved for later';
+                        }
+                    }, wait);
                 }
                 button.disabled = false;
             })

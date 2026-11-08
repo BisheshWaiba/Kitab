@@ -64,32 +64,53 @@ $stmt->execute();
 $books = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $total = count($books);
 
+// The Wishlist page has the glass look (from the design canvas): a body class and a stylesheet only the redesigned pages load
+$body_class = 'is-glass is-wishlist';
+$extra_css = 'assets/css/glass.css';
 $page_title = 'My Wishlist';
 require_once '../includes/header.php';
+
+// Light from the books: the two most recently saved covers glow softly behind the top of the page
+$ambient = [];
+foreach ($books as $b) {
+    $img = trim((string) $b['image']);
+    if ($img !== '') {
+        $ambient[] = strpos($img, 'http') === 0 ? $img : BASE_URL . $img;
+        if (count($ambient) === 2) {
+            break;
+        }
+    }
+}
 ?>
 
-<section class="k-pagehead">
-    <div class="k-pagehead__inner">
-        <h1 class="k-h1">My Wishlist</h1>
-        <p data-wish-total><?php echo $total === 0 ? 'Books you save will wait for you here' : $total . ($total === 1 ? ' book' : ' books') . ' saved for later'; ?></p>
-    </div>
+<div class="hg-ambient" aria-hidden="true">
+    <?php foreach ($ambient as $src): ?>
+        <img src="<?php echo htmlspecialchars($src); ?>" alt="">
+    <?php endforeach; ?>
+</div>
+
+<section class="gs-head hg-wrap">
+    <h1 class="hg-h1 gs-title">My Wishlist</h1>
+    <p class="hg-lede" data-wish-total><?php echo $total === 0 ? 'Books you save will wait for you here' : $total . ($total === 1 ? ' book' : ' books') . ' saved for later'; ?></p>
 </section>
 
-<div class="k-shop">
-    <main class="k-shop__main">
-        <?php if ($total > 0): ?>
-            <div class="k-grid" data-wish-list>
-                <?php foreach ($books as $row): ?>
-                    <?php k_book_card($row); ?>
-                <?php endforeach; ?>
-            </div>
-        <?php else: ?>
-            <div class="k-empty">
-                <p>Your wishlist is empty. Tap the heart on any book to save it for later.</p>
-                <a href="shop.php" class="k-btn k-btn--primary">Browse Books</a>
-            </div>
-        <?php endif; ?>
-    </main>
+<div class="hg-wrap gs-main">
+    <?php if ($total > 0): ?>
+        <div class="hg-grid" data-wish-list>
+            <?php foreach ($books as $row): ?>
+                <?php k_glass_tile($row); ?>
+            <?php endforeach; ?>
+        </div>
+    <?php else: ?>
+        <div class="k-empty">
+            <svg class="k-empty__icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21.2l7.8-7.7 1-1.1a5.5 5.5 0 0 0 0-7.8z" />
+            </svg>
+            <p>Your wishlist is empty. Tap the heart on any book to save it for later.</p>
+            <a href="shop.php" class="k-btn k-btn--primary">Browse Books</a>
+        </div>
+    <?php endif; ?>
 </div>
 
 <?php require_once '../includes/footer.php'; ?>
