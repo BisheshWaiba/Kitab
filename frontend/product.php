@@ -63,7 +63,7 @@ require_once '../includes/header.php';
     <div class="k-product__info">
         <span class="k-product__cat"><?php echo htmlspecialchars($book['category']); ?></span>
         <h1 class="k-product__title"><?php echo htmlspecialchars($book['title']); ?></h1>
-        <p class="k-product__author">by <?php echo htmlspecialchars($book['author']); ?></p>
+        <p class="k-product__author">by <a href="shop.php?author=<?php echo urlencode(trim($book['author'])); ?>"><?php echo htmlspecialchars($book['author']); ?></a></p>
         <p class="k-product__price">Rs. <?php echo htmlspecialchars(number_format($book['price'])); ?></p>
 
         <?php if ($description !== ''): ?>

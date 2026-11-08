@@ -63,7 +63,7 @@ $user_initial = isset($_SESSION['user_name']) ? strtoupper(mb_substr($_SESSION['
                 <a href="<?php echo BASE_URL; ?>frontend/shop.php"
                     class="k-link<?php echo $nav_shop ? ' is-active' : ''; ?>">Shop</a>
                 <a href="<?php echo BASE_URL; ?>frontend/wishlist.php"
-                    class="k-cart k-cart--wish<?php echo $nav_wish ? ' is-active' : ''; ?>"
+                    class="k-cart k-cart--wish<?php echo $nav_wish ? ' is-active' : ''; ?><?php echo isset($_SESSION['user_id']) ? '' : ' k-cart--guest'; ?>"
                     aria-label="Wishlist<?php echo $wish_count > 0 ? ', ' . $wish_count . ' saved' : ''; ?>"
                     <?php echo $nav_wish ? 'aria-current="page"' : ''; ?>>
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"

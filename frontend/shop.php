@@ -10,6 +10,13 @@ if (isset($_GET['search']) && !empty($_GET['search'])) {
     $where_clauses[] = "(title LIKE '%$search%' OR author LIKE '%$search%')";
 }
 
+// Books by one author (linked from the Authors page and the product page)
+$author_filter = is_string($_GET['author'] ?? null) ? trim($_GET['author']) : '';
+if ($author_filter !== '') {
+    $author = $conn->real_escape_string($author_filter);
+    $where_clauses[] = "TRIM(author) = '$author'";
+}
+
 if (isset($_GET['category']) && !empty($_GET['category'])) {
     $category = $conn->real_escape_string($_GET['category']);
     $where_clauses[] = "category = '$category'";
@@ -50,6 +57,11 @@ $active_category = $_GET['category'] ?? '';
                 <?php endwhile; ?>
             </ul>
         </nav>
+
+        <?php if ($author_filter !== ''): ?>
+            <p class="k-results">Books by <strong><?php echo htmlspecialchars($author_filter); ?></strong>
+                &middot; <a href="shop.php">Show all books</a></p>
+        <?php endif; ?>
 
         <?php if (isset($_GET['search'])): ?>
             <p class="k-results">Search results for
