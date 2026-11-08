@@ -19,6 +19,22 @@
   --k-red: #B3261E;
   --k-display: 'Fraunces', Georgia, serif;
   --k-body: 'Inter', system-ui, sans-serif;
+  --k-on-ink: #FFFFFF;          /* text on an ink-coloured button or badge */
+  --k-on-red: #FFFFFF;
+  --k-border: #D9D9D6;          /* the edge of an input */
+  --k-border-mid: #D2D2CF;      /* chips, empty stars */
+  --k-border-strong: #BDBDBA;   /* dashed boxes, hovered edges */
+  --k-hairline: #EFEFED;        /* table rows, quiet fills */
+  --k-track: #E1E1DE;           /* progress lines */
+  --k-float: rgba(255, 255, 255, .94); /* a button floating over a cover */
+  --k-invalid-bg: #FFF9F8;      /* a field with a problem */
+  --k-announce-bg: #111214;
+  --k-announce-fg: #E6E8EF;
+  --k-ok-bg: #DDF1E6;   --k-ok: #17663F;
+  --k-bad-bg: #FBE3E1;  --k-bad: #8C1D18;
+  --k-warn-bg: #FCEFD0; --k-warn: #7A4A00;
+  --k-info-bg: #E8EAF8; --k-info: #2A3B9E;
+  --k-ship-bg: #DCEBF7; --k-ship: #1B5280;
   --k-cover-shadow: 0 1px 2px rgba(20, 22, 28, .2), 0 12px 24px -8px rgba(20, 22, 28, .38);
   --k-ease: cubic-bezier(.16, 1, .3, 1);
 }
@@ -26,6 +42,94 @@
 body {
   background: var(--k-paper);
   color: var(--k-ink);
+}
+
+/* ---------- Dark mode ----------
+   The storefront sets data-theme="dark" on <html> (includes/theme.php, before the page is painted; the header button
+   switches it). Pages without that attribute, such as the admin area, stay as they were. Every colour in this file is
+   one of the tokens above, so changing them here changes the whole site. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --k-paper: #0E0F12;
+  --k-white: #16181C;
+  --k-band: #1B1D22;
+  --k-shelf: #23262C;
+  --k-ink: #F3F2EE;
+  --k-ink-2: #C8C9D0;
+  --k-muted: #9A9CA6;
+  --k-line: #2A2D34;
+  --k-accent: #F3F2EE;
+  --k-accent-dark: #D6D5D0;
+  --k-accent-tint: #23262C;
+  --k-accent-wash: #1E2025;
+  --k-red: #FF7A6E;
+  --k-on-ink: #111214;
+  --k-on-red: #2A0E0B;
+  --k-border: #3A3D45;
+  --k-border-mid: #40434B;
+  --k-border-strong: #555964;
+  --k-hairline: #24272D;
+  --k-track: #30333B;
+  --k-float: rgba(36, 38, 44, .92);
+  --k-invalid-bg: rgba(255, 122, 110, .1);
+  --k-announce-bg: #1C1E24;
+  --k-announce-fg: #E6E8EF;
+  --k-ok-bg: rgba(72, 187, 120, .16);   --k-ok: #86DBA9;
+  --k-bad-bg: rgba(255, 122, 110, .16); --k-bad: #FFA29A;
+  --k-warn-bg: rgba(242, 177, 52, .16); --k-warn: #F2C46A;
+  --k-info-bg: rgba(130, 148, 255, .16); --k-info: #B0BBFF;
+  --k-ship-bg: rgba(96, 175, 232, .16); --k-ship: #94C9F1;
+  --k-cover-shadow: 0 1px 2px rgba(0, 0, 0, .5), 0 12px 24px -8px rgba(0, 0, 0, .7);
+  /* the older stylesheet (style.css) colours bare headings and the page from these */
+  --primary: #F3F2EE;
+  --secondary: #0E0F12;
+  --text-dark: #C8C9D0;
+  --text-light: #9A9CA6;
+  --white: #16181C;
+  --border-color: #2A2D34;
+}
+:root[data-theme="dark"] ::selection { background: rgba(242, 177, 52, .4); color: #fff; }
+/* the browser's own autofill colours would otherwise break a dark field */
+:root[data-theme="dark"] input:-webkit-autofill,
+:root[data-theme="dark"] textarea:-webkit-autofill {
+  -webkit-text-fill-color: var(--k-ink);
+  box-shadow: 0 0 0 100px var(--k-band) inset;
+  caret-color: var(--k-ink);
+}
+
+/* ---------- The theme switch in the header ---------- */
+.k-theme {
+  flex: none;
+  order: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--k-ink);
+  cursor: pointer;
+  transition: background-color .2s, transform .3s var(--k-ease);
+}
+.k-theme:hover { background: var(--k-accent-tint); }
+.k-theme:active { transform: scale(.92); }
+.k-theme:focus-visible { outline: 3px solid var(--k-accent); outline-offset: 2px; }
+.k-theme svg { display: block; }
+.k-theme .k-theme__sun { display: none; }
+:root[data-theme="dark"] .k-theme .k-theme__sun { display: block; }
+:root[data-theme="dark"] .k-theme .k-theme__moon { display: none; }
+@media (max-width: 900px) {
+  /* the links row keeps a free corner for the switch, which sits in the top right of the header */
+  .k-nav__inner { position: relative; }
+  .k-theme { position: absolute; top: 7px; right: 14px; }
+  .k-links { margin-right: 52px; }
+}
+@media (max-width: 560px) {
+  /* on phones the links wrap below the logo, so the corner beside the logo is free */
+  .k-links { margin-right: 0; flex: 1 1 100%; }
 }
 
 /* ---------- Buttons ---------- */
@@ -49,11 +153,11 @@ body {
 .k-btn--sm { height: 44px; padding: 0 22px; }
 .k-btn--lg { height: 52px; padding: 0 28px; font-size: 16px; }
 
-.k-btn--primary { background: var(--k-accent); color: #fff; }
+.k-btn--primary { background: var(--k-accent); color: var(--k-on-ink); }
 .k-btn--primary:hover { background: var(--k-accent-dark); }
 
 .k-btn--outline { border-color: var(--k-ink); color: var(--k-ink); background: transparent; }
-.k-btn--outline:hover { background: var(--k-ink); color: #fff; }
+.k-btn--outline:hover { background: var(--k-ink); color: var(--k-on-ink); }
 
 .k-btn:focus-visible,
 .k-link:focus-visible,
@@ -74,8 +178,8 @@ body {
 
 /* ---------- Header ---------- */
 .k-announce {
-  background: var(--k-ink);
-  color: #E6E8EF;
+  background: var(--k-announce-bg);
+  color: var(--k-announce-fg);
   font-size: 13px;
   line-height: 1.4;
   text-align: center;
@@ -152,7 +256,7 @@ body {
   font: 400 15px/1.4 var(--k-body);
   color: var(--k-ink);
 }
-.k-search input::placeholder { color: #6B6C72; }
+.k-search input::placeholder { color: var(--k-muted); }
 
 .k-links { display: flex; align-items: center; gap: 28px; }
 
@@ -201,7 +305,7 @@ body {
   height: 44px;
   border-radius: 50%;
   background: var(--k-accent);
-  color: #fff;
+  color: var(--k-on-ink);
   font-family: var(--k-display);
   font-weight: 600;
   font-size: 18px;
@@ -350,7 +454,7 @@ body {
   padding: 0;
   border: 0;
   border-radius: 50%;
-  background: rgba(255, 255, 255, .94);
+  background: var(--k-float);
   color: var(--k-ink-2);
   box-shadow: 0 1px 2px rgba(20, 22, 28, .14), 0 6px 14px -6px rgba(20, 22, 28, .3);
   cursor: pointer;
@@ -525,7 +629,7 @@ body {
   justify-content: center;
   border-radius: 50%;
   background: var(--k-ink);
-  color: #fff;
+  color: var(--k-on-ink);
   font-family: var(--k-display);
   font-weight: 600;
   font-size: 20px;
@@ -575,7 +679,7 @@ body {
   font-size: 18px;
   line-height: 1;
   white-space: nowrap;
-  background: linear-gradient(90deg, var(--k-gold) var(--pct, 0%), #D9D9D6 var(--pct, 0%));
+  background: linear-gradient(90deg, var(--k-gold) var(--pct, 0%), var(--k-border) var(--pct, 0%));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -621,7 +725,7 @@ body {
 .k-rate legend { padding: 0; }
 .k-rate__stars { display: flex; flex-direction: row-reverse; justify-content: flex-end; }
 .k-rate__stars input { position: absolute; width: 1px; height: 1px; margin: 0; opacity: 0; }
-.k-rate__stars label { padding: 0 3px; font-size: 36px; line-height: 1; color: #D2D2CF; cursor: pointer; transition: color .1s; }
+.k-rate__stars label { padding: 0 3px; font-size: 36px; line-height: 1; color: var(--k-border-mid); cursor: pointer; transition: color .1s; }
 .k-rate__stars label:first-of-type { padding-right: 0; }
 .k-rate__stars input:checked ~ label,
 .k-rate__stars label:hover,
@@ -847,7 +951,7 @@ body {
   height: 44px;
   padding: 0 22px;
   border-radius: 999px;
-  border: 1.5px solid #D2D2CF;
+  border: 1.5px solid var(--k-border-mid);
   background: var(--k-white);
   color: var(--k-ink-2);
   font: 500 15px/1 var(--k-body);
@@ -855,7 +959,7 @@ body {
   transition: border-color .15s, background-color .15s, color .15s;
 }
 .k-chip:hover { border-color: var(--k-ink); color: var(--k-ink); }
-.k-chip.is-active { background: var(--k-ink); border-color: var(--k-ink); color: #fff; font-weight: 600; }
+.k-chip.is-active { background: var(--k-ink); border-color: var(--k-ink); color: var(--k-on-ink); font-weight: 600; }
 
 .k-picks__panel {
   display: none;
@@ -904,7 +1008,7 @@ body {
 .k-cats { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 36px; padding: 0; list-style: none; }
 .k-cats .k-genre { height: 44px; padding: 0 20px; }
 .k-genre.is-active,
-.k-genre.is-active:hover { background: var(--k-ink); border-color: var(--k-ink); color: #fff; font-weight: 600; }
+.k-genre.is-active:hover { background: var(--k-ink); border-color: var(--k-ink); color: var(--k-on-ink); font-weight: 600; }
 
 .k-results { margin: 0 0 28px; font-size: 16px; color: var(--k-ink-2); }
 .k-results strong { color: var(--k-ink); }
@@ -915,7 +1019,7 @@ body {
   align-items: center;
   gap: 20px;
   padding: 72px 24px;
-  border: 1px dashed #BDBDBA;
+  border: 1px dashed var(--k-border-strong);
   border-radius: 16px;
   text-align: center;
 }
@@ -945,21 +1049,21 @@ body {
   height: 52px;
   box-sizing: border-box;
   padding: 0 16px;
-  border: 1.5px solid #D9D9D6;
+  border: 1.5px solid var(--k-border);
   border-radius: 10px;
   background: var(--k-white);
   font: 400 16px/1.4 var(--k-body);
   color: var(--k-ink);
   transition: border-color .15s;
 }
-.k-input:hover { border-color: #BDBDBA; }
+.k-input:hover { border-color: var(--k-border-strong); }
 .k-input:focus { outline: 3px solid var(--k-accent-tint); outline-offset: 0; border-color: var(--k-accent); }
 .k-input--qty { width: 72px; height: 44px; padding: 0 12px; border-radius: 8px; font-weight: 600; }
 
 /* Form errors: the message sits right under its field (see k_field_error() in helpers.php and the form validation in main.js) */
 .k-input[aria-invalid="true"],
-.k-input[aria-invalid="true"]:hover { border-color: var(--k-red); background: #FFF9F8; }
-.k-input[aria-invalid="true"]:focus { border-color: var(--k-red); outline-color: rgba(179, 38, 30, .22); }
+.k-input[aria-invalid="true"]:hover { border-color: var(--k-red); background: var(--k-invalid-bg); }
+.k-input[aria-invalid="true"]:focus { border-color: var(--k-red); outline-color: color-mix(in srgb, var(--k-red) 30%, transparent); }
 .k-field, .k-rate, .gs-price { scroll-margin: 130px 0 40px; } /* when a field with a problem is scrolled to, keep it clear of the sticky header */
 .k-field__error { display: flex; align-items: flex-start; gap: 7px; margin: 0; font-size: 14px; font-weight: 500; line-height: 1.45; color: var(--k-red); }
 .k-field__error::before { content: ""; flex: none; width: 16px; height: 16px; margin-top: 2px; background: currentColor; -webkit-mask: var(--k-error-icon) center / contain no-repeat; mask: var(--k-error-icon) center / contain no-repeat; }
@@ -983,7 +1087,7 @@ body {
   text-transform: uppercase;
   color: var(--k-muted);
 }
-.k-table td { padding: 20px 12px; border-bottom: 1px solid #EFEFED; vertical-align: middle; }
+.k-table td { padding: 20px 12px; border-bottom: 1px solid var(--k-hairline); vertical-align: middle; }
 .k-table tr:last-child td { border-bottom: 0; }
 .k-table th:first-child, .k-table td:first-child { padding-left: 24px; }
 .k-table th:last-child, .k-table td:last-child { padding-right: 24px; }
@@ -1150,7 +1254,7 @@ body {
 .k-rowactions form { margin: 0; }
 .k-btn--xs { height: 40px; padding: 0 16px; font-size: 14px; border-radius: 8px; }
 .k-btn--danger { border-color: var(--k-red); color: var(--k-red); background: transparent; }
-.k-btn--danger:hover { background: var(--k-red); color: #fff; }
+.k-btn--danger:hover { background: var(--k-red); color: var(--k-on-red); }
 
 @media (max-width: 900px) {
   .k-adminbody { flex-direction: column; }
@@ -1193,7 +1297,7 @@ body {
 .k-field__hint { font-weight: 400; color: var(--k-muted); }
 select.k-input { appearance: auto; }
 
-.k-alert--success { background: #DDF1E6; color: #17663F; }
+.k-alert--success { background: var(--k-ok-bg); color: var(--k-ok); }
 .k-alert--success a { margin-left: 4px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 
 .k-dropzone {
@@ -1203,11 +1307,11 @@ select.k-input { appearance: auto; }
   gap: 20px;
   padding: 24px;
   box-sizing: border-box;
-  border: 2px dashed #BDBDBA;
+  border: 2px dashed var(--k-border-strong);
   border-radius: 14px;
   background: var(--k-band);
 }
-.k-dropzone__preview { flex: 0 0 auto; width: 56px; height: 84px; display: flex; overflow: hidden; border-radius: 3px; background: #E8E8E6; }
+.k-dropzone__preview { flex: 0 0 auto; width: 56px; height: 84px; display: flex; overflow: hidden; border-radius: 3px; background: var(--k-line); }
 .k-dropzone__preview img { width: 100%; height: 100%; object-fit: cover; border-radius: 0; }
 .k-dropzone__preview:not(.has-image) img { display: none; }
 .k-dropzone__text { flex: 1 1 240px; margin: 0; font-size: 15px; color: var(--k-ink-2); }
@@ -1245,7 +1349,7 @@ select.k-input { appearance: auto; }
   justify-content: center;
   overflow: hidden;
   border-radius: 50%;
-  border: 2px dashed #BDBDBA;
+  border: 2px dashed var(--k-border-strong);
   background: var(--k-band);
   color: var(--k-muted);
 }
@@ -1273,7 +1377,7 @@ select.k-input { appearance: auto; }
   transition: border-color .15s, background-color .15s;
 }
 .k-tile input { width: 20px; height: 20px; margin: 0; flex: 0 0 auto; accent-color: var(--k-accent); }
-.k-tile:hover { border-color: #BDBDBA; }
+.k-tile:hover { border-color: var(--k-border-strong); }
 .k-tile:has(input:checked) { border-color: var(--k-accent); background: var(--k-accent-wash); }
 .k-tile:has(input:focus-visible) { outline: 3px solid var(--k-accent); outline-offset: 2px; }
 
@@ -1316,7 +1420,7 @@ select.k-input { appearance: auto; }
 .k-authpage__form .k-h1 { font-size: clamp(36px, 4vw, 48px); margin-bottom: 8px; }
 
 .k-alert { padding: 12px 16px; border-radius: 10px; font-size: 15px; line-height: 1.5; }
-.k-alert--error { background: #FBE3E1; color: #8C1D18; }
+.k-alert--error { background: var(--k-bad-bg); color: var(--k-bad); }
 
 .k-authpage__text { margin: 0; font-size: 17px; line-height: 1.6; color: var(--k-ink-2); }
 .k-authpage__text strong { color: var(--k-ink); overflow-wrap: anywhere; }
@@ -1325,7 +1429,7 @@ select.k-input { appearance: auto; }
 .k-field__link:hover { color: var(--k-accent-dark); }
 .k-devnote {
   padding: 16px 18px;
-  border: 1px dashed #BDBDBA;
+  border: 1px dashed var(--k-border-strong);
   border-radius: 12px;
   background: var(--k-band);
   font-size: 14px;
@@ -1345,12 +1449,12 @@ select.k-input { appearance: auto; }
 }
 
 /* ---------- My account ---------- */
-.k-btn--ghost-light { border-color: #D2D2CF; color: var(--k-ink); }
+.k-btn--ghost-light { border-color: var(--k-border-mid); color: var(--k-ink); }
 .k-btn--ghost-light:hover { border-color: var(--k-ink); background: var(--k-white); }
-.k-btn--light { background: var(--k-ink); color: #fff; }
+.k-btn--light { background: var(--k-ink); color: var(--k-on-ink); }
 .k-btn--light:hover { background: var(--k-accent-dark); }
 .k-btn--danger-light { border-color: var(--k-red); color: var(--k-red); }
-.k-btn--danger-light:hover { background: #FBE3E1; }
+.k-btn--danger-light:hover { background: var(--k-bad-bg); }
 
 .k-hello { background: var(--k-band); color: var(--k-ink); border-bottom: 1px solid var(--k-line); }
 .k-hello__inner {
@@ -1375,7 +1479,7 @@ select.k-input { appearance: auto; }
   border-radius: 50%;
   object-fit: cover;
   background: var(--k-accent);
-  color: #fff;
+  color: var(--k-on-ink);
   font-family: var(--k-display);
   font-weight: 600;
   font-size: 40px;
@@ -1431,13 +1535,13 @@ select.k-input { appearance: auto; }
 .k-order__amount { font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; }
 
 .k-pill { display: inline-block; padding: 5px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; }
-.k-pill--pending { background: #FCEFD0; color: #7A4A00; }
-.k-pill--processing { background: #E8EAF8; color: #2A3B9E; } /* a status color, deliberately not tied to the brand color */
-.k-pill--shipped { background: #DCEBF7; color: #1B5280; }
-.k-pill--delivered { background: #DDF1E6; color: #17663F; }
-.k-pill--cancelled { background: #FBE3E1; color: #8C1D18; }
+.k-pill--pending { background: var(--k-warn-bg); color: var(--k-warn); }
+.k-pill--processing { background: var(--k-info-bg); color: var(--k-info); } /* a status color, deliberately not tied to the brand color */
+.k-pill--shipped { background: var(--k-ship-bg); color: var(--k-ship); }
+.k-pill--delivered { background: var(--k-ok-bg); color: var(--k-ok); }
+.k-pill--cancelled { background: var(--k-bad-bg); color: var(--k-bad); }
 .k-pill--admin { background: var(--k-ink); color: #fff; }
-.k-pill--user { background: #EFEFED; color: var(--k-ink-2); } /* neutral, so it never reads as the green "delivered" status */
+.k-pill--user { background: var(--k-hairline); color: var(--k-ink-2); } /* neutral, so it never reads as the green "delivered" status */
 
 @media (max-width: 900px) {
   .k-hello__inner { padding: 40px 20px; }
@@ -1461,7 +1565,7 @@ select.k-input { appearance: auto; }
 .k-field { display: flex; flex-direction: column; gap: 8px; }
 .k-field label { font-size: 14px; font-weight: 600; color: var(--k-ink); }
 .k-textarea { height: auto; padding: 14px 16px; line-height: 1.5; resize: vertical; }
-.k-input::placeholder { color: #6B6C72; }
+.k-input::placeholder { color: var(--k-muted); }
 
 .k-radio {
   display: flex;
@@ -1470,7 +1574,7 @@ select.k-input { appearance: auto; }
   min-height: 64px;
   padding: 0 20px;
   box-sizing: border-box;
-  border: 1.5px solid #D9D9D6;
+  border: 1.5px solid var(--k-border);
   border-radius: 12px;
   background: var(--k-white);
   font-size: 16px;
@@ -1499,8 +1603,8 @@ select.k-input { appearance: auto; }
   width: 72px;
   height: 72px;
   border-radius: 50%;
-  background: #DDF1E6;
-  color: #17663F;
+  background: var(--k-ok-bg);
+  color: var(--k-ok);
 }
 .k-success p { margin: 0 0 8px; max-width: 460px; font-size: 17px; color: var(--k-ink-2); }
 
@@ -1518,7 +1622,7 @@ select.k-input { appearance: auto; }
     grid-template-columns: 1fr 1fr;
     gap: 14px 16px;
     padding: 20px;
-    border-bottom: 1px solid #EFEFED;
+    border-bottom: 1px solid var(--k-hairline);
   }
   .k-table--stack tr:last-child { border-bottom: 0; }
   .k-table--stack td,
@@ -1726,7 +1830,7 @@ select.k-input { appearance: auto; }
   height: 14px;
   box-sizing: border-box;
   border-radius: 50%;
-  border: 2px solid #CFCFCB;
+  border: 2px solid var(--k-border-mid);
   background: var(--k-white);
 }
 .k-steps__item:not(:last-child)::after {
@@ -1736,7 +1840,7 @@ select.k-input { appearance: auto; }
   top: calc(50% + 7px);
   width: 2px;
   height: calc(100% - 14px);
-  background: #E1E1DE;
+  background: var(--k-track);
 }
 .k-steps__item.is-done { color: var(--k-ink-2); }
 .k-steps__item.is-done::before { background: var(--k-ink); border-color: var(--k-ink); }

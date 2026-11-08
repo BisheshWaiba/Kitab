@@ -248,6 +248,34 @@ document.querySelectorAll('form[data-wish]').forEach(function (form) {
     });
 })();
 
+// Dark mode switch. The page already carries data-theme (includes/theme.php ran before it was painted); this flips it,
+// remembers the choice, and fades between the two where the browser can (not for people who asked for less motion).
+document.querySelectorAll('[data-theme-toggle]').forEach(function (button) {
+    var root = document.documentElement;
+    var media = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+    function show() {
+        button.setAttribute('aria-pressed', root.getAttribute('data-theme') === 'dark' ? 'true' : 'false');
+    }
+    show();
+    button.addEventListener('click', function () {
+        var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        function apply() {
+            root.setAttribute('data-theme', next);
+            show();
+        }
+        try { localStorage.setItem('kitab-theme', next); } catch (e) { /* private window: it still works until the page is left */ }
+        var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (document.startViewTransition && !calm) {
+            document.startViewTransition(apply);
+        } else {
+            apply();
+        }
+    });
+    // the device or another tab changed the theme: keep the button's state in step
+    if (media && media.addEventListener) { media.addEventListener('change', show); }
+    window.addEventListener('storage', show);
+});
+
 // Shop controls: the sort applies at once, and empty price boxes (and the default sort) stay out of the address
 document.querySelectorAll('form[data-shop-tools]').forEach(function (form) {
     var skipped = [];

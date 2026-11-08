@@ -26,6 +26,7 @@ $user_initial = isset($_SESSION['user_name']) ? strtoupper(mb_substr($_SESSION['
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<?php require __DIR__ . '/theme.php'; ?>
     <title><?php echo isset($page_title) ? htmlspecialchars($page_title) . ' - KITAB' : 'KITAB - Premium Book Store'; ?></title>
 <?php require __DIR__ . '/favicon.php'; ?>
 <?php require __DIR__ . '/share_meta.php'; ?>
@@ -102,5 +103,16 @@ $user_initial = isset($_SESSION['user_name']) ? strtoupper(mb_substr($_SESSION['
                     </div>
                 <?php endif; ?>
             </nav>
+            <button type="button" class="k-theme" data-theme-toggle aria-pressed="false" aria-label="Dark mode" title="Switch between light and dark">
+                <svg class="k-theme__moon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M20 14.6A8.4 8.4 0 0 1 9.4 4a8.4 8.4 0 1 0 10.6 10.6Z" />
+                </svg>
+                <svg class="k-theme__sun" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <circle cx="12" cy="12" r="4" />
+                    <path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4" />
+                </svg>
+            </button>
         </div>
     </header>

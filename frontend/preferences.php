@@ -87,6 +87,7 @@ if ($saved_picture !== '') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<?php require __DIR__ . '/../includes/theme.php'; ?>
     <title>Personalize Your Experience - KITAB</title>
 <?php require __DIR__ . '/../includes/favicon.php'; ?>
     <link rel="preconnect" href="https://fonts.googleapis.com">
