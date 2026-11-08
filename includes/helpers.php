@@ -228,6 +228,14 @@ function k_glass_tile(array $b): void
     <?php
 }
 
+// A full address (https://...) for a path on this site. Uses the public address from config/db.php (SITE_URL) once the
+// site is online, and the address the page was asked at until then.
+function k_site_url(string $path = ''): string
+{
+    $base = SITE_URL !== '' ? rtrim(SITE_URL, '/') . '/' : BASE_URL;
+    return $base . ltrim($path, '/');
+}
+
 // Form errors that belong to one field. $errors is ['field' => 'message']; a field's id is its name.
 // k_field_error() prints the message right under the field, k_field_invalid() goes inside the input's tag.
 // assets/js/main.js uses the same markup for the messages it shows before the form is sent.

@@ -4,6 +4,7 @@ require_once '../includes/helpers.php';
 // The Shop page has the glass look (from the design canvas): a body class and a stylesheet only the redesigned pages load
 $body_class = 'is-glass is-shop';
 $extra_css = 'assets/css/glass.css';
+$meta_description = 'Browse the full KITAB catalog and filter by category, author or price.';
 require_once '../includes/header.php';
 
 // ---------- What the visitor asked for (every value is checked before it goes near the database) ----------

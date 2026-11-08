@@ -94,6 +94,16 @@ $form_comment = (string) ($review_flash['old']['comment'] ?? ($my_review['commen
 
 $description = trim((string) ($book['description'] ?? ''));
 $page_title = $book['title'];
+
+// What a shared link to this book shows (see includes/share_meta.php): its own cover, and the author and price in the text
+$meta_type = 'book';
+$meta_image = trim((string) ($book['image'] ?? ''));
+$meta_image_alt = 'Cover of ' . $book['title'];
+$blurb = trim(preg_replace('/\s+/u', ' ', strip_tags($description)));
+if (mb_strlen($blurb) > 180) {
+    $blurb = preg_replace('/\s+\S*$/u', '', mb_substr($blurb, 0, 180)) . '…'; // ends on a whole word
+}
+$meta_description = 'By ' . $book['author'] . '. Rs. ' . number_format((float) $book['price']) . '. ' . ($blurb !== '' ? $blurb : 'Available at KITAB.');
 require_once '../includes/header.php';
 ?>
 
