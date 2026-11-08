@@ -40,21 +40,39 @@ $book = $result->fetch_assoc();
 
 // Handle Add to Cart
 if (isset($_POST['add_to_cart'])) {
-    $book_id = $book['id'];
-    $quantity = max(1, min(100, intval($_POST['quantity'])));
+    $book_id = (int) $book['id'];
+    $quantity = max(1, min(100, intval($_POST['quantity'] ?? 1)));
 
     if (!isset($_SESSION['cart'])) {
         $_SESSION['cart'] = [];
     }
 
-    if (isset($_SESSION['cart'][$book_id])) {
-        $_SESSION['cart'][$book_id] += $quantity;
-    } else {
-        $_SESSION['cart'][$book_id] = $quantity;
+    // Up to 100 copies of one book, the same limit the cart page uses
+    $_SESSION['cart'][$book_id] = min(100, ($_SESSION['cart'][$book_id] ?? 0) + $quantity);
+
+    // The page's script adds without leaving the book and shows a message; it asks for JSON
+    if (strpos($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false) {
+        header('Content-Type: application/json');
+        echo json_encode([
+            'ok' => true,
+            'count' => array_sum($_SESSION['cart']),
+            'added' => $quantity,
+            'inCart' => $_SESSION['cart'][$book_id],
+        ]);
+        exit();
     }
 
-    header("Location: cart.php");
+    // Without JavaScript: back to the book, where the same message is shown once
+    $_SESSION['cart_toast'] = ['book' => $book_id, 'added' => $quantity];
+    header("Location: product.php?id=" . $book_id);
     exit();
+}
+
+// The "added to your cart" message left by the step above
+$cart_toast = $_SESSION['cart_toast'] ?? null;
+unset($_SESSION['cart_toast']);
+if ($cart_toast && (int) $cart_toast['book'] !== (int) $book['id']) {
+    $cart_toast = null;
 }
 
 // Reviews
@@ -141,7 +159,8 @@ $category = trim((string) ($book['category'] ?? ''));
         </dl>
 
         <div class="gp-actions">
-            <form method="POST" class="gp-buyform">
+            <form method="POST" class="gp-buyform" data-add-form data-title="<?php echo htmlspecialchars($book['title']); ?>"
+                data-cover="<?php echo htmlspecialchars($cover_url); ?>">
                 <label class="k-sr" for="quantity">Quantity</label>
                 <div class="gp-qty" data-qty>
                     <button type="button" class="gp-qty__btn" data-step="-1" aria-label="Decrease quantity">
@@ -165,7 +184,7 @@ $category = trim((string) ($book['category'] ?? ''));
                         <circle cx="9.5" cy="19.5" r="1.4" />
                         <circle cx="17" cy="19.5" r="1.4" />
                     </svg>
-                    Add to Cart
+                    <span data-add-label>Add to Cart</span>
                 </button>
             </form>
             <?php k_wish_button($book, 'button'); ?>
@@ -346,5 +365,27 @@ if ($result_related->num_rows > 0):
         </div>
     </section>
 <?php endif; ?>
+
+<!-- "Added to your cart" message (main.js shows the same one without reloading the page) -->
+<div class="gt-toasts" aria-live="polite">
+    <?php if ($cart_toast): ?>
+        <div class="gt-toast" role="status" data-bump>
+            <?php if ($cover_url !== ''): ?>
+                <img class="gt-toast__img" src="<?php echo htmlspecialchars($cover_url); ?>" alt="">
+            <?php endif; ?>
+            <div class="gt-toast__text">
+                <strong>Added to your cart</strong>
+                <span><?php echo htmlspecialchars($book['title']); ?> &times; <?php echo (int) $cart_toast['added']; ?></span>
+            </div>
+            <a href="cart.php" class="k-btn k-btn--primary k-btn--sm">View cart</a>
+            <button type="button" class="gt-toast__close" aria-label="Dismiss">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" aria-hidden="true">
+                    <path d="M6 6l12 12M18 6 6 18" />
+                </svg>
+            </button>
+        </div>
+    <?php endif; ?>
+</div>
 
 <?php require_once '../includes/footer.php'; ?>

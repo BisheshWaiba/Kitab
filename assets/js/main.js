@@ -117,6 +117,148 @@ document.querySelectorAll('form[data-wish]').forEach(function (form) {
     });
 });
 
+// Add to cart without leaving the page: the book goes in, the cart badge pops and a message slides in with "View cart".
+// Without JavaScript the form posts normally and comes back to the book, which shows the same message once.
+function bumpCartBadge(count) {
+    var link = document.querySelector('.k-links a.k-cart:not(.k-cart--wish)');
+    if (!link) {
+        return;
+    }
+    var badge = link.querySelector('.k-cart__badge');
+    if (!badge) {
+        badge = document.createElement('span');
+        badge.className = 'k-cart__badge';
+        link.appendChild(badge);
+    }
+    if (typeof count === 'number') {
+        badge.textContent = count;
+        link.setAttribute('aria-label', 'Cart, ' + count + (count === 1 ? ' item' : ' items'));
+    }
+    badge.classList.remove('k-cart__badge--bump');
+    void badge.offsetWidth; // lets the animation start again when a book is added twice in a row
+    badge.classList.add('k-cart__badge--bump');
+}
+
+// Sets up a message that is already in the page (shown by the server or built just now): close button, auto-dismiss
+function initToast(toast) {
+    var timer;
+    function close() {
+        clearTimeout(timer);
+        toast.classList.add('is-out');
+        setTimeout(function () {
+            toast.remove();
+        }, 220);
+    }
+    function start() {
+        clearTimeout(timer);
+        timer = setTimeout(close, 6000);
+    }
+    var button = toast.querySelector('.gt-toast__close');
+    if (button) {
+        button.addEventListener('click', close);
+    }
+    toast.addEventListener('mouseenter', function () { clearTimeout(timer); });
+    toast.addEventListener('focusin', function () { clearTimeout(timer); });
+    toast.addEventListener('mouseleave', start);
+    toast.addEventListener('focusout', start);
+    start();
+}
+
+function showCartToast(title, cover, added) {
+    var box = document.querySelector('.gt-toasts');
+    if (!box) {
+        box = document.createElement('div');
+        box.className = 'gt-toasts';
+        box.setAttribute('aria-live', 'polite');
+        document.body.appendChild(box);
+    }
+    box.querySelectorAll('.gt-toast').forEach(function (old) { old.remove(); }); // one message at a time
+
+    var toast = document.createElement('div');
+    toast.className = 'gt-toast';
+    toast.setAttribute('role', 'status');
+    if (cover) {
+        var img = document.createElement('img');
+        img.className = 'gt-toast__img';
+        img.src = cover;
+        img.alt = '';
+        toast.appendChild(img);
+    }
+    var text = document.createElement('div');
+    text.className = 'gt-toast__text';
+    var strong = document.createElement('strong');
+    strong.textContent = 'Added to your cart';
+    var line = document.createElement('span');
+    line.textContent = title + ' × ' + added; // the title is plain text, never HTML
+    text.appendChild(strong);
+    text.appendChild(line);
+    toast.appendChild(text);
+    var view = document.createElement('a');
+    view.className = 'k-btn k-btn--primary k-btn--sm';
+    view.href = 'cart.php';
+    view.textContent = 'View cart';
+    toast.appendChild(view);
+    var close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'gt-toast__close';
+    close.setAttribute('aria-label', 'Dismiss');
+    close.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+    toast.appendChild(close);
+    box.appendChild(toast);
+    initToast(toast);
+}
+
+document.querySelectorAll('.gt-toast').forEach(function (toast) {
+    initToast(toast);
+    if (toast.hasAttribute('data-bump')) {
+        bumpCartBadge();
+    }
+});
+
+document.querySelectorAll('form[data-add-form]').forEach(function (form) {
+    var button = form.querySelector('button[name="add_to_cart"]');
+    var label = button.querySelector('[data-add-label]');
+    var normal = label ? label.textContent : '';
+    var plain = false;
+
+    form.addEventListener('submit', function (event) {
+        if (plain) {
+            return; // the script could not do it: let the form post the ordinary way
+        }
+        event.preventDefault();
+        if (button.disabled) {
+            return;
+        }
+        button.disabled = true;
+        if (label) {
+            label.textContent = 'Adding...';
+        }
+        var body = new FormData(form);
+        body.append('add_to_cart', '1');
+        fetch(form.action, { method: 'POST', body: body, headers: { Accept: 'application/json' }, credentials: 'same-origin' })
+            .then(function (response) {
+                return response.ok ? response.json() : Promise.reject();
+            })
+            .then(function (data) {
+                bumpCartBadge(data.count);
+                showCartToast(form.dataset.title, form.dataset.cover, data.added);
+                if (label) {
+                    label.textContent = 'Added';
+                    setTimeout(function () { label.textContent = normal; }, 1800);
+                }
+                button.disabled = false;
+            })
+            .catch(function () {
+                plain = true;
+                button.disabled = false;
+                if (label) {
+                    label.textContent = normal;
+                }
+                form.requestSubmit(button);
+            });
+    });
+});
+
 // Product page: quantity stepper
 document.querySelectorAll('[data-qty]').forEach(function (box) {
     var input = box.querySelector('input');

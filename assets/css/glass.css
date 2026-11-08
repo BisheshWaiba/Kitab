@@ -276,6 +276,48 @@ body.is-glass {
 .is-product .k-rate__stars label svg { display: block; }
 .is-product .k-reviewform .k-input { background: rgba(255, 255, 255, .6); border-color: var(--hg-edge); border-radius: 18px; box-shadow: inset 0 1px 3px rgba(17, 18, 20, .08); }
 
+/* ---------- Add to cart: the message that slides in, and the badge that pops ---------- */
+.gt-toasts { position: fixed; z-index: 200; top: 136px; right: 24px; display: flex; flex-direction: column; gap: 12px; width: min(420px, calc(100vw - 32px)); pointer-events: none; }
+.gt-toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  border-radius: 26px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, .94), rgba(255, 255, 255, .8));
+  -webkit-backdrop-filter: blur(22px) saturate(170%);
+  backdrop-filter: blur(22px) saturate(170%);
+  border: 1px solid rgba(255, 255, 255, .85);
+  box-shadow: inset 0 1px 0 #fff, 0 26px 50px -22px rgba(17, 18, 20, .5), 0 2px 8px rgba(17, 18, 20, .08);
+}
+.gt-toast__img { flex: none; width: 44px; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 4px rgba(17, 18, 20, .25), 0 10px 18px -8px rgba(17, 18, 20, .5); }
+.gt-toast__text { flex: 1; min-width: 0; display: flex; flex-direction: column; font-size: 14px; color: var(--k-ink-2); }
+.gt-toast__text strong { font-size: 15px; color: var(--k-ink); }
+.gt-toast__text span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gt-toast .k-btn { flex: none; }
+.gt-toast__close { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 50%; background: none; color: var(--hg-muted, #5C5D64); cursor: pointer; transition: background-color .2s, color .2s; }
+.gt-toast__close:hover { background: rgba(17, 18, 20, .07); color: var(--k-ink); }
+.gt-toast.is-out { opacity: 0; transform: translateX(24px); transition: opacity .2s ease-in, transform .2s ease-in; }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes gt-in { from { opacity: 0; transform: translateX(36px); } to { opacity: 1; transform: none; } }
+  @keyframes gt-bump { 0% { transform: scale(.4); } 60% { transform: scale(1.35); } 100% { transform: scale(1); } }
+  .gt-toast { animation: gt-in .55s var(--k-ease) backwards; }
+  .k-cart__badge--bump { animation: gt-bump .5s var(--k-ease); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gt-toast.is-out { transform: none; transition: opacity .2s; }
+}
+@media (max-width: 900px) {
+  /* on a phone the message rises from the bottom, where the thumb is */
+  .gt-toasts { top: auto; bottom: max(16px, env(safe-area-inset-bottom)); left: 16px; right: 16px; width: auto; }
+  .gt-toast.is-out { transform: translateY(24px); }
+}
+@media (max-width: 900px) and (prefers-reduced-motion: no-preference) {
+  @keyframes gt-up { from { opacity: 0; transform: translateY(36px); } to { opacity: 1; transform: none; } }
+  .gt-toast { animation-name: gt-up; }
+}
+
 /* ---------- Wishlist: a removed book fades out before it leaves the grid ---------- */
 .hg-tile.is-leaving { opacity: 0; transform: scale(.94); pointer-events: none; transition: opacity .25s ease-out, transform .25s ease-out; }
 @media (prefers-reduced-motion: reduce) {
