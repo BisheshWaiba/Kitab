@@ -3,8 +3,8 @@ require_once 'config/db.php';
 require_once 'includes/helpers.php';
 require_once 'includes/reviews.php'; // k_review_name() for the review card in the hero
 // The Home page has its own look (glass, from the design canvas): a body class and a stylesheet only this page loads
-$body_class = 'is-home';
-$extra_css = 'assets/css/home-glass.css';
+$body_class = 'is-glass is-home';
+$extra_css = 'assets/css/glass.css';
 require_once 'includes/header.php';
 
 // Cover address, the same rule k_cover() uses
