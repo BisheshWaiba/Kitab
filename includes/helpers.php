@@ -228,6 +228,23 @@ function k_glass_tile(array $b): void
     <?php
 }
 
+// Form errors that belong to one field. $errors is ['field' => 'message']; a field's id is its name.
+// k_field_error() prints the message right under the field, k_field_invalid() goes inside the input's tag.
+// assets/js/main.js uses the same markup for the messages it shows before the form is sent.
+function k_field_error(array $errors, string $field): void
+{
+    if (isset($errors[$field])) {
+        echo '<p class="k-field__error" id="' . htmlspecialchars($field) . '-error">' . htmlspecialchars($errors[$field]) . '</p>';
+    }
+}
+
+function k_field_invalid(array $errors, string $field): void
+{
+    if (isset($errors[$field])) {
+        echo ' aria-invalid="true" aria-describedby="' . htmlspecialchars($field) . '-error"';
+    }
+}
+
 // Thin "Cart > Details > Done" progress line shown on the Cart and Checkout pages: $current is 'cart', 'details' or 'done'.
 // Steps before the current one are finished (and "Cart" links back while the visitor is on Details); styles: assets/css/glass.css
 function k_checkout_steps(string $current): void

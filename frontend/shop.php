@@ -167,7 +167,7 @@ foreach ($books as $b) {
             <?php if ($notes): ?><span>&middot; <?php echo htmlspecialchars(implode(' · ', $notes)); ?></span><?php endif; ?>
         </p>
 
-        <form method="GET" action="shop.php" class="gs-tools" data-shop-tools>
+        <form method="GET" action="shop.php" class="gs-tools" data-shop-tools data-validate>
             <?php foreach (['search' => $search_text, 'author' => $author_filter, 'category' => $active_category] as $name => $value): ?>
                 <?php if ($value !== ''): ?>
                     <input type="hidden" name="<?php echo $name; ?>" value="<?php echo htmlspecialchars($value); ?>">
@@ -186,11 +186,11 @@ foreach ($books as $b) {
             <div class="gs-price" role="group" aria-labelledby="gs-price-label">
                 <span id="gs-price-label" class="gs-price__label">Price (Rs.)</span>
                 <input type="number" name="min" class="k-input gs-num" min="0" step="any" inputmode="numeric"
-                    placeholder="<?php echo (int) $price_lo; ?>" aria-label="Lowest price"
+                    placeholder="<?php echo (int) $price_lo; ?>" aria-label="Lowest price" data-msg-invalid="Enter a lowest price of 0 or more."
                     value="<?php echo $min_price !== null ? $plain($min_price) : ''; ?>">
                 <span aria-hidden="true">to</span>
                 <input type="number" name="max" class="k-input gs-num" min="0" step="any" inputmode="numeric"
-                    placeholder="<?php echo (int) $price_hi; ?>" aria-label="Highest price"
+                    placeholder="<?php echo (int) $price_hi; ?>" aria-label="Highest price" data-msg-invalid="Enter a highest price of 0 or more."
                     value="<?php echo $max_price !== null ? $plain($max_price) : ''; ?>">
                 <button type="submit" class="k-btn k-btn--outline k-btn--sm">Apply</button>
                 <?php if ($min_price !== null || $max_price !== null): ?>

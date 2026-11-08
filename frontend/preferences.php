@@ -10,7 +10,8 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = (int) $_SESSION['user_id'];
-$error_message = '';
+$error_message = '';   // a problem with saving (shown at the top)
+$errors = [];          // a problem with the photo, shown under it
 
 // value stored in the database => label shown on the page
 $genre_options = [
@@ -37,9 +38,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $saved_genres = $genres_list; // keep the choices on screen if something below fails
 
     // 1. VALIDATE + SAVE UPLOAD (before anything else is saved)
-    [$new_picture, $error_message] = k_upload_image($_FILES['profile_pic'] ?? ['error' => UPLOAD_ERR_NO_FILE], 'profiles', 'user_' . $user_id);
+    [$new_picture, $photo_error] = k_upload_image($_FILES['profile_pic'] ?? ['error' => UPLOAD_ERR_NO_FILE], 'profiles', 'user_' . $user_id);
+    if ($photo_error !== '') {
+        $errors['profile_pic'] = $photo_error;
+    }
 
-    if ($error_message === '') {
+    if (!$errors) {
         // 3. ENSURE COLUMNS EXIST (Self-Healing)
         $columns = [
             'favorite_genres' => 'TEXT',
@@ -123,6 +127,7 @@ if ($saved_picture !== '') {
                 <button type="button" class="k-btn k-btn--outline k-btn--sm" data-upload-pick>Upload Photo</button>
                 <input type="file" id="profile_pic" name="profile_pic" accept="image/jpeg,image/png,image/gif,image/webp"
                     hidden>
+                <?php k_field_error($errors, 'profile_pic'); ?>
             </div>
 
             <div class="k-tiles">

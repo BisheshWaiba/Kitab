@@ -117,6 +117,137 @@ document.querySelectorAll('form[data-wish]').forEach(function (form) {
     });
 });
 
+// Form errors: a form marked data-validate shows what is wrong as a short message under the field, not in the browser's
+// own popup. The checks come from the fields' own rules (required, minlength, type="email", pattern, min and max), and
+// these optional attributes on a field give the wording:
+//   data-msg-missing  a required field left empty      data-msg-invalid  a value of the wrong shape (bad email, number, pattern)
+//   data-match="id"   must be the same as the field with that id (data-msg-match is the message)
+// Without JavaScript the browser's own checks still run, and the server checks everything again either way.
+(function () {
+    var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // the same rule PHP's email check applies: something@something.something
+
+    function group(el) {
+        return Array.prototype.filter.call(el.form.querySelectorAll('input[type="radio"]'), function (r) { return r.name === el.name; });
+    }
+    function targets(el) { return el.type === 'radio' ? group(el) : [el]; }
+    function messageId(el) { return (el.type === 'radio' ? el.name : (el.id || el.name)) + '-error'; }
+    function holder(el) {
+        return (el.type === 'radio' && el.closest('fieldset')) || el.closest('.k-field') || el.parentNode;
+    }
+    function invalid(el) {
+        return el.dataset.msgInvalid || (el.type === 'email' ? 'Enter a valid email address, like name@example.com.'
+            : el.type === 'number' ? 'Enter a valid number.' : 'Please check this value.');
+    }
+
+    // What is wrong with this field, as a sentence ('' when nothing is)
+    function problem(el) {
+        var v = el.validity;
+        if (el.type === 'radio') {
+            return !el.required || group(el).some(function (r) { return r.checked; }) ? '' : (el.dataset.msgMissing || 'Please choose an option.');
+        }
+        if (el.type === 'checkbox') {
+            return el.required && !el.checked ? (el.dataset.msgMissing || 'Please tick this box to continue.') : '';
+        }
+        var text = el.type === 'password' ? el.value : el.value.trim(); // spaces alone do not count as an answer
+        if (el.required && text === '') {
+            return el.dataset.msgMissing || (el.tagName === 'SELECT' ? 'Please choose an option.' : 'Please fill in this field.');
+        }
+        if (v.badInput) { return invalid(el); }
+        if (text === '') { return ''; }
+        if (el.dataset.match) {
+            var other = document.getElementById(el.dataset.match);
+            if (other && other.value !== el.value) { return el.dataset.msgMatch || 'These do not match.'; }
+        }
+        // Counted here, because browsers only apply minlength and maxlength to text that was typed (not to autofill)
+        if (el.minLength > 0 && text.length < el.minLength) { return 'Use at least ' + el.minLength + ' characters (you typed ' + text.length + ').'; }
+        if (el.maxLength >= 0 && el.value.length > el.maxLength) { return 'Use ' + el.maxLength + ' characters or fewer.'; }
+        if (el.type === 'email' && !EMAIL.test(text)) { return invalid(el); }
+        if (v.typeMismatch || v.patternMismatch || v.rangeUnderflow || v.rangeOverflow || v.stepMismatch) { return invalid(el); }
+        return '';
+    }
+
+    function describedBy(field, id, on) {
+        var ids = (field.getAttribute('aria-describedby') || '').split(' ').filter(function (x) { return x && x !== id; });
+        if (on) { ids.push(id); }
+        if (ids.length) { field.setAttribute('aria-describedby', ids.join(' ')); } else { field.removeAttribute('aria-describedby'); }
+    }
+    function show(el, text) {
+        var id = messageId(el);
+        var box = document.getElementById(id); // the server may have printed this message already
+        if (!box) {
+            box = document.createElement('p');
+            box.className = 'k-field__error';
+            box.id = id;
+            holder(el).appendChild(box);
+        }
+        box.textContent = text;
+        targets(el).forEach(function (field) {
+            field.setAttribute('aria-invalid', 'true');
+            describedBy(field, id, true);
+        });
+    }
+    function clear(el) {
+        var id = messageId(el);
+        var box = document.getElementById(id);
+        if (box) { box.remove(); }
+        targets(el).forEach(function (field) {
+            field.removeAttribute('aria-invalid');
+            describedBy(field, id, false);
+        });
+    }
+    function check(el) {
+        var text = problem(el);
+        if (text) { show(el, text); } else { clear(el); }
+        return text === '';
+    }
+    function reveal(el) {
+        el.focus({ preventScroll: true });
+        holder(el).scrollIntoView({ block: 'nearest', behavior: reduced ? 'auto' : 'smooth' });
+    }
+
+    document.querySelectorAll('form[data-validate]').forEach(function (form) {
+        form.setAttribute('novalidate', '');
+
+        function fields() {
+            var seen = {};
+            return Array.prototype.filter.call(form.elements, function (el) {
+                if (!el.willValidate || ['hidden', 'submit', 'button', 'reset', 'file'].indexOf(el.type) !== -1) { return false; }
+                if (el.type === 'radio') {
+                    if (seen[el.name]) { return false; }
+                    seen[el.name] = true;
+                }
+                return true;
+            });
+        }
+
+        form.addEventListener('submit', function (event) {
+            var first = null;
+            fields().forEach(function (el) {
+                if (!check(el) && !first) { first = el; }
+            });
+            if (first) {
+                event.preventDefault();
+                reveal(first);
+            }
+        });
+
+        // Once a message is showing, it follows what the visitor types and goes away the moment the field is fine
+        function recheck(event) {
+            var el = event.target;
+            if (el.willValidate && el.getAttribute('aria-invalid') === 'true') {
+                check(el);
+            }
+        }
+        form.addEventListener('input', recheck);
+        form.addEventListener('change', recheck);
+
+        // The server sent the form back with messages in it: put the cursor on the first one
+        var bad = form.querySelector('[aria-invalid="true"]');
+        if (bad) { reveal(bad); }
+    });
+})();
+
 // Shop controls: the sort applies at once, and empty price boxes (and the default sort) stay out of the address
 document.querySelectorAll('form[data-shop-tools]').forEach(function (form) {
     var skipped = [];
@@ -129,7 +260,10 @@ document.querySelectorAll('form[data-shop-tools]').forEach(function (form) {
             }
         });
     });
-    form.addEventListener('submit', function () {
+    form.addEventListener('submit', function (event) {
+        if (event.defaultPrevented) {
+            return; // a price box has a message under it: nothing is sent, so nothing is switched off
+        }
         form.querySelectorAll('input[name="min"], input[name="max"]').forEach(function (input) {
             if (input.value.trim() === '') {
                 input.disabled = true;
@@ -252,8 +386,14 @@ document.querySelectorAll('form[data-add-form]').forEach(function (form) {
     var label = button.querySelector('[data-add-label]');
     var normal = label ? label.textContent : '';
     var plain = false;
+    var qty = form.querySelector('input[name="quantity"]');
+    form.setAttribute('novalidate', ''); // a quantity typed out of range is put right below instead of shown in a browser popup
 
     form.addEventListener('submit', function (event) {
+        if (qty) {
+            var n = parseInt(qty.value, 10);
+            qty.value = !n || n < 1 ? 1 : Math.min(n, parseInt(qty.max, 10) || 100);
+        }
         if (plain) {
             return; // the script could not do it: let the form post the ordinary way
         }

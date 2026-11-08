@@ -44,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <?php k_auth_art($conn, 0); ?>
 
     <div class="k-authpage__main">
-        <form method="POST" class="k-authpage__form">
+        <form method="POST" class="k-authpage__form" data-validate>
             <h1 class="k-h1">Welcome Back</h1>
 
             <?php if ($notice && !$error): ?>
@@ -58,6 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="k-field">
                 <label for="email">Email Address</label>
                 <input type="email" id="email" name="email" class="k-input" required autocomplete="email"
+                    data-msg-missing="Enter your email address."
                     value="<?php echo htmlspecialchars($_POST['email'] ?? ''); ?>">
             </div>
             <div class="k-field">
@@ -66,7 +67,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <a href="forgot_password.php" class="k-field__link">Forgot password?</a>
                 </div>
                 <input type="password" id="password" name="password" class="k-input" required
-                    autocomplete="current-password">
+                    autocomplete="current-password" data-msg-missing="Enter your password.">
             </div>
             <button type="submit" class="k-btn k-btn--primary k-btn--block">Login</button>
 

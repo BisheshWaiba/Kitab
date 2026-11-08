@@ -956,6 +956,19 @@ body {
 .k-input:focus { outline: 3px solid var(--k-accent-tint); outline-offset: 0; border-color: var(--k-accent); }
 .k-input--qty { width: 72px; height: 44px; padding: 0 12px; border-radius: 8px; font-weight: 600; }
 
+/* Form errors: the message sits right under its field (see k_field_error() in helpers.php and the form validation in main.js) */
+.k-input[aria-invalid="true"],
+.k-input[aria-invalid="true"]:hover { border-color: var(--k-red); background: #FFF9F8; }
+.k-input[aria-invalid="true"]:focus { border-color: var(--k-red); outline-color: rgba(179, 38, 30, .22); }
+.k-field, .k-rate, .gs-price { scroll-margin: 130px 0 40px; } /* when a field with a problem is scrolled to, keep it clear of the sticky header */
+.k-field__error { display: flex; align-items: flex-start; gap: 7px; margin: 0; font-size: 14px; font-weight: 500; line-height: 1.45; color: var(--k-red); }
+.k-field__error::before { content: ""; flex: none; width: 16px; height: 16px; margin-top: 2px; background: currentColor; -webkit-mask: var(--k-error-icon) center / contain no-repeat; mask: var(--k-error-icon) center / contain no-repeat; }
+:root { --k-error-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='12' cy='12' r='9.5'/%3E%3Cpath d='M12 7.5v5.5M12 16.5v.01'/%3E%3C/svg%3E"); }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes k-error-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+  .k-field__error { animation: k-error-in .22s ease-out; }
+}
+
 .k-tablecard { background: var(--k-white); border: 1px solid var(--k-line); border-radius: 16px; overflow-x: auto; }
 
 .k-table { width: 100%; min-width: 620px; border-collapse: collapse; font-size: 15px; }

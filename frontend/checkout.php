@@ -29,8 +29,38 @@ if (empty($cart_items)) {
 
 $order_placed = false;
 
-// Handle Order Submission
+// What was typed, kept when a field needs another look, and the problems found (field => message, shown under the field)
+$old = ['name' => '', 'email' => '', 'phone' => '', 'address' => ''];
+$errors = [];
 if (isset($_POST['place_order'])) {
+    foreach ($old as $key => $unused) {
+        $old[$key] = is_string($_POST[$key] ?? null) ? trim($_POST[$key]) : '';
+    }
+    if ($old['name'] === '') {
+        $errors['name'] = "Enter your full name.";
+    } elseif (mb_strlen($old['name']) > 100) {
+        $errors['name'] = "Use 100 characters or fewer.";
+    }
+    if ($old['email'] === '') {
+        $errors['email'] = "Enter your email address.";
+    } elseif (!filter_var($old['email'], FILTER_VALIDATE_EMAIL) || strlen($old['email']) > 255) {
+        $errors['email'] = "Enter a valid email address, like name@example.com.";
+    }
+    $phone_digits = strlen(preg_replace('/\D/', '', $old['phone']));
+    if ($old['phone'] === '') {
+        $errors['phone'] = "Enter a phone number we can reach you on.";
+    } elseif (!preg_match('/^[+0-9 ()\-]+$/', $old['phone']) || $phone_digits < 7 || $phone_digits > 15) {
+        $errors['phone'] = "Enter a phone number with 7 to 15 digits, like +977 98XXXXXXXX.";
+    }
+    if ($old['address'] === '') {
+        $errors['address'] = "Enter the address we should deliver to.";
+    } elseif (mb_strlen($old['address']) > 500) {
+        $errors['address'] = "Use 500 characters or fewer.";
+    }
+}
+
+// Handle Order Submission (only when every field is fine; otherwise the form comes back with the messages)
+if (isset($_POST['place_order']) && !$errors) {
     $name = $conn->real_escape_string($_POST['name']);
     $address = $conn->real_escape_string($_POST['address']);
     $email = $conn->real_escape_string($_POST['email']);
@@ -131,27 +161,40 @@ foreach ($cart_items as $b) {
         </div>
     <?php else: ?>
         <div class="gk-grid">
-            <form method="POST" class="gk-form hg-panel">
+            <form method="POST" class="gk-form hg-panel" data-validate>
                 <h2 class="hg-h2">Billing Details</h2>
 
                 <div class="k-fields">
                     <div class="k-field">
                         <label for="name">Full Name</label>
-                        <input type="text" id="name" name="name" class="k-input" required placeholder="Ram Lama" autocomplete="name">
+                        <input type="text" id="name" name="name" class="k-input" required placeholder="Ram Lama" autocomplete="name"
+                            maxlength="100" data-msg-missing="Enter your full name."
+                            value="<?php echo htmlspecialchars($old['name']); ?>" <?php k_field_invalid($errors, 'name'); ?>>
+                        <?php k_field_error($errors, 'name'); ?>
                     </div>
                     <div class="k-field">
                         <label for="email">Email Address</label>
-                        <input type="email" id="email" name="email" class="k-input" required placeholder="ram@gmail.com" autocomplete="email">
+                        <input type="email" id="email" name="email" class="k-input" required placeholder="ram@gmail.com" autocomplete="email"
+                            maxlength="255" data-msg-missing="Enter your email address."
+                            value="<?php echo htmlspecialchars($old['email']); ?>" <?php k_field_invalid($errors, 'email'); ?>>
+                        <?php k_field_error($errors, 'email'); ?>
                     </div>
                 </div>
                 <div class="k-field">
                     <label for="phone">Phone Number</label>
-                    <input type="tel" id="phone" name="phone" class="k-input" required placeholder="+977 98XXXXXXXX" autocomplete="tel">
+                    <input type="tel" id="phone" name="phone" class="k-input" required placeholder="+977 98XXXXXXXX" autocomplete="tel"
+                        pattern="[+0-9 \(\)\-]{7,25}" maxlength="25" data-msg-missing="Enter a phone number we can reach you on."
+                        data-msg-invalid="Enter a phone number with 7 to 15 digits, like +977 98XXXXXXXX."
+                        value="<?php echo htmlspecialchars($old['phone']); ?>" <?php k_field_invalid($errors, 'phone'); ?>>
+                    <?php k_field_error($errors, 'phone'); ?>
                 </div>
                 <div class="k-field">
                     <label for="address">Shipping Address</label>
-                    <textarea id="address" name="address" class="k-input k-textarea" rows="3" required
-                        placeholder="Maitidevi, Kathmandu" autocomplete="street-address"></textarea>
+                    <textarea id="address" name="address" class="k-input k-textarea" rows="3" required maxlength="500"
+                        placeholder="Maitidevi, Kathmandu" autocomplete="street-address"
+                        data-msg-missing="Enter the address we should deliver to."
+                        <?php k_field_invalid($errors, 'address'); ?>><?php echo htmlspecialchars($old['address']); ?></textarea>
+                    <?php k_field_error($errors, 'address'); ?>
                 </div>
 
                 <h2 class="hg-h2 gk-form__sub">Payment</h2>

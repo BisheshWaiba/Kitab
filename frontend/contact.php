@@ -19,7 +19,8 @@ if (isset($_SESSION['user_id'])) {
 }
 $topic = 'order';
 $message = '';
-$error = '';
+$error = '';   // a problem with the whole form (expired session, too many messages), shown at the top of it
+$errors = [];  // problems with one field, shown under it
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $field = fn(string $key): string => is_string($_POST[$key] ?? null) ? trim($_POST[$key]) : '';
@@ -30,6 +31,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $recent = array_filter($_SESSION['contact_times'] ?? [], fn($t) => $t > time() - CONTACT_WINDOW);
 
+    // Every field is checked, so all the problems show at once, each under its own field
+    if ($name === '') {
+        $errors['name'] = "Enter your name.";
+    } elseif (mb_strlen($name) > 100) {
+        $errors['name'] = "Use 100 characters or fewer.";
+    }
+    if ($email === '') {
+        $errors['email'] = "Enter your email address so we can reply.";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 255) {
+        $errors['email'] = "Enter a valid email address, like name@example.com.";
+    }
+    if (!isset(CONTACT_TOPICS[$topic])) {
+        $errors['topic'] = "Choose what your message is about.";
+    }
+    if (mb_strlen($message) < CONTACT_MIN_MESSAGE) {
+        $errors['message'] = "Write a little more, at least " . CONTACT_MIN_MESSAGE . " characters (you wrote " . mb_strlen($message) . ").";
+    } elseif (mb_strlen($message) > CONTACT_MAX_MESSAGE) {
+        $errors['message'] = "Keep your message under " . CONTACT_MAX_MESSAGE . " characters.";
+    }
+
     if (!k_csrf_valid($_POST['csrf'] ?? '')) {
         $error = "Your session expired, so nothing was sent. Please try again.";
     } elseif ($field('website') !== '') {
@@ -37,16 +58,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['contact_sent'] = true;
         header("Location: contact.php");
         exit();
-    } elseif ($name === '' || mb_strlen($name) > 100) {
-        $error = "Please enter your name (up to 100 characters).";
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 255) {
-        $error = "Please enter a valid email address so we can reply.";
-    } elseif (!isset(CONTACT_TOPICS[$topic])) {
-        $error = "Please choose what your message is about.";
-    } elseif (mb_strlen($message) < CONTACT_MIN_MESSAGE) {
-        $error = "Please write a little more, at least " . CONTACT_MIN_MESSAGE . " characters.";
-    } elseif (mb_strlen($message) > CONTACT_MAX_MESSAGE) {
-        $error = "Please keep your message under " . CONTACT_MAX_MESSAGE . " characters.";
+    } elseif ($errors) {
+        // the messages show under the fields
     } elseif (count($recent) >= CONTACT_PER_SESSION) {
         $error = "You have sent a few messages already. Please wait a few minutes before sending another.";
     } else {
@@ -124,7 +137,7 @@ require_once '../includes/header.php';
                     <div class="k-alert k-alert--success" role="status">Thank you, your message was sent. We will reply by email.</div>
                 <?php endif; ?>
 
-                <form method="POST" class="k-card k-formcard">
+                <form method="POST" class="k-card k-formcard" data-validate>
                     <input type="hidden" name="csrf" value="<?php echo k_csrf_token(); ?>">
                     <h2 class="k-h3">Send a message</h2>
 
@@ -136,29 +149,37 @@ require_once '../includes/header.php';
                         <div class="k-field">
                             <label for="name">Your Name</label>
                             <input type="text" id="name" name="name" class="k-input" required maxlength="100"
-                                autocomplete="name" value="<?php echo htmlspecialchars($name); ?>">
+                                autocomplete="name" data-msg-missing="Enter your name."
+                                value="<?php echo htmlspecialchars($name); ?>" <?php k_field_invalid($errors, 'name'); ?>>
+                            <?php k_field_error($errors, 'name'); ?>
                         </div>
                         <div class="k-field">
                             <label for="email">Email Address</label>
                             <input type="email" id="email" name="email" class="k-input" required maxlength="255"
-                                autocomplete="email" value="<?php echo htmlspecialchars($email); ?>">
+                                autocomplete="email" data-msg-missing="Enter your email address so we can reply."
+                                value="<?php echo htmlspecialchars($email); ?>" <?php k_field_invalid($errors, 'email'); ?>>
+                            <?php k_field_error($errors, 'email'); ?>
                         </div>
                     </div>
 
                     <div class="k-field">
                         <label for="topic">What is it about?</label>
-                        <select id="topic" name="topic" class="k-input" required>
+                        <select id="topic" name="topic" class="k-input" required data-msg-missing="Choose what your message is about."
+                            <?php k_field_invalid($errors, 'topic'); ?>>
                             <?php foreach (CONTACT_TOPICS as $key => $label): ?>
                                 <option value="<?php echo $key; ?>" <?php echo $topic === $key ? 'selected' : ''; ?>><?php echo htmlspecialchars($label); ?></option>
                             <?php endforeach; ?>
                         </select>
+                        <?php k_field_error($errors, 'topic'); ?>
                     </div>
 
                     <div class="k-field">
                         <label for="message">Message</label>
                         <textarea id="message" name="message" rows="6" class="k-input k-textarea" required
                             minlength="<?php echo CONTACT_MIN_MESSAGE; ?>" maxlength="<?php echo CONTACT_MAX_MESSAGE; ?>"
-                            placeholder="How can we help?"><?php echo htmlspecialchars($message); ?></textarea>
+                            data-msg-missing="Tell us how we can help." placeholder="How can we help?"
+                            <?php k_field_invalid($errors, 'message'); ?>><?php echo htmlspecialchars($message); ?></textarea>
+                        <?php k_field_error($errors, 'message'); ?>
                     </div>
 
                     <div class="k-hp" aria-hidden="true">

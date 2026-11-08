@@ -9,7 +9,8 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-$error = '';
+$error = '';   // a problem with the whole form (the book could not be saved)
+$errors = [];  // problems with one field, shown under it (field name => message)
 $success = '';
 
 // Check if tables have necessary columns (ensure manual run first, but just in case)
@@ -43,21 +44,40 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $seller_id = (int) $_SESSION['user_id'];
     $image = ''; // no cover: pages show a titled placeholder
 
-    if ($title === '' || $author === '') {
-        $error = "Please enter a title and an author.";
+    $price_text = trim((string) ($_POST['price'] ?? ''));
+    if ($title === '') {
+        $errors['title'] = "Enter the book's title.";
+    } elseif (mb_strlen($title) > 255) {
+        $errors['title'] = "Use 255 characters or fewer.";
+    }
+    if ($author === '') {
+        $errors['author'] = "Enter the author's name.";
+    } elseif (mb_strlen($author) > 255) {
+        $errors['author'] = "Use 255 characters or fewer.";
+    }
+    if ($price_text === '') {
+        $errors['price'] = "Enter a price.";
     } elseif ($price <= 0) {
-        $error = "Please enter a price greater than zero.";
-    } elseif (!in_array($category, $categories, true)) {
-        $error = "Please choose a category.";
-    } else {
-        // Image Upload (optional)
-        [$uploaded, $error] = k_upload_image($_FILES['image'] ?? ['error' => UPLOAD_ERR_NO_FILE], 'books', 'book_' . $seller_id);
-        if ($uploaded !== null) {
+        $errors['price'] = "Enter a price above zero, like 499.";
+    }
+    if (!in_array($category, $categories, true)) {
+        $errors['category'] = "Choose a category.";
+    }
+    if (mb_strlen($isbn) > 20) {
+        $errors['isbn'] = "Use 20 characters or fewer.";
+    }
+
+    if (!$errors) {
+        // Image Upload (optional); a problem with the file is shown under the picture box
+        [$uploaded, $upload_error] = k_upload_image($_FILES['image'] ?? ['error' => UPLOAD_ERR_NO_FILE], 'books', 'book_' . $seller_id);
+        if ($upload_error !== '') {
+            $errors['image'] = $upload_error;
+        } elseif ($uploaded !== null) {
             $image = $uploaded;
         }
     }
 
-    if (empty($error)) {
+    if (!$errors) {
         $title_sql = $conn->real_escape_string($title);
         $author_sql = $conn->real_escape_string($author);
         $category_sql = $conn->real_escape_string($category);
@@ -101,17 +121,21 @@ $old_category = $old['category'] ?? '';
         <div class="k-alert k-alert--error" role="alert"><?php echo htmlspecialchars($error); ?></div>
     <?php endif; ?>
 
-    <form method="POST" enctype="multipart/form-data" class="k-card k-formcard">
+    <form method="POST" enctype="multipart/form-data" class="k-card k-formcard" data-validate>
         <div class="k-fields">
             <div class="k-field">
                 <label for="title">Book Title *</label>
-                <input type="text" id="title" name="title" class="k-input" required
-                    value="<?php echo htmlspecialchars($old['title'] ?? ''); ?>">
+                <input type="text" id="title" name="title" class="k-input" required maxlength="255"
+                    data-msg-missing="Enter the book's title."
+                    value="<?php echo htmlspecialchars($old['title'] ?? ''); ?>" <?php k_field_invalid($errors, 'title'); ?>>
+                <?php k_field_error($errors, 'title'); ?>
             </div>
             <div class="k-field">
                 <label for="author">Author *</label>
-                <input type="text" id="author" name="author" class="k-input" required
-                    value="<?php echo htmlspecialchars($old['author'] ?? ''); ?>">
+                <input type="text" id="author" name="author" class="k-input" required maxlength="255"
+                    data-msg-missing="Enter the author's name."
+                    value="<?php echo htmlspecialchars($old['author'] ?? ''); ?>" <?php k_field_invalid($errors, 'author'); ?>>
+                <?php k_field_error($errors, 'author'); ?>
             </div>
         </div>
 
@@ -119,11 +143,14 @@ $old_category = $old['category'] ?? '';
             <div class="k-field">
                 <label for="price">Price (NPR) *</label>
                 <input type="number" step="0.01" min="0.01" id="price" name="price" class="k-input" required
-                    value="<?php echo htmlspecialchars($old['price'] ?? ''); ?>">
+                    data-msg-missing="Enter a price." data-msg-invalid="Enter a price above zero, like 499."
+                    value="<?php echo htmlspecialchars($old['price'] ?? ''); ?>" <?php k_field_invalid($errors, 'price'); ?>>
+                <?php k_field_error($errors, 'price'); ?>
             </div>
             <div class="k-field">
                 <label for="category">Category *</label>
-                <select id="category" name="category" class="k-input" required>
+                <select id="category" name="category" class="k-input" required data-msg-missing="Choose a category."
+                    <?php k_field_invalid($errors, 'category'); ?>>
                     <option value="">Select Category</option>
                     <?php foreach ($categories as $name): ?>
                         <option value="<?php echo htmlspecialchars($name); ?>"
@@ -131,6 +158,7 @@ $old_category = $old['category'] ?? '';
                             <?php echo htmlspecialchars($name); ?></option>
                     <?php endforeach; ?>
                 </select>
+                <?php k_field_error($errors, 'category'); ?>
             </div>
         </div>
 
@@ -151,6 +179,7 @@ $old_category = $old['category'] ?? '';
                 <input type="file" name="image" accept="image/jpeg,image/png,image/gif,image/webp" hidden
                     aria-labelledby="cover-label">
             </div>
+            <?php k_field_error($errors, 'image'); ?>
         </div>
 
         <h2 class="k-formcard__sub">Additional Details</h2>
@@ -164,12 +193,14 @@ $old_category = $old['category'] ?? '';
             <div class="k-field">
                 <label for="pages">Pages</label>
                 <input type="number" min="0" id="pages" name="pages" class="k-input"
+                    data-msg-invalid="Enter the number of pages as a whole number, like 320."
                     value="<?php echo htmlspecialchars($old['pages'] ?? ''); ?>">
             </div>
             <div class="k-field">
                 <label for="isbn">ISBN</label>
                 <input type="text" maxlength="20" id="isbn" name="isbn" class="k-input"
-                    value="<?php echo htmlspecialchars($old['isbn'] ?? ''); ?>">
+                    value="<?php echo htmlspecialchars($old['isbn'] ?? ''); ?>" <?php k_field_invalid($errors, 'isbn'); ?>>
+                <?php k_field_error($errors, 'isbn'); ?>
             </div>
         </div>
 

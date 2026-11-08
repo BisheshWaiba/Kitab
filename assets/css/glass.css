@@ -435,6 +435,11 @@ body.is-glass {
 .is-glass .k-input:hover { border-color: rgba(17, 18, 20, .3); }
 .is-glass .k-input:focus { border-color: var(--k-ink); background: #fff; outline: 3px solid rgba(17, 18, 20, .12); outline-offset: 0; }
 .is-glass .k-input::placeholder { color: #6B6C72; }
+/* a field with a problem (message under it, see .k-field__error): red edge, still frosted */
+.is-glass .k-input[aria-invalid="true"],
+.is-glass .k-input[aria-invalid="true"]:hover { border-color: var(--k-red); background: rgba(255, 255, 255, .85); }
+.is-glass .k-input[aria-invalid="true"]:focus { border-color: var(--k-red); background: #fff; outline-color: rgba(179, 38, 30, .22); }
+.gs-price .k-field__error { flex: 1 1 100%; }
 
 /* ---------- Checkout ---------- */
 .gk-grid { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 32px; align-items: start; }

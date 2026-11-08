@@ -12,6 +12,7 @@ if (isset($_SESSION['user_id'])) {
 }
 
 $error = '';
+$errors = []; // problems with one field, shown under it
 $sent = false;
 $dev_link = '';
 $email = '';
@@ -21,8 +22,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!k_csrf_valid($_POST['csrf'] ?? '')) {
         $error = "Your session expired. Please try again.";
+    } elseif ($email === '') {
+        $errors['email'] = "Enter the email address of your account.";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = "Please enter a valid email address.";
+        $errors['email'] = "Enter a valid email address, like name@example.com.";
     } else {
         $request = k_request_reset($conn, $email);
         // Same answer whether or not the email has an account. The one exception: on your own computer, where
@@ -64,7 +67,7 @@ require_once '../includes/header.php';
                 <a href="login.php" class="k-btn k-btn--outline k-btn--block">Back to Login</a>
             </div>
         <?php else: ?>
-            <form method="POST" class="k-authpage__form">
+            <form method="POST" class="k-authpage__form" data-validate>
                 <input type="hidden" name="csrf" value="<?php echo k_csrf_token(); ?>">
                 <h1 class="k-h1">Forgot Password</h1>
                 <p class="k-authpage__text">Enter the email address of your account and we will send you a link to choose a new password.</p>
@@ -76,7 +79,9 @@ require_once '../includes/header.php';
                 <div class="k-field">
                     <label for="email">Email Address</label>
                     <input type="email" id="email" name="email" class="k-input" required autocomplete="email"
-                        value="<?php echo htmlspecialchars($email); ?>">
+                        data-msg-missing="Enter the email address of your account."
+                        value="<?php echo htmlspecialchars($email); ?>" <?php k_field_invalid($errors, 'email'); ?>>
+                    <?php k_field_error($errors, 'email'); ?>
                 </div>
                 <button type="submit" class="k-btn k-btn--primary k-btn--block">Send Reset Link</button>
 

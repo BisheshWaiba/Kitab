@@ -270,7 +270,7 @@ $category = trim((string) ($book['category'] ?? ''));
                     <p class="k-reviewform__note">Your review was removed by our team and can't be changed.</p>
                 </div>
             <?php else: ?>
-                <form method="POST" action="review.php" class="k-card k-reviewform">
+                <form method="POST" action="review.php" class="k-card k-reviewform" data-validate>
                     <input type="hidden" name="csrf" value="<?php echo k_csrf_token(); ?>">
                     <input type="hidden" name="book_id" value="<?php echo (int) $book['id']; ?>">
                     <input type="hidden" name="do" value="save">
@@ -281,6 +281,7 @@ $category = trim((string) ($book['category'] ?? ''));
                         <div class="k-rate__stars">
                             <?php for ($v = 5; $v >= 1; $v--): ?>
                                 <input type="radio" name="rating" id="rate<?php echo $v; ?>" value="<?php echo $v; ?>" required
+                                    data-msg-missing="Choose a rating from 1 to 5 stars."
                                     <?php echo $form_rating === $v ? 'checked' : ''; ?>>
                                 <label for="rate<?php echo $v; ?>"><span class="k-sr"><?php echo $v; ?> star<?php echo $v === 1 ? '' : 's'; ?></span><svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7 6.1 20.8l1.2-6.5L2.5 9.7l6.6-.9z" /></svg></label>
                             <?php endfor; ?>
