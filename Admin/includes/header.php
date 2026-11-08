@@ -1,19 +1,12 @@
 <?php
-session_start();
-require_once dirname(dirname(__DIR__)) . '/config/db.php';
-
-// Security Check: must be logged in AND hold the admin role (a session with no role is not an admin)
-if (!isset($_SESSION['user_id']) || ($_SESSION['user_role'] ?? '') !== 'admin') {
-    header("Location: " . BASE_URL . "frontend/login.php");
-    exit();
-}
+require_once __DIR__ . '/auth.php'; // session, database and the admin check
 
 $current_page = basename($_SERVER['PHP_SELF']);
 
 // file => [label, files that keep it highlighted]
 $admin_nav = [
     'index.php' => ['Dashboard', ['index.php']],
-    'books.php' => ['Books', ['books.php', 'add_book.php']],
+    'books.php' => ['Books', ['books.php', 'add_book.php', 'edit_book.php']],
     'users.php' => ['Users', ['users.php']],
     'orders.php' => ['Orders', ['orders.php']],
     'profile.php' => ['Profile', ['profile.php']],

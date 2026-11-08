@@ -18,6 +18,34 @@ function k_payment_label(?string $method): string
     return ucwords(str_replace('_', ' ', $method));
 }
 
+// One-time token for forms that change data (needs an active session). Pair with k_csrf_valid() on the POST side.
+function k_csrf_token(): string
+{
+    if (empty($_SESSION['csrf'])) {
+        $_SESSION['csrf'] = bin2hex(random_bytes(16));
+    }
+    return $_SESSION['csrf'];
+}
+
+function k_csrf_valid($token): bool
+{
+    return is_string($token) && !empty($_SESSION['csrf']) && hash_equals($_SESSION['csrf'], $token);
+}
+
+// Remove a cover that was uploaded to uploads/books/. Anything else (the bundled assets/ covers, outside paths) is left alone.
+function k_delete_upload(?string $path): void
+{
+    $path = (string) $path;
+    $name = basename($path);
+    if ($name === '' || $path !== 'uploads/books/' . $name) {
+        return;
+    }
+    $file = dirname(__DIR__) . '/uploads/books/' . $name;
+    if (is_file($file)) {
+        @unlink($file);
+    }
+}
+
 // Validate and store an uploaded image under uploads/<subdir>/.
 // Returns [relative path or null, error message or ''].
 // Only real JPG/PNG/GIF/WebP files are accepted (checked by content, not by name); the saved extension

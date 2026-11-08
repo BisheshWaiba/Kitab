@@ -794,6 +794,7 @@ body {
   white-space: nowrap;
 }
 .k-rowactions { display: flex; gap: 8px; }
+.k-rowactions form { margin: 0; }
 .k-btn--xs { height: 40px; padding: 0 16px; font-size: 14px; border-radius: 8px; }
 .k-btn--danger { border-color: var(--k-red); color: var(--k-red); background: transparent; }
 .k-btn--danger:hover { background: var(--k-red); color: #fff; }

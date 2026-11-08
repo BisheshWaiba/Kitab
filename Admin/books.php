@@ -3,6 +3,10 @@ require_once dirname(__DIR__) . '/includes/helpers.php';
 
 // Fetch Books
 $books = $conn->query("SELECT * FROM books ORDER BY id DESC");
+
+// One-time message left by delete_book.php
+$flash = $_SESSION['flash'] ?? null;
+unset($_SESSION['flash']);
 ?>
 
 <main class="k-admin__main">
@@ -16,6 +20,12 @@ $books = $conn->query("SELECT * FROM books ORDER BY id DESC");
             Add New Book
         </a>
     </div>
+
+    <?php if ($flash): ?>
+        <div class="k-alert k-alert--<?php echo $flash['type'] === 'success' ? 'success' : 'error'; ?>"
+            role="<?php echo $flash['type'] === 'success' ? 'status' : 'alert'; ?>">
+            <?php echo htmlspecialchars($flash['message']); ?></div>
+    <?php endif; ?>
 
     <div class="k-tablecard">
         <table class="k-table k-table--wide">
@@ -47,8 +57,17 @@ $books = $conn->query("SELECT * FROM books ORDER BY id DESC");
                         <td class="k-num k-num--strong">Rs. <?php echo number_format($book['price']); ?></td>
                         <td>
                             <div class="k-rowactions">
-                                <button type="button" class="k-btn k-btn--outline k-btn--xs">Edit</button>
-                                <button type="button" class="k-btn k-btn--danger k-btn--xs">Delete</button>
+                                <a href="<?php echo BASE_URL; ?>admin/edit_book.php?id=<?php echo (int) $book['id']; ?>"
+                                    class="k-btn k-btn--outline k-btn--xs"
+                                    aria-label="Edit <?php echo htmlspecialchars($book['title']); ?>">Edit</a>
+                                <form method="POST" action="<?php echo BASE_URL; ?>admin/delete_book.php"
+                                    onsubmit="return confirm(this.dataset.confirm)"
+                                    data-confirm="<?php echo htmlspecialchars('Delete "' . $book['title'] . '"? Its reviews are removed too, and this can\'t be undone.'); ?>">
+                                    <input type="hidden" name="csrf" value="<?php echo k_csrf_token(); ?>">
+                                    <input type="hidden" name="id" value="<?php echo (int) $book['id']; ?>">
+                                    <button type="submit" class="k-btn k-btn--danger k-btn--xs"
+                                        aria-label="Delete <?php echo htmlspecialchars($book['title']); ?>">Delete</button>
+                                </form>
                             </div>
                         </td>
                     </tr>
