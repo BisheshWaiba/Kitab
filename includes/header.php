@@ -11,8 +11,12 @@ if (isset($_SESSION['cart'])) {
     }
 }
 
+require_once __DIR__ . '/helpers.php';
+$wish_count = count(k_wishlist_ids());
+
 $current_page = basename($_SERVER['SCRIPT_NAME']);
 $nav_home = $current_page === 'index.php';
+$nav_wish = $current_page === 'wishlist.php';
 $nav_shop = in_array($current_page, ['shop.php', 'product.php'], true);
 $user_initial = isset($_SESSION['user_name']) ? strtoupper(mb_substr($_SESSION['user_name'], 0, 1)) : '';
 ?>
@@ -58,6 +62,18 @@ $user_initial = isset($_SESSION['user_name']) ? strtoupper(mb_substr($_SESSION['
                     class="k-link<?php echo $nav_home ? ' is-active' : ''; ?>">Home</a>
                 <a href="<?php echo BASE_URL; ?>frontend/shop.php"
                     class="k-link<?php echo $nav_shop ? ' is-active' : ''; ?>">Shop</a>
+                <a href="<?php echo BASE_URL; ?>frontend/wishlist.php"
+                    class="k-cart k-cart--wish<?php echo $nav_wish ? ' is-active' : ''; ?>"
+                    aria-label="Wishlist<?php echo $wish_count > 0 ? ', ' . $wish_count . ' saved' : ''; ?>"
+                    <?php echo $nav_wish ? 'aria-current="page"' : ''; ?>>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21.2l7.8-7.7 1-1.1a5.5 5.5 0 0 0 0-7.8z" />
+                    </svg>
+                    <?php if ($wish_count > 0): ?>
+                        <span class="k-cart__badge"><?php echo $wish_count; ?></span>
+                    <?php endif; ?>
+                </a>
                 <a href="<?php echo BASE_URL; ?>frontend/cart.php" class="k-cart" aria-label="Cart<?php echo $cart_count > 0 ? ', ' . $cart_count . ' items' : ''; ?>">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">

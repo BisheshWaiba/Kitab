@@ -113,6 +113,7 @@ require_once '../includes/header.php';
             </div>
             <button type="submit" name="add_to_cart" class="k-btn k-btn--primary">Add to Cart</button>
         </form>
+        <?php k_wish_button($book, 'button'); ?>
     </div>
 </section>
 

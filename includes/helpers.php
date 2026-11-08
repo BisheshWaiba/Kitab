@@ -115,14 +115,81 @@ function k_auth_art(mysqli $conn, int $offset = 0, bool $flip = false): void
     <?php
 }
 
+// Ids of the books on the signed-in user's wishlist, as [id => true]. One query per request; empty for guests.
+function k_wishlist_ids(): array
+{
+    static $ids = null;
+    if ($ids !== null) {
+        return $ids;
+    }
+    $ids = [];
+    $user_id = (int) ($_SESSION['user_id'] ?? 0);
+    $conn = $GLOBALS['conn'] ?? null;
+    if ($user_id > 0 && $conn instanceof mysqli) {
+        $stmt = $conn->prepare("SELECT book_id FROM wishlist WHERE user_id = ?");
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        foreach ($stmt->get_result()->fetch_all(MYSQLI_NUM) as [$book_id]) {
+            $ids[(int) $book_id] = true;
+        }
+    }
+    return $ids;
+}
+
+// Heart that saves a book to the wishlist: a round icon on book cards, or a text button on the product page.
+// It is a plain form (works without JavaScript); main.js upgrades it to update in place.
+// Guests get a link to the login page instead.
+function k_wish_button(array $b, string $variant = 'icon'): void
+{
+    $id = (int) $b['id'];
+    $title = (string) $b['title'];
+    $on = isset(k_wishlist_ids()[$id]);
+    $as_button = $variant === 'button';
+    $heart = '<svg width="' . ($as_button ? 18 : 20) . '" height="' . ($as_button ? 18 : 20) . '" viewBox="0 0 24 24" stroke="currentColor"'
+        . ' stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+        . '<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21.2l7.8-7.7 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
+    $button_class = $as_button ? 'k-btn k-btn--outline k-wishbtn' : 'k-wish__btn';
+
+    if (!isset($_SESSION['user_id'])) {
+        $label = 'Log in to save "' . $title . '" to your wishlist';
+        $link = '<a href="' . BASE_URL . 'frontend/login.php" class="' . $button_class . '" aria-label="' . htmlspecialchars($label) . '"'
+            . ($as_button ? '' : ' title="Log in to save this book"') . '>' . $heart
+            . ($as_button ? '<span>Add to Wishlist</span>' : '') . '</a>';
+        echo $as_button ? $link : '<span class="k-wish">' . $link . '</span>';
+        return;
+    }
+    ?>
+    <form method="POST" action="<?php echo BASE_URL; ?>frontend/wishlist.php"
+        class="<?php echo $as_button ? 'k-wishrow' : 'k-wish'; ?>" data-wish data-title="<?php echo htmlspecialchars($title); ?>">
+        <input type="hidden" name="csrf" value="<?php echo k_csrf_token(); ?>">
+        <input type="hidden" name="book_id" value="<?php echo $id; ?>">
+        <input type="hidden" name="do" value="<?php echo $on ? 'remove' : 'add'; ?>">
+        <input type="hidden" name="back" value="<?php echo htmlspecialchars($_SERVER['REQUEST_URI'] ?? ''); ?>">
+        <?php if ($as_button): ?>
+            <button type="submit" class="<?php echo $button_class . ($on ? ' is-on' : ''); ?>" data-wish-btn>
+                <?php echo $heart; ?>
+                <span data-wish-text data-on="Saved to Wishlist" data-off="Add to Wishlist"><?php echo $on ? 'Saved to Wishlist' : 'Add to Wishlist'; ?></span>
+            </button>
+        <?php else: ?>
+            <button type="submit" class="<?php echo $button_class . ($on ? ' is-on' : ''); ?>" data-wish-btn
+                aria-pressed="<?php echo $on ? 'true' : 'false'; ?>"
+                aria-label="<?php echo htmlspecialchars('Save "' . $title . '" to wishlist'); ?>"><?php echo $heart; ?></button>
+        <?php endif; ?>
+    </form>
+    <?php
+}
+
 function k_book_card(array $b): void
 {
     $href = BASE_URL . 'frontend/product.php?id=' . (int) $b['id'];
     ?>
     <article class="k-book">
-        <a class="k-book__cover" href="<?php echo $href; ?>" tabindex="-1" aria-hidden="true">
-            <?php k_cover($b); ?>
-        </a>
+        <div class="k-book__media">
+            <a class="k-book__cover" href="<?php echo $href; ?>" tabindex="-1" aria-hidden="true">
+                <?php k_cover($b); ?>
+            </a>
+            <?php k_wish_button($b); ?>
+        </div>
         <div class="k-book__info">
             <span class="k-book__cat"><?php echo htmlspecialchars($b['category']); ?></span>
             <a class="k-book__title" href="<?php echo $href; ?>"><?php echo htmlspecialchars($b['title']); ?></a>

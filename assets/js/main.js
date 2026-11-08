@@ -37,6 +37,81 @@ document.querySelectorAll('[data-upload]').forEach(function (box) {
     });
 });
 
+// Wishlist hearts: save or remove a book without reloading the page.
+// Without JavaScript the same form posts normally and comes back to the page.
+function setWishCount(count) {
+    var link = document.querySelector('.k-cart--wish');
+    if (!link) {
+        return;
+    }
+    var badge = link.querySelector('.k-cart__badge');
+    if (count > 0 && !badge) {
+        badge = document.createElement('span');
+        badge.className = 'k-cart__badge';
+        link.appendChild(badge);
+    }
+    if (badge) {
+        if (count > 0) {
+            badge.textContent = count;
+        } else {
+            badge.remove();
+        }
+    }
+    link.setAttribute('aria-label', count > 0 ? 'Wishlist, ' + count + ' saved' : 'Wishlist');
+}
+
+document.querySelectorAll('form[data-wish]').forEach(function (form) {
+    var button = form.querySelector('[data-wish-btn]');
+    var action = form.querySelector('input[name="do"]');
+
+    form.addEventListener('submit', function (event) {
+        event.preventDefault();
+        if (button.disabled) {
+            return;
+        }
+        button.disabled = true;
+        fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: { Accept: 'application/json' },
+            credentials: 'same-origin'
+        })
+            .then(function (response) {
+                return response.ok ? response.json() : Promise.reject();
+            })
+            .then(function (data) {
+                action.value = data.wished ? 'remove' : 'add';
+                button.classList.toggle('is-on', data.wished);
+                if (button.hasAttribute('aria-pressed')) {
+                    button.setAttribute('aria-pressed', data.wished ? 'true' : 'false');
+                }
+                var text = button.querySelector('[data-wish-text]');
+                if (text) {
+                    text.textContent = data.wished ? text.dataset.on : text.dataset.off;
+                }
+                setWishCount(data.count);
+
+                // On the wishlist page a removed book leaves the list
+                var list = document.querySelector('[data-wish-list]');
+                var card = form.closest('.k-book');
+                if (list && card && !data.wished) {
+                    card.remove();
+                    var total = document.querySelector('[data-wish-total]');
+                    if (data.count === 0) {
+                        window.location.reload();
+                    } else if (total) {
+                        total.textContent = data.count + (data.count === 1 ? ' book' : ' books') + ' saved for later';
+                    }
+                }
+                button.disabled = false;
+            })
+            .catch(function () {
+                // Session ended or the request failed: let the form do it the ordinary way
+                form.submit();
+            });
+    });
+});
+
 // Product page: quantity stepper
 document.querySelectorAll('[data-qty]').forEach(function (box) {
     var input = box.querySelector('input');
