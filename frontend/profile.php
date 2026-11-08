@@ -104,12 +104,12 @@ $initial = strtoupper(mb_substr($user_name, 0, 1));
                     ?>
                     <article class="k-order">
                         <div class="k-order__id">
-                            <div class="k-order__num">Order #<?php echo (int) $order['id']; ?></div>
+                            <div class="k-order__num"><a href="order.php?id=<?php echo (int) $order['id']; ?>" class="k-order__link">Order #<?php echo (int) $order['id']; ?></a></div>
                             <div class="k-order__date"><?php echo date('F j, Y', strtotime($order['created_at'])); ?></div>
                         </div>
                         <div class="k-order__ship">
                             <div class="k-order__label">Shipping to</div>
-                            <div class="k-order__value"><?php echo htmlspecialchars((string) $order['address']); ?></div>
+                            <div class="k-order__value"><?php echo htmlspecialchars(k_order_address($order)); ?></div>
                         </div>
                         <div class="k-order__total">
                             <div class="k-order__label">Total</div>
@@ -117,6 +117,7 @@ $initial = strtoupper(mb_substr($user_name, 0, 1));
                         </div>
                         <div class="k-order__status">
                             <span class="k-pill k-pill--<?php echo $status; ?>"><?php echo ucfirst($status); ?></span>
+                            <a href="order.php?id=<?php echo (int) $order['id']; ?>" class="k-order__details">View details</a>
                         </div>
                     </article>
                 <?php endwhile; ?>

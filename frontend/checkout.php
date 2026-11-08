@@ -97,7 +97,12 @@ require_once '../includes/header.php';
             <h2 class="k-h3">Order Placed Successfully!</h2>
             <p>Thank you, <?php echo htmlspecialchars($name); ?>. Your order #<?php echo $order_id; ?> has been received.
             </p>
-            <a href="shop.php" class="k-btn k-btn--primary">Continue Shopping</a>
+            <div class="k-success__actions">
+                <?php if ($user_id !== null): ?>
+                    <a href="order.php?id=<?php echo (int) $order_id; ?>" class="k-btn k-btn--outline">View Order</a>
+                <?php endif; ?>
+                <a href="shop.php" class="k-btn k-btn--primary">Continue Shopping</a>
+            </div>
         </div>
     <?php else: ?>
         <div class="k-checkout">

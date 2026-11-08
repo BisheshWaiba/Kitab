@@ -1,6 +1,23 @@
 <?php
 // Shared markup helpers for the redesigned pages. Needs BASE_URL (config/db.php).
 
+// The delivery address of an order. Older orders kept it in shipping_address instead of address.
+function k_order_address(array $order): string
+{
+    $address = trim((string) ($order['address'] ?? ''));
+    return $address !== '' ? $address : trim((string) ($order['shipping_address'] ?? ''));
+}
+
+// Readable payment method (cash_on_delivery -> Cash on Delivery); empty means the default
+function k_payment_label(?string $method): string
+{
+    $method = (string) $method;
+    if ($method === '' || $method === 'cash_on_delivery') {
+        return 'Cash on Delivery';
+    }
+    return ucwords(str_replace('_', ' ', $method));
+}
+
 // Validate and store an uploaded image under uploads/<subdir>/.
 // Returns [relative path or null, error message or ''].
 // Only real JPG/PNG/GIF/WebP files are accepted (checked by content, not by name); the saved extension
