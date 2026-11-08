@@ -57,7 +57,7 @@ $user_initial = isset($_SESSION['user_name']) ? strtoupper(mb_substr($_SESSION['
                     </svg>
                 </button>
                 <input type="text" name="search" placeholder="Search books..." aria-label="Search books"
-                    value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
+                    value="<?php echo is_string($_GET['search'] ?? null) ? htmlspecialchars($_GET['search']) : ''; ?>">
             </form>
 
             <nav class="k-links" aria-label="Main">

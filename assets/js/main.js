@@ -117,6 +117,38 @@ document.querySelectorAll('form[data-wish]').forEach(function (form) {
     });
 });
 
+// Shop controls: the sort applies at once, and empty price boxes (and the default sort) stay out of the address
+document.querySelectorAll('form[data-shop-tools]').forEach(function (form) {
+    var skipped = [];
+    form.querySelectorAll('select[data-autosubmit]').forEach(function (select) {
+        select.addEventListener('change', function () {
+            if (form.requestSubmit) {
+                form.requestSubmit();
+            } else {
+                form.submit();
+            }
+        });
+    });
+    form.addEventListener('submit', function () {
+        form.querySelectorAll('input[name="min"], input[name="max"]').forEach(function (input) {
+            if (input.value.trim() === '') {
+                input.disabled = true;
+                skipped.push(input);
+            }
+        });
+        var sort = form.querySelector('select[name="sort"]');
+        if (sort && sort.value === 'newest') {
+            sort.disabled = true;
+            skipped.push(sort);
+        }
+    });
+    // coming back with the browser's Back button must not find them still switched off
+    window.addEventListener('pageshow', function () {
+        skipped.forEach(function (el) { el.disabled = false; });
+        skipped = [];
+    });
+});
+
 // Add to cart without leaving the page: the book goes in, the cart badge pops and a message slides in with "View cart".
 // Without JavaScript the form posts normally and comes back to the book, which shows the same message once.
 function bumpCartBadge(count) {
