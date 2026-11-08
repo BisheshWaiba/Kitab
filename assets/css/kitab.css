@@ -450,6 +450,32 @@ body {
 .k-collection:hover .k-collection__name { text-decoration: underline; text-underline-offset: 4px; }
 .k-collection__count { padding: 0 4px; font-size: 15px; color: var(--k-muted); }
 
+/* ---------- Legal pages ---------- */
+.k-prose { max-width: 740px; counter-reset: section; }
+.k-prose__lead { margin: 0 0 8px; font-size: 20px; line-height: 1.6; color: var(--k-ink); }
+.k-prose h2 {
+  counter-increment: section;
+  margin: 44px 0 14px;
+  font-family: var(--k-display);
+  font-weight: 600;
+  font-size: 26px;
+  line-height: 1.2;
+  letter-spacing: -.01em;
+  color: var(--k-ink);
+}
+.k-prose h2::before { content: counter(section) ". "; color: var(--k-muted); font-weight: 500; }
+.k-prose p,
+.k-prose li { font-size: 17px; line-height: 1.75; color: var(--k-ink-2); }
+.k-prose p { margin: 0 0 14px; }
+.k-prose ul,
+.k-prose ol { margin: 0 0 14px; padding-left: 24px; }
+.k-prose ul { list-style: disc; }
+.k-prose ol { list-style: decimal; }
+.k-prose li { margin: 0 0 8px; padding-left: 4px; }
+.k-prose a { color: var(--k-ink); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.k-prose a:hover { text-decoration-thickness: 2px; }
+.k-prose .k-prose__contact { margin: 48px 0 0; padding: 24px 28px; border-radius: 14px; background: var(--k-band); font-size: 16px; }
+
 .k-results a,
 .k-product__author a { color: var(--k-ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
 .k-results a { font-weight: 600; }

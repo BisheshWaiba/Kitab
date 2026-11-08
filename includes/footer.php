@@ -11,14 +11,14 @@
                     <li><a href="#">Events</a></li>
                 </ul>
                 <ul class="k-footer__col">
-                    <li><a href="#">Legal warning</a></li>
-                    <li><a href="#">Giveaway terms and conditions</a></li>
-                    <li><a href="#">Legal bases of the draws</a></li>
+                    <li><a href="<?php echo BASE_URL; ?>frontend/legal.php?page=legal-warning">Legal warning</a></li>
+                    <li><a href="<?php echo BASE_URL; ?>frontend/legal.php?page=giveaway-terms">Giveaway terms and conditions</a></li>
+                    <li><a href="<?php echo BASE_URL; ?>frontend/legal.php?page=draw-rules">Legal bases of the draws</a></li>
                 </ul>
                 <ul class="k-footer__col">
-                    <li><a href="#">Return policy</a></li>
-                    <li><a href="#">Cookies policy</a></li>
-                    <li><a href="#">Privacy policy</a></li>
+                    <li><a href="<?php echo BASE_URL; ?>frontend/legal.php?page=returns">Return policy</a></li>
+                    <li><a href="<?php echo BASE_URL; ?>frontend/legal.php?page=cookies">Cookies policy</a></li>
+                    <li><a href="<?php echo BASE_URL; ?>frontend/legal.php?page=privacy">Privacy policy</a></li>
                 </ul>
             </div>
         </div>
