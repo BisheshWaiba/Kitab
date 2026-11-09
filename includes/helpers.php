@@ -309,7 +309,8 @@ function k_checkout_steps(string $current): void
     <?php
 }
 
-function k_book_card(array $b): void
+// $cta is the look of the Add to Cart button: 'outline' (Shop and Wishlist) or 'primary' (the Home page)
+function k_book_card(array $b, string $cta = 'outline'): void
 {
     $href = BASE_URL . 'frontend/product.php?id=' . (int) $b['id'];
     ?>
@@ -327,7 +328,7 @@ function k_book_card(array $b): void
         </div>
         <div class="k-book__foot">
             <span class="k-book__price">Rs. <?php echo number_format((float) $b['price']); ?></span>
-            <a href="<?php echo $href; ?>" class="k-btn k-btn--outline">Add to Cart</a>
+            <a href="<?php echo $href; ?>" class="k-btn k-btn--<?php echo $cta === 'primary' ? 'primary' : 'outline'; ?>">Add to Cart</a>
         </div>
     </article>
     <?php

@@ -1,0 +1,133 @@
+/* KITAB glass buttons ("Frost", from the design canvas).
+   Only the buttons are glass. Everything else on the page stays flat.
+   A page opts in with <body class="is-gbtn">, so no other page is touched. The buttons keep their existing classes:
+     main action   .k-btn--primary, .k-avatar, a chip that is switched on   -> smoked glass
+     everything    .k-btn--outline, .k-cart, .k-theme, .k-wish__btn, .k-more,
+     else          .k-genre, .k-chip                                          -> milky glass
+   The two looks are written once, as the variables below; dark mode only swaps the variables. */
+
+body.is-gbtn {
+  --gb-ease: cubic-bezier(.16, 1, .3, 1);
+
+  /* main action: smoked glass with a bright top edge */
+  --gb1-ink: #fff;
+  --gb1-edge: rgba(255, 255, 255, .22);
+  --gb1-bg: linear-gradient(180deg, rgba(255, 255, 255, .26), rgba(255, 255, 255, .05) 46%, rgba(255, 255, 255, 0)), rgba(17, 18, 20, .76);
+  --gb1-bg-hover: linear-gradient(180deg, rgba(255, 255, 255, .32), rgba(255, 255, 255, .06) 46%, rgba(255, 255, 255, 0)), rgba(17, 18, 20, .86);
+  --gb1-shadow: inset 0 1px 0 rgba(255, 255, 255, .4), inset 0 -12px 20px -12px rgba(0, 0, 0, .45), 0 14px 26px -12px rgba(17, 18, 20, .6), 0 2px 6px rgba(17, 18, 20, .2);
+  --gb1-shadow-hover: inset 0 1px 0 rgba(255, 255, 255, .5), inset 0 -12px 20px -12px rgba(0, 0, 0, .45), 0 22px 34px -14px rgba(17, 18, 20, .7), 0 2px 6px rgba(17, 18, 20, .2);
+  --gb1-shadow-press: inset 0 2px 8px rgba(0, 0, 0, .5), 0 6px 12px -8px rgba(17, 18, 20, .6);
+
+  /* everything else: milky glass */
+  --gb2-ink: var(--k-ink);
+  --gb2-edge: rgba(255, 255, 255, .9);
+  --gb2-bg: linear-gradient(135deg, rgba(255, 255, 255, .82), rgba(255, 255, 255, .44));
+  --gb2-bg-hover: linear-gradient(135deg, rgba(255, 255, 255, .96), rgba(255, 255, 255, .64));
+  --gb2-shadow: inset 0 1px 0 #fff, 0 0 0 1px rgba(17, 18, 20, .07), 0 10px 24px -14px rgba(17, 18, 20, .4);
+  --gb2-shadow-hover: inset 0 1px 0 #fff, 0 0 0 1px rgba(17, 18, 20, .09), 0 18px 30px -14px rgba(17, 18, 20, .45);
+  --gb2-shadow-press: inset 0 2px 6px rgba(17, 18, 20, .16), 0 0 0 1px rgba(17, 18, 20, .08);
+
+  --gb-badge-ring: rgba(255, 255, 255, .5);
+}
+
+/* dark mode: the main action turns into bright glass, the rest into smoke */
+:root[data-theme="dark"] body.is-gbtn {
+  --gb1-ink: #111214;
+  --gb1-edge: rgba(255, 255, 255, .6);
+  --gb1-bg: linear-gradient(180deg, rgba(255, 255, 255, .96), rgba(255, 255, 255, .62)), rgba(243, 242, 238, .7);
+  --gb1-bg-hover: linear-gradient(180deg, #fff, rgba(255, 255, 255, .76)), rgba(243, 242, 238, .8);
+  --gb1-shadow: inset 0 1px 0 #fff, inset 0 -10px 16px -10px rgba(17, 18, 20, .22), 0 14px 30px -12px rgba(0, 0, 0, .85), 0 0 0 1px rgba(255, 255, 255, .06);
+  --gb1-shadow-hover: inset 0 1px 0 #fff, inset 0 -10px 16px -10px rgba(17, 18, 20, .22), 0 22px 36px -14px rgba(0, 0, 0, .9);
+  --gb1-shadow-press: inset 0 2px 8px rgba(17, 18, 20, .3), 0 6px 12px -8px rgba(0, 0, 0, .8);
+
+  --gb2-edge: rgba(255, 255, 255, .2);
+  --gb2-bg: linear-gradient(135deg, rgba(255, 255, 255, .17), rgba(255, 255, 255, .05));
+  --gb2-bg-hover: linear-gradient(135deg, rgba(255, 255, 255, .26), rgba(255, 255, 255, .1));
+  --gb2-shadow: inset 0 1px 0 rgba(255, 255, 255, .3), 0 10px 24px -14px rgba(0, 0, 0, .75);
+  --gb2-shadow-hover: inset 0 1px 0 rgba(255, 255, 255, .4), 0 18px 30px -14px rgba(0, 0, 0, .8);
+  --gb2-shadow-press: inset 0 2px 6px rgba(0, 0, 0, .4);
+
+  --gb-badge-ring: rgba(14, 15, 18, .6);
+}
+
+/* ---------- the glass itself, shared by every button ---------- */
+body.is-gbtn :is(.k-btn, .k-cart, .k-theme, .k-avatar, .k-genre, .k-chip, .k-more, .k-wish__btn) {
+  isolation: isolate;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  -webkit-backdrop-filter: blur(16px) saturate(170%);
+  backdrop-filter: blur(16px) saturate(170%);
+  transition: transform .35s var(--gb-ease), box-shadow .35s var(--gb-ease), background-color .2s, color .2s, border-color .2s;
+}
+/* the sheen needs something to sit inside (the theme switch is positioned by kitab.css on phones, so it is handled below) */
+body.is-gbtn :is(.k-btn, .k-cart, .k-avatar, .k-genre, .k-chip, .k-more, .k-wish__btn, .k-theme) { position: relative; }
+@media (max-width: 900px) {
+  body.is-gbtn .k-theme { position: absolute; }
+}
+
+/* a light sheen sweeps across on hover. It moves a gradient inside the button, so nothing is drawn outside its edge */
+body.is-gbtn :is(.k-btn, .k-cart, .k-theme, .k-avatar, .k-genre, .k-chip, .k-more, .k-wish__btn)::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 36%, rgba(255, 255, 255, .42) 50%, transparent 64%) no-repeat;
+  background-size: 260% 100%;
+  background-position: 170% 0;
+  transition: background-position .9s var(--gb-ease);
+}
+body.is-gbtn :is(.k-btn, .k-cart, .k-theme, .k-avatar, .k-genre, .k-chip, .k-more, .k-wish__btn):hover::before { background-position: -70% 0; }
+
+body.is-gbtn :is(.k-btn, .k-cart, .k-theme, .k-avatar, .k-genre, .k-chip, .k-more, .k-wish__btn):hover { transform: translateY(-2px); }
+body.is-gbtn :is(.k-btn, .k-cart, .k-theme, .k-avatar, .k-genre, .k-chip, .k-more, .k-wish__btn):active { transform: translateY(0) scale(.97); }
+body.is-gbtn .k-btn:disabled { opacity: .42; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* ---------- sizes (the buttons keep their own sizes; only the big one and the chips change) ---------- */
+body.is-gbtn .k-btn--lg { height: 56px; padding: 0 34px; font-size: 16px; }
+body.is-gbtn :is(.k-genre, .k-chip) { height: 44px; padding: 0 20px; font-size: 15px; font-weight: 500; line-height: 1; }
+body.is-gbtn .k-more { height: 48px; padding: 0 26px; gap: 9px; font-size: 15px; font-weight: 600; }
+body.is-gbtn .k-more:hover { text-decoration: none; }
+body.is-gbtn .k-cart__badge { top: 2px; right: 1px; box-shadow: 0 0 0 2px var(--gb-badge-ring); }
+
+/* ---------- milky glass ---------- */
+body.is-gbtn :is(.k-btn--outline, .k-cart, .k-theme, .k-wish__btn, .k-more, .k-genre, .k-chip) {
+  color: var(--gb2-ink);
+  border-color: var(--gb2-edge);
+  background: var(--gb2-bg);
+  box-shadow: var(--gb2-shadow);
+}
+body.is-gbtn :is(.k-btn--outline, .k-cart, .k-theme, .k-wish__btn, .k-more, .k-genre, .k-chip):hover {
+  background: var(--gb2-bg-hover);
+  box-shadow: var(--gb2-shadow-hover);
+}
+body.is-gbtn :is(.k-btn--outline, .k-cart, .k-theme, .k-wish__btn, .k-more, .k-genre, .k-chip):active { box-shadow: var(--gb2-shadow-press); }
+/* the heart turns red on hover and while the book is saved */
+body.is-gbtn .k-wish__btn:hover,
+body.is-gbtn .k-wish__btn.is-on { color: var(--k-red); }
+
+/* ---------- smoked glass (written after the milky glass so a switched-on chip wins) ---------- */
+body.is-gbtn :is(.k-btn--primary, .k-avatar, .k-chip.is-active, .k-genre.is-active) {
+  color: var(--gb1-ink);
+  border-color: var(--gb1-edge);
+  background: var(--gb1-bg);
+  box-shadow: var(--gb1-shadow);
+}
+body.is-gbtn :is(.k-btn--primary, .k-avatar, .k-chip.is-active, .k-genre.is-active):hover {
+  color: var(--gb1-ink);
+  border-color: var(--gb1-edge);
+  background: var(--gb1-bg-hover);
+  box-shadow: var(--gb1-shadow-hover);
+}
+body.is-gbtn :is(.k-btn--primary, .k-avatar, .k-chip.is-active, .k-genre.is-active):active { box-shadow: var(--gb1-shadow-press); }
+body.is-gbtn .k-chip.is-active { font-weight: 600; }
+
+/* ---------- people who asked for less motion get the glass without the movement ---------- */
+@media (prefers-reduced-motion: reduce) {
+  body.is-gbtn :is(.k-btn, .k-cart, .k-theme, .k-avatar, .k-genre, .k-chip, .k-more, .k-wish__btn) {
+    transition: background-color .2s, color .2s, border-color .2s;
+  }
+  body.is-gbtn :is(.k-btn, .k-cart, .k-theme, .k-avatar, .k-genre, .k-chip, .k-more, .k-wish__btn)::before { display: none; }
+  body.is-gbtn :is(.k-btn, .k-cart, .k-theme, .k-avatar, .k-genre, .k-chip, .k-more, .k-wish__btn):is(:hover, :active) { transform: none; }
+}
