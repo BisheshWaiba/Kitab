@@ -1,9 +1,10 @@
 /* KITAB glass buttons ("Frost", from the design canvas).
    Only the buttons are glass. Everything else on the page stays flat.
    A page opts in with <body class="is-gbtn">, so no other page is touched. The buttons keep their existing classes:
-     main action   .k-btn--primary, .k-avatar, a chip that is switched on   -> smoked glass
-     everything    .k-btn--outline, .k-cart, .k-theme, .k-wish__btn, .k-more,
-     else          .k-genre, .k-chip                                          -> milky glass
+     main action   .k-btn--primary, .k-btn--light, .k-avatar, a chip that is switched on -> smoked glass
+     everything    .k-btn--outline, .k-btn--ghost-light, .k-cart, .k-theme, .k-wish__btn, .k-more,
+     else          .k-genre, .k-chip                                                       -> milky glass
+     small actions .k-btn--ghost (no glass until hovered)   Logout .k-btn--danger-light (red glass)
    The two looks are written once, as the variables below; dark mode only swaps the variables. */
 
 body.is-gbtn {
@@ -33,6 +34,16 @@ body.is-gbtn {
   --gb0-bg-hover: rgba(255, 255, 255, .6);
   --gb0-shadow-hover: inset 0 1px 0 #fff, 0 8px 18px -12px rgba(17, 18, 20, .35);
 
+  /* danger glass: red-tinted milky glass that fills red on hover (Logout) */
+  --gb3-ink: #8C1D18;
+  --gb3-edge: rgba(179, 38, 30, .34);
+  --gb3-bg: linear-gradient(180deg, rgba(255, 255, 255, .55), rgba(255, 255, 255, .1)), rgba(179, 38, 30, .12);
+  --gb3-shadow: inset 0 1px 0 rgba(255, 255, 255, .85), 0 8px 18px -12px rgba(179, 38, 30, .5);
+  --gb3-ink-hover: #fff;
+  --gb3-edge-hover: rgba(255, 255, 255, .35);
+  --gb3-bg-hover: linear-gradient(180deg, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0)), rgba(179, 38, 30, .86);
+  --gb3-shadow-hover: inset 0 1px 0 rgba(255, 255, 255, .45), 0 16px 26px -12px rgba(179, 38, 30, .6);
+
   --gb-badge-ring: rgba(255, 255, 255, .5);
 }
 
@@ -56,6 +67,15 @@ body.is-gbtn {
   --gb0-edge: rgba(255, 255, 255, .18);
   --gb0-bg-hover: rgba(255, 255, 255, .1);
   --gb0-shadow-hover: inset 0 1px 0 rgba(255, 255, 255, .2);
+
+  --gb3-ink: #FFA29A;
+  --gb3-edge: rgba(255, 122, 110, .38);
+  --gb3-bg: linear-gradient(180deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, 0)), rgba(255, 122, 110, .14);
+  --gb3-shadow: inset 0 1px 0 rgba(255, 255, 255, .18), 0 8px 18px -12px rgba(0, 0, 0, .7);
+  --gb3-ink-hover: #2A0E0B;
+  --gb3-edge-hover: rgba(255, 255, 255, .3);
+  --gb3-bg-hover: linear-gradient(180deg, rgba(255, 255, 255, .35), rgba(255, 255, 255, 0)), rgba(255, 122, 110, .92);
+  --gb3-shadow-hover: inset 0 1px 0 rgba(255, 255, 255, .3), 0 16px 26px -12px rgba(0, 0, 0, .7);
 
   --gb-badge-ring: rgba(14, 15, 18, .6);
 }
@@ -102,35 +122,35 @@ body.is-gbtn .k-more:hover { text-decoration: none; }
 body.is-gbtn .k-cart__badge { top: 2px; right: 1px; box-shadow: 0 0 0 2px var(--gb-badge-ring); }
 
 /* ---------- milky glass ---------- */
-body.is-gbtn :is(.k-btn--outline, .k-cart, .k-theme, .k-wish__btn, .k-more, .k-genre, .k-chip, .gs-sort, .gp-qty, .gt-toast__close) {
+body.is-gbtn :is(.k-btn--outline, .k-btn--ghost-light, .k-cart, .k-theme, .k-wish__btn, .k-more, .k-genre, .k-chip, .gs-sort, .gp-qty, .gt-toast__close) {
   color: var(--gb2-ink);
   border-color: var(--gb2-edge);
   background: var(--gb2-bg);
   box-shadow: var(--gb2-shadow);
 }
-body.is-gbtn :is(.k-btn--outline, .k-cart, .k-theme, .k-wish__btn, .k-more, .k-genre, .k-chip, .gs-sort, .gp-qty, .gt-toast__close):hover {
+body.is-gbtn :is(.k-btn--outline, .k-btn--ghost-light, .k-cart, .k-theme, .k-wish__btn, .k-more, .k-genre, .k-chip, .gs-sort, .gp-qty, .gt-toast__close):hover {
   background: var(--gb2-bg-hover);
   box-shadow: var(--gb2-shadow-hover);
 }
-body.is-gbtn :is(.k-btn--outline, .k-cart, .k-theme, .k-wish__btn, .k-more, .k-genre, .k-chip, .gs-sort, .gp-qty, .gt-toast__close):active { box-shadow: var(--gb2-shadow-press); }
+body.is-gbtn :is(.k-btn--outline, .k-btn--ghost-light, .k-cart, .k-theme, .k-wish__btn, .k-more, .k-genre, .k-chip, .gs-sort, .gp-qty, .gt-toast__close):active { box-shadow: var(--gb2-shadow-press); }
 /* the heart turns red on hover and while the book is saved */
 body.is-gbtn .k-wish__btn:hover,
 body.is-gbtn .k-wish__btn.is-on { color: var(--k-red); }
 
 /* ---------- smoked glass (written after the milky glass so a switched-on chip wins) ---------- */
-body.is-gbtn :is(.k-btn--primary, .k-avatar, .k-chip.is-active, .k-genre.is-active) {
+body.is-gbtn :is(.k-btn--primary, .k-btn--light, .k-avatar, .k-chip.is-active, .k-genre.is-active) {
   color: var(--gb1-ink);
   border-color: var(--gb1-edge);
   background: var(--gb1-bg);
   box-shadow: var(--gb1-shadow);
 }
-body.is-gbtn :is(.k-btn--primary, .k-avatar, .k-chip.is-active, .k-genre.is-active):hover {
+body.is-gbtn :is(.k-btn--primary, .k-btn--light, .k-avatar, .k-chip.is-active, .k-genre.is-active):hover {
   color: var(--gb1-ink);
   border-color: var(--gb1-edge);
   background: var(--gb1-bg-hover);
   box-shadow: var(--gb1-shadow-hover);
 }
-body.is-gbtn :is(.k-btn--primary, .k-avatar, .k-chip.is-active, .k-genre.is-active):active { box-shadow: var(--gb1-shadow-press); }
+body.is-gbtn :is(.k-btn--primary, .k-btn--light, .k-avatar, .k-chip.is-active, .k-genre.is-active):active { box-shadow: var(--gb1-shadow-press); }
 body.is-gbtn .k-chip.is-active { font-weight: 600; }
 
 /* ---------- quiet glass: .k-btn--ghost shows no glass until it is hovered ---------- */
@@ -150,6 +170,21 @@ body.is-gbtn .k-btn--ghost:hover {
   box-shadow: var(--gb0-shadow-hover);
 }
 body.is-gbtn .k-btn--ghost:active { box-shadow: none; }
+
+/* ---------- danger glass: .k-btn--danger-light ---------- */
+body.is-gbtn .k-btn--danger-light {
+  color: var(--gb3-ink);
+  border-color: var(--gb3-edge);
+  background: var(--gb3-bg);
+  box-shadow: var(--gb3-shadow);
+}
+body.is-gbtn .k-btn--danger-light:hover {
+  color: var(--gb3-ink-hover);
+  border-color: var(--gb3-edge-hover);
+  background: var(--gb3-bg-hover);
+  box-shadow: var(--gb3-shadow-hover);
+}
+body.is-gbtn .k-btn--danger-light:active { box-shadow: none; }
 
 /* ---------- people who asked for less motion get the glass without the movement ---------- */
 @media (prefers-reduced-motion: reduce) {

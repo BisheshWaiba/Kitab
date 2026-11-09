@@ -1,0 +1,5 @@
+/* The flat Profile page. It was already flat (the legacy account layout in kitab.css); this makes "My Listings" use the same flat
+   book cards as the Shop (those come from flat.css) and keeps the rest as it was. The glass on Settings, Sell a Book, Logout,
+   Add New and View is in glass-buttons.css. Everything is under .fl, so no other page picks it up. */
+
+.fl .k-account .k-grid { grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr)); gap: 24px; }

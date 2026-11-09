@@ -1,6 +1,10 @@
 <?php
 require_once '../config/db.php';
 require_once '../includes/helpers.php';
+// The Profile page is flat (white and light-grey surfaces, like the Shop); only its buttons are glass.
+// is-gbtn switches the glass buttons on, and these stylesheets are loaded by the redesigned pages only
+$body_class = 'is-gbtn';
+$extra_css = ['assets/css/glass-buttons.css', 'assets/css/flat.css', 'assets/css/profile-flat.css'];
 require_once '../includes/header.php';
 
 if (!isset($_SESSION['user_id'])) {
@@ -35,6 +39,8 @@ $avatar_path = trim((string) ($user['profile_picture'] ?? ''));
 $avatar_url = $avatar_path === '' ? '' : (strpos($avatar_path, 'http') === 0 ? $avatar_path : BASE_URL . $avatar_path);
 $initial = strtoupper(mb_substr($user_name, 0, 1));
 ?>
+
+<main class="fl">
 
 <section class="k-hello">
     <div class="k-hello__inner">
@@ -76,9 +82,11 @@ $initial = strtoupper(mb_substr($user_name, 0, 1));
                         </a>
                         <div class="k-book__info">
                             <a class="k-book__title" href="<?php echo $book_href; ?>"><?php echo htmlspecialchars($book['title']); ?></a>
-                            <span class="k-book__price">Rs. <?php echo number_format($book['price']); ?></span>
                         </div>
-                        <a href="<?php echo $book_href; ?>" class="k-btn k-btn--outline k-btn--sm">View</a>
+                        <div class="k-book__foot">
+                            <span class="k-book__price">Rs. <?php echo number_format($book['price']); ?></span>
+                            <a href="<?php echo $book_href; ?>" class="k-btn k-btn--outline k-btn--sm">View</a>
+                        </div>
                     </article>
                 <?php endforeach; ?>
             </div>
@@ -124,5 +132,7 @@ $initial = strtoupper(mb_substr($user_name, 0, 1));
         <?php endif; ?>
     </section>
 </div>
+
+</main>
 
 <?php require_once '../includes/footer.php'; ?>
