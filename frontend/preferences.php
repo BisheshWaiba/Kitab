@@ -96,11 +96,13 @@ if ($saved_picture !== '') {
         href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/style.css">
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/kitab.css">
+    <!-- This page is flat (it already was); only its buttons are glass, switched on by the is-gbtn class below -->
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/glass-buttons.css">
 </head>
 
-<body>
+<body class="is-gbtn">
 
-    <div class="k-setup">
+    <main class="k-setup">
         <a href="<?php echo BASE_URL; ?>index.php" class="k-logo">KITAB<span>.</span></a>
 
         <form method="POST" enctype="multipart/form-data" class="k-card k-setup__card">
@@ -144,7 +146,7 @@ if ($saved_picture !== '') {
 
             <button type="submit" class="k-btn k-btn--primary k-btn--block">Continue</button>
         </form>
-    </div>
+    </main>
 
     <script src="<?php echo BASE_URL; ?>assets/js/main.js"></script>
 </body>
