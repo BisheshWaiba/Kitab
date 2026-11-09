@@ -27,6 +27,12 @@ body.is-gbtn {
   --gb2-shadow-hover: inset 0 1px 0 #fff, 0 0 0 1px rgba(17, 18, 20, .09), 0 18px 30px -14px rgba(17, 18, 20, .45);
   --gb2-shadow-press: inset 0 2px 6px rgba(17, 18, 20, .16), 0 0 0 1px rgba(17, 18, 20, .08);
 
+  /* quiet glass: no glass at rest, milky glass on hover (for small actions such as Remove) */
+  --gb0-ink: var(--k-muted);
+  --gb0-edge: rgba(255, 255, 255, .9);
+  --gb0-bg-hover: rgba(255, 255, 255, .6);
+  --gb0-shadow-hover: inset 0 1px 0 #fff, 0 8px 18px -12px rgba(17, 18, 20, .35);
+
   --gb-badge-ring: rgba(255, 255, 255, .5);
 }
 
@@ -46,6 +52,10 @@ body.is-gbtn {
   --gb2-shadow: inset 0 1px 0 rgba(255, 255, 255, .3), 0 10px 24px -14px rgba(0, 0, 0, .75);
   --gb2-shadow-hover: inset 0 1px 0 rgba(255, 255, 255, .4), 0 18px 30px -14px rgba(0, 0, 0, .8);
   --gb2-shadow-press: inset 0 2px 6px rgba(0, 0, 0, .4);
+
+  --gb0-edge: rgba(255, 255, 255, .18);
+  --gb0-bg-hover: rgba(255, 255, 255, .1);
+  --gb0-shadow-hover: inset 0 1px 0 rgba(255, 255, 255, .2);
 
   --gb-badge-ring: rgba(14, 15, 18, .6);
 }
@@ -122,6 +132,24 @@ body.is-gbtn :is(.k-btn--primary, .k-avatar, .k-chip.is-active, .k-genre.is-acti
 }
 body.is-gbtn :is(.k-btn--primary, .k-avatar, .k-chip.is-active, .k-genre.is-active):active { box-shadow: var(--gb1-shadow-press); }
 body.is-gbtn .k-chip.is-active { font-weight: 600; }
+
+/* ---------- quiet glass: .k-btn--ghost shows no glass until it is hovered ---------- */
+body.is-gbtn .k-btn--ghost {
+  color: var(--gb0-ink);
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+body.is-gbtn .k-btn--ghost::before { display: none; }
+body.is-gbtn .k-btn--ghost:hover {
+  color: var(--gb0-ink);
+  border-color: var(--gb0-edge);
+  background: var(--gb0-bg-hover);
+  box-shadow: var(--gb0-shadow-hover);
+}
+body.is-gbtn .k-btn--ghost:active { box-shadow: none; }
 
 /* ---------- people who asked for less motion get the glass without the movement ---------- */
 @media (prefers-reduced-motion: reduce) {

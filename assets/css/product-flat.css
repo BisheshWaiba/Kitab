@@ -33,18 +33,6 @@
 .fl .k-wishrow { margin: 0; }
 .fl .gp-actions .k-wishbtn { width: auto; height: 56px; padding: 0 34px; font-size: 16px; } /* a button for customers, a link to Log In for guests */
 
-/* the quantity stepper is one glass pill (the glass is in glass-buttons.css) holding two round buttons and the number */
-.gp-qty { display: inline-flex; align-items: center; gap: 2px; height: 52px; padding: 0 6px; box-sizing: border-box; cursor: default; }
-body.is-gbtn .gp-qty:hover,
-body.is-gbtn .gp-qty:active { transform: none; }
-.gp-qty:focus-within { outline: 3px solid var(--k-accent); outline-offset: 3px; }
-.gp-qty__btn { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; margin: 0; padding: 0; border: 0; border-radius: 50%; background: transparent; color: inherit; cursor: pointer; transition: background-color .2s; }
-.gp-qty__btn:hover { background: color-mix(in srgb, var(--k-ink) 9%, transparent); }
-.gp-qty__btn:focus-visible { outline: 3px solid var(--k-accent); outline-offset: 1px; }
-.gp-qty input { width: 40px; padding: 0; border: 0; outline: 0; background: none; color: inherit; text-align: center; font: 600 16px var(--k-body); font-variant-numeric: tabular-nums; -moz-appearance: textfield; }
-.gp-qty input::-webkit-inner-spin-button,
-.gp-qty input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-
 .gp-trust { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; }
 .gp-trust li { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; border-radius: 12px; background: var(--k-band); font-size: 14px; line-height: 1.4; color: var(--k-ink-2); }
 .gp-trust svg { color: var(--k-ink); }

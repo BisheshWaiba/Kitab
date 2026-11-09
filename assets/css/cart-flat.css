@@ -1,0 +1,69 @@
+/* The flat Cart page (from the design canvas): the books in the cart as rows on a plain card, a few suggestions, and the order summary.
+   Shared pieces (wrap, headings, cards, the quantity stepper, the Cart > Details > Done line) are in flat.css; the glass on the
+   stepper, Remove, Proceed to Checkout and Continue Shopping is in glass-buttons.css. Everything here has a gc- name or sits under .fl. */
+
+.gc-head { padding-top: 56px; padding-bottom: 28px; }
+.gc-main { padding-bottom: 80px; }
+
+/* the books on the left, the summary on the right (it drops below on narrow screens) */
+.gc-cart { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 32px; }
+.gc-left { flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 24px; }
+
+/* ---------- the books ---------- */
+.gc-list { margin: 0; padding: 8px 28px; }
+.gc-list ul { margin: 0; padding: 0; list-style: none; }
+.gc-list noscript .k-btn { margin: 8px 0 16px; }
+.gc-row { display: grid; grid-template-columns: 96px minmax(0, 1fr) auto auto; gap: 24px; align-items: center; padding: 22px 0; border-bottom: 1px solid var(--k-line); }
+.gc-row:last-child { border-bottom: 0; }
+.gc-row__cover { display: block; }
+.gc-row__img { display: block; width: 96px; height: auto; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 4px rgba(17, 18, 20, .22), 0 14px 22px -12px rgba(17, 18, 20, .5); }
+.gc-row__img.k-cover--empty { font-size: 12px; padding: 8px; }
+.gc-row__info { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-width: 0; }
+.gc-row__title { font: 600 22px/1.2 var(--k-display); letter-spacing: -.01em; color: var(--k-ink); overflow-wrap: anywhere; }
+.gc-row__title:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.gc-row__by { font-size: 15px; color: var(--k-muted); }
+.gc-remove { margin-left: -12px; padding: 0 12px; gap: 6px; font-size: 14px; }
+.gc-row__price { margin: 0; min-width: 110px; text-align: right; font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.gc-row__price small { display: block; font-size: 13px; font-weight: 400; color: var(--k-muted); }
+
+/* ---------- "Add a book, ship it free" ---------- */
+.gc-suggest { padding: 28px; }
+.gc-suggest .fl-h2 { font-size: 26px; }
+.gc-minis { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 12px; margin: 20px 0 0; padding: 0; list-style: none; }
+.gc-mini { display: flex; align-items: center; gap: 14px; padding: 12px; border-radius: 12px; background: var(--k-band); transition: background-color .2s; }
+.gc-mini:hover { background: var(--k-accent-tint); }
+.gc-mini__img { flex: none; width: 52px; height: auto; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 3px; box-shadow: 0 8px 14px -8px rgba(17, 18, 20, .5); }
+.gc-mini__img.k-cover--empty { font-size: 8px; padding: 4px; }
+.gc-mini strong { display: block; font: 600 16px/1.2 var(--k-display); color: var(--k-ink); }
+.gc-mini small { font-size: 13px; color: var(--k-muted); }
+
+/* ---------- order summary ---------- */
+.gc-summary { flex: 1 1 380px; min-width: 0; padding: 32px; display: flex; flex-direction: column; gap: 20px; }
+.gc-summary .fl-h2 { font-size: 28px; }
+.gc-ship { display: flex; flex-direction: column; gap: 10px; padding: 16px 18px; border-radius: 12px; background: var(--k-band); font-size: 15px; color: var(--k-ink-2); }
+.gc-ship strong { color: var(--k-ink); }
+.gc-ship__track { height: 8px; border-radius: 4px; background: var(--k-line); overflow: hidden; }
+.gc-ship__fill { display: block; height: 100%; border-radius: 4px; background: var(--k-gold); transform-origin: left; }
+.gc-summary__row { display: flex; justify-content: space-between; font-size: 16px; color: var(--k-ink-2); }
+.gc-summary__total { display: flex; justify-content: space-between; align-items: baseline; padding-top: 18px; border-top: 1px solid var(--k-line); font-weight: 600; }
+.gc-summary__total strong { font: 600 34px/1 var(--k-display); letter-spacing: -.02em; }
+.gc-summary__note { margin: 0; font-size: 14px; color: var(--k-muted); text-align: center; }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes gc-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  .gc-ship__fill { animation: gc-fill 1.2s var(--k-ease) .3s backwards; }
+}
+
+/* ---------- tablets and phones ---------- */
+@media (max-width: 900px) {
+  .gc-head { padding-top: 40px; }
+  .gc-list { padding: 8px 20px; }
+}
+@media (max-width: 640px) {
+  .gc-main { padding-bottom: 48px; }
+  .gc-row { grid-template-columns: 72px minmax(0, 1fr); gap: 4px 16px; }
+  .gc-row__img { width: 72px; }
+  .gc-row .gp-qty { grid-column: 2; justify-self: start; margin-top: 8px; }
+  .gc-row__price { grid-column: 2; min-width: 0; text-align: left; }
+  .gc-suggest { padding: 22px; }
+  .gc-summary { padding: 24px 22px; }
+}

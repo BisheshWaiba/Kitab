@@ -1,9 +1,10 @@
 <?php
 require_once '../config/db.php';
 require_once '../includes/helpers.php';
-// The Cart page has the glass look (from the design canvas): a body class and a stylesheet only the redesigned pages load
-$body_class = 'is-glass is-cart';
-$extra_css = 'assets/css/glass.css';
+// The Cart page is flat (white and light-grey surfaces, from the design canvas); only its buttons are glass.
+// is-gbtn switches the glass buttons on, and these stylesheets are loaded by the redesigned pages only
+$body_class = 'is-gbtn';
+$extra_css = ['assets/css/glass-buttons.css', 'assets/css/flat.css', 'assets/css/cart-flat.css'];
 $page_title = 'Shopping Cart';
 require_once '../includes/header.php';
 
@@ -64,38 +65,22 @@ if ($cart_items && $left > 0) {
     $stmt->execute();
     $suggestions = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 }
-
-// Light from the books: the first two covers in the cart glow softly behind the top of the page
-$ambient = [];
-foreach ($cart_items as $b) {
-    $img = trim((string) $b['image']);
-    if ($img !== '') {
-        $ambient[] = strpos($img, 'http') === 0 ? $img : BASE_URL . $img;
-        if (count($ambient) === 2) {
-            break;
-        }
-    }
-}
 ?>
 
-<div class="hg-ambient" aria-hidden="true">
-    <?php foreach ($ambient as $src): ?>
-        <img src="<?php echo htmlspecialchars($src); ?>" alt="">
-    <?php endforeach; ?>
-</div>
+<main class="fl">
 
-<section class="gc-head hg-wrap">
-    <h1 class="hg-h1 gc-title">Shopping Cart</h1>
+<section class="gc-head fl-wrap">
+    <h1 class="fl-h1">Shopping Cart</h1>
     <?php if (!empty($cart_items)) { k_checkout_steps('cart'); } ?>
 </section>
 
-<div class="hg-wrap gc-main">
+<div class="fl-wrap gc-main">
     <?php if (empty($cart_items)): ?>
         <?php k_empty_state('cart', 'Your cart is empty', "Looks like you haven't added any books yet.", 'Start Shopping', 'shop.php'); ?>
     <?php else: ?>
         <div class="gc-cart">
             <div class="gc-left">
-                <form method="POST" action="cart.php" class="gc-list hg-panel" data-cart-form>
+                <form method="POST" action="cart.php" class="gc-list fl-panel" data-cart-form>
                     <input type="hidden" name="update_cart" value="1">
                     <ul>
                         <?php foreach ($cart_items as $item): ?>
@@ -107,7 +92,7 @@ foreach ($cart_items as $b) {
                                 <div class="gc-row__info">
                                     <a class="gc-row__title" href="<?php echo $href; ?>"><?php echo htmlspecialchars($item['title']); ?></a>
                                     <span class="gc-row__by"><?php echo htmlspecialchars($item['author']); ?></span>
-                                    <a href="cart.php?remove=<?php echo (int) $item['id']; ?>" class="gc-remove"
+                                    <a href="cart.php?remove=<?php echo (int) $item['id']; ?>" class="gc-remove k-btn k-btn--ghost k-btn--sm"
                                         aria-label="Remove <?php echo htmlspecialchars($item['title']); ?> from cart">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -146,9 +131,9 @@ foreach ($cart_items as $b) {
                 </form>
 
                 <?php if ($suggestions): ?>
-                    <section class="gc-suggest hg-panel" aria-labelledby="gc-suggest">
-                        <h2 class="hg-h2" id="gc-suggest">Add a book, ship it free</h2>
-                        <p class="hg-sub">Any of these takes you past Rs. 2,000.</p>
+                    <section class="gc-suggest fl-panel" aria-labelledby="gc-suggest">
+                        <h2 class="fl-h2" id="gc-suggest">Add a book, ship it free</h2>
+                        <p class="fl-sub">Any of these takes you past Rs. 2,000.</p>
                         <ul class="gc-minis">
                             <?php foreach ($suggestions as $s): ?>
                                 <li>
@@ -166,8 +151,8 @@ foreach ($cart_items as $b) {
                 <?php endif; ?>
             </div>
 
-            <aside class="gc-summary hg-panel" aria-label="Order summary">
-                <h2 class="hg-h2">Order Summary</h2>
+            <aside class="gc-summary fl-panel" aria-label="Order summary">
+                <h2 class="fl-h2">Order Summary</h2>
                 <div class="gc-ship">
                     <?php if ($left > 0): ?>
                         <span><strong>Rs. <?php echo number_format($left); ?></strong> more for free shipping</span>
@@ -191,5 +176,7 @@ foreach ($cart_items as $b) {
         </div>
     <?php endif; ?>
 </div>
+
+</main>
 
 <?php require_once '../includes/footer.php'; ?>

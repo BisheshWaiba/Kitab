@@ -39,3 +39,50 @@
   .fl-lede { font-size: 17px; }
   .fl-head { gap: 16px; margin-bottom: 24px; }
 }
+
+/* ---------- a plain card for groups of content (cart rows, order summary, forms) ---------- */
+.fl .fl-panel { background: var(--k-white); border: 1px solid var(--k-line); border-radius: 16px; box-sizing: border-box; }
+
+/* ---------- the quantity stepper (Book page and Cart): one glass pill (the glass is in glass-buttons.css) holding two round buttons and the number ---------- */
+.gp-qty { display: inline-flex; align-items: center; gap: 2px; height: 52px; padding: 0 6px; box-sizing: border-box; cursor: default; }
+body.is-gbtn .gp-qty:hover,
+body.is-gbtn .gp-qty:active { transform: none; }
+.gp-qty:focus-within { outline: 3px solid var(--k-accent); outline-offset: 3px; }
+.gp-qty__btn { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; margin: 0; padding: 0; border: 0; border-radius: 50%; background: transparent; color: inherit; cursor: pointer; transition: background-color .2s; }
+.gp-qty__btn:hover { background: color-mix(in srgb, var(--k-ink) 9%, transparent); }
+.gp-qty__btn:focus-visible { outline: 3px solid var(--k-accent); outline-offset: 1px; }
+.gp-qty input { width: 40px; padding: 0; border: 0; outline: 0; background: none; color: inherit; text-align: center; font: 600 16px var(--k-body); font-variant-numeric: tabular-nums; -moz-appearance: textfield; }
+.gp-qty input::-webkit-inner-spin-button,
+.gp-qty input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* ---------- "Cart > Details > Done" (k_checkout_steps() in includes/helpers.php): a thin progress line ---------- */
+.fl .gk-steps { margin-top: 24px; }
+.fl .gk-steps ol { display: flex; align-items: center; max-width: 520px; margin: 0; padding: 0; list-style: none; }
+.fl .gk-steps li { display: flex; align-items: center; font-size: 14px; font-weight: 600; color: var(--k-ink-2); white-space: nowrap; }
+.fl .gk-steps li:not(:last-child) { flex: 1; }
+.fl .gk-steps li:not(:last-child)::after { content: ""; flex: 1; min-width: 16px; height: 2px; margin: 0 14px; border-radius: 1px; background: var(--k-line); }
+.fl .gk-steps li.is-done:not(:last-child)::after { background: linear-gradient(var(--k-ink), var(--k-ink)) 0 0 / 100% 100% no-repeat, var(--k-line); }
+.fl .gk-steps__item { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; color: inherit; }
+.fl a.gk-steps__item:hover .gk-steps__label { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.fl a.gk-steps__item:focus-visible { outline: 3px solid var(--k-accent); outline-offset: 2px; border-radius: 999px; }
+.fl .gk-steps__dot { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; font-size: 13px; font-variant-numeric: tabular-nums; color: var(--k-ink-2); background: var(--k-white); border: 1px solid var(--k-border-strong); }
+.fl .gk-steps li.is-done .gk-steps__dot { color: var(--k-on-ink); background: var(--k-ink); border-color: var(--k-ink); }
+.fl .gk-steps li.is-current { color: var(--k-ink); }
+.fl .gk-steps li.is-current .gk-steps__dot { color: #111214; background: var(--k-gold); border-color: var(--k-gold); box-shadow: 0 0 0 4px rgba(242, 177, 52, .22); }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes gk-line { from { background-size: 0 100%, 100% 100%; } to { background-size: 100% 100%, 100% 100%; } }
+  @keyframes gk-pop { 0% { transform: scale(.6); opacity: 0; } 60% { transform: scale(1.08); } 100% { transform: scale(1); opacity: 1; } }
+  .fl .gk-steps li.is-done:not(:last-child)::after { animation: gk-line .8s var(--k-ease) .25s backwards; }
+  .fl .gk-steps li.is-current .gk-steps__dot { animation: gk-pop .6s var(--k-ease) .5s backwards; }
+}
+@media (max-width: 480px) {
+  .fl .gk-steps { margin-top: 20px; }
+  .fl .gk-steps li { font-size: 13px; }
+  .fl .gk-steps__item { gap: 8px; }
+  .fl .gk-steps li:not(:last-child)::after { margin: 0 10px; }
+}
+@media (max-width: 360px) {
+  .fl .gk-steps__item { gap: 6px; }
+  .fl .gk-steps__dot { width: 24px; height: 24px; font-size: 12px; }
+  .fl .gk-steps li:not(:last-child)::after { min-width: 10px; margin: 0 8px; }
+}
