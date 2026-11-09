@@ -1,6 +1,6 @@
-/* The flat Login page (from the design canvas). The page was already flat (the legacy sign-in layout in kitab.css), so this
-   only matches the canvas details; the glass on the buttons is in glass-buttons.css. Everything is under body.is-gbtn, which
-   only the Login page sets, so Register and the other sign-in pages keep their own look until they are redone. */
+/* The flat sign-in pages: Login, Register, Forgot password and Choose a new password (from the design canvas Login). These pages were already
+   flat (the legacy sign-in layout in kitab.css), so this only matches the canvas details; the glass on the buttons is in glass-buttons.css.
+   Everything is under body.is-gbtn, which a page sets when it opts in to the glass buttons. */
 
 body.is-gbtn .k-auth-art { background: var(--k-band); }
 body.is-gbtn .k-authpage__form input.k-input { height: 48px; }

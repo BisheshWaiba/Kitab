@@ -4,7 +4,7 @@ require_once '../includes/helpers.php';
 // The Login page is flat (from the design canvas); only its buttons are glass.
 // is-gbtn switches the glass buttons on, and these stylesheets are loaded by the redesigned pages only
 $body_class = 'is-gbtn';
-$extra_css = ['assets/css/glass-buttons.css', 'assets/css/login-flat.css'];
+$extra_css = ['assets/css/glass-buttons.css', 'assets/css/auth-flat.css'];
 require_once '../includes/header.php';
 
 $error = '';

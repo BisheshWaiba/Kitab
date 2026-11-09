@@ -3,6 +3,9 @@
 // Apache through the rules in .htaccess.
 require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/includes/helpers.php';
+// Flat page; only the buttons are glass: is-gbtn switches them on (see assets/css/glass-buttons.css)
+$body_class = 'is-gbtn';
+$extra_css = ['assets/css/glass-buttons.css', 'assets/css/flat.css', 'assets/css/pages-flat.css'];
 http_response_code(404);
 
 $page_title = 'Page not found';
@@ -32,11 +35,11 @@ $books = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
 </section>
 
 <?php if ($books): ?>
-    <section class="k-related">
+    <section class="k-related fl">
         <h2 class="k-h2">New on the shelves</h2>
         <div class="k-grid">
             <?php foreach ($books as $row): ?>
-                <?php k_book_card($row); ?>
+                <?php k_book_card($row, 'primary'); ?>
             <?php endforeach; ?>
         </div>
     </section>

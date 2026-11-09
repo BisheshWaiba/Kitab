@@ -1,0 +1,11 @@
+/* Small touch-ups for the older flat pages that now have glass buttons (Order, Legal, the 404 page). The glass is in glass-buttons.css and
+   the shared flat cards in flat.css. Everything is under body.is-gbtn or .fl, so no other page picks it up. */
+
+/* Order: the "My Account" back link is a quiet glass button (no glass until it is hovered), lined up with the page edge */
+body.is-gbtn .k-back.k-btn { margin-left: -12px; padding: 0 12px; margin-bottom: -12px; gap: 8px; }
+body.is-gbtn .k-back.k-btn:hover { text-decoration: none; }
+
+/* Legal: the chip row scrolls sideways on phones; room above and below keeps the glass shadows from being cut off */
+@media (max-width: 640px) {
+  body.is-gbtn .k-shop__main .k-cats { margin: -6px -20px 22px; padding: 6px 20px 18px; }
+}

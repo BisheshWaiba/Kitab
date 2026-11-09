@@ -2,6 +2,9 @@
 mysqli_report(MYSQLI_REPORT_OFF);
 require_once '../config/db.php';
 require_once '../includes/helpers.php';
+// Flat page; only the buttons are glass: is-gbtn switches them on (see assets/css/glass-buttons.css)
+$body_class = 'is-gbtn';
+$extra_css = ['assets/css/glass-buttons.css'];
 require_once '../includes/header.php';
 
 if (!isset($_SESSION['user_id'])) {

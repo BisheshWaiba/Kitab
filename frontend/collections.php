@@ -1,6 +1,9 @@
 <?php
 require_once '../config/db.php';
 require_once '../includes/helpers.php';
+// Flat page; only the buttons are glass: is-gbtn switches them on (see assets/css/glass-buttons.css)
+$body_class = 'is-gbtn';
+$extra_css = ['assets/css/glass-buttons.css'];
 $page_title = 'Collections';
 require_once '../includes/header.php';
 

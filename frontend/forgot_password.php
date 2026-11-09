@@ -1,6 +1,9 @@
 <?php
 require_once '../config/db.php';
 require_once '../includes/helpers.php';
+// Flat page; only the buttons are glass: is-gbtn switches them on (see assets/css/glass-buttons.css)
+$body_class = 'is-gbtn';
+$extra_css = ['assets/css/glass-buttons.css', 'assets/css/auth-flat.css'];
 require_once '../includes/password_reset.php';
 if (session_status() === PHP_SESSION_NONE) {
     session_start();

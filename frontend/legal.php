@@ -2,6 +2,9 @@
 // One template for every legal page. The wording lives in includes/legal_pages.php; open it as legal.php?page=privacy
 require_once '../config/db.php';
 require_once '../includes/helpers.php';
+// Flat page; only the buttons are glass: is-gbtn switches them on (see assets/css/glass-buttons.css)
+$body_class = 'is-gbtn';
+$extra_css = ['assets/css/glass-buttons.css', 'assets/css/pages-flat.css'];
 
 $legal = require '../includes/legal_pages.php';
 $site = $legal['site'];

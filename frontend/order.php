@@ -1,6 +1,9 @@
 <?php
 require_once '../config/db.php';
 require_once '../includes/helpers.php';
+// Flat page; only the buttons are glass: is-gbtn switches them on (see assets/css/glass-buttons.css)
+$body_class = 'is-gbtn';
+$extra_css = ['assets/css/glass-buttons.css', 'assets/css/pages-flat.css'];
 // Looked up before the header is output, so the tab title is correct and login redirects work.
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -65,7 +68,7 @@ require_once '../includes/header.php';
 ?>
 
 <div class="k-page k-page--stack">
-    <a href="profile.php" class="k-back">
+    <a href="profile.php" class="k-back k-btn k-btn--ghost k-btn--sm">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M19 12H5M11 6l-6 6 6 6" />
