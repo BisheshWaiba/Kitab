@@ -1,0 +1,17 @@
+/* The flat Wishlist page: the same flat book cards as the Shop, with the glass buttons from glass-buttons.css.
+   Shared pieces (wrap, headings, grid, cards) are in flat.css. Everything here has a gw- name or sits under .gw-list. */
+
+.gw-head { padding-top: 56px; padding-bottom: 28px; }
+.gw-head .fl-sub { margin-top: 8px; }
+.gw-main { padding-bottom: 80px; }
+
+/* a book you un-save fades out of the list (main.js adds .is-leaving, then removes the card) */
+.gw-list .k-book.is-leaving { opacity: 0; transform: scale(.96); pointer-events: none; transition: opacity .25s ease-out, transform .25s ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  .gw-list .k-book.is-leaving { transition: none; }
+}
+
+@media (max-width: 600px) {
+  .gw-head { padding-top: 36px; }
+  .gw-main { padding-bottom: 48px; }
+}

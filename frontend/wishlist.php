@@ -64,46 +64,33 @@ $stmt->execute();
 $books = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 $total = count($books);
 
-// The Wishlist page has the glass look (from the design canvas): a body class and a stylesheet only the redesigned pages load
-$body_class = 'is-glass is-wishlist';
-$extra_css = 'assets/css/glass.css';
+// The Wishlist page is flat (white and light-grey surfaces, like the Shop); only its buttons are glass.
+// is-gbtn switches the glass buttons on, and these stylesheets are loaded by the redesigned pages only
+$body_class = 'is-gbtn';
+$extra_css = ['assets/css/glass-buttons.css', 'assets/css/flat.css', 'assets/css/wishlist-flat.css'];
 $page_title = 'My Wishlist';
 require_once '../includes/header.php';
-
-// Light from the books: the two most recently saved covers glow softly behind the top of the page
-$ambient = [];
-foreach ($books as $b) {
-    $img = trim((string) $b['image']);
-    if ($img !== '') {
-        $ambient[] = strpos($img, 'http') === 0 ? $img : BASE_URL . $img;
-        if (count($ambient) === 2) {
-            break;
-        }
-    }
-}
 ?>
 
-<div class="hg-ambient" aria-hidden="true">
-    <?php foreach ($ambient as $src): ?>
-        <img src="<?php echo htmlspecialchars($src); ?>" alt="">
-    <?php endforeach; ?>
-</div>
+<main class="fl">
 
-<section class="gs-head hg-wrap">
-    <h1 class="hg-h1 gs-title">My Wishlist</h1>
-    <p class="hg-lede" data-wish-total><?php echo $total === 0 ? 'Books you save will wait for you here' : $total . ($total === 1 ? ' book' : ' books') . ' saved for later'; ?></p>
+<section class="gw-head fl-wrap">
+    <h1 class="fl-h1">My Wishlist</h1>
+    <p class="fl-sub" data-wish-total><?php echo $total === 0 ? 'Books you save will wait for you here' : $total . ($total === 1 ? ' book' : ' books') . ' saved for later'; ?></p>
 </section>
 
-<div class="hg-wrap gs-main">
+<div class="fl-wrap gw-main">
     <?php if ($total > 0): ?>
-        <div class="hg-grid" data-wish-list>
+        <div class="fl-grid gw-list" data-wish-list>
             <?php foreach ($books as $row): ?>
-                <?php k_glass_tile($row); ?>
+                <?php k_book_card($row, 'primary'); ?>
             <?php endforeach; ?>
         </div>
     <?php else: ?>
         <?php k_empty_state('heart', 'Nothing saved yet', 'Tap the heart on any book to keep it here for later.', 'Browse Books', 'shop.php'); ?>
     <?php endif; ?>
 </div>
+
+</main>
 
 <?php require_once '../includes/footer.php'; ?>
