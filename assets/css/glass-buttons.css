@@ -51,7 +51,7 @@ body.is-gbtn {
 }
 
 /* ---------- the glass itself, shared by every button ---------- */
-body.is-gbtn :is(.k-btn, .k-cart, .k-theme, .k-avatar, .k-genre, .k-chip, .k-more, .k-wish__btn) {
+body.is-gbtn :is(.k-btn, .k-cart, .k-theme, .k-avatar, .k-genre, .k-chip, .k-more, .k-wish__btn, .gs-sort) {
   isolation: isolate;
   border: 1px solid transparent;
   border-radius: 999px;
@@ -60,13 +60,13 @@ body.is-gbtn :is(.k-btn, .k-cart, .k-theme, .k-avatar, .k-genre, .k-chip, .k-mor
   transition: transform .35s var(--gb-ease), box-shadow .35s var(--gb-ease), background-color .2s, color .2s, border-color .2s;
 }
 /* the sheen needs something to sit inside (the theme switch is positioned by kitab.css on phones, so it is handled below) */
-body.is-gbtn :is(.k-btn, .k-cart, .k-avatar, .k-genre, .k-chip, .k-more, .k-wish__btn, .k-theme) { position: relative; }
+body.is-gbtn :is(.k-btn, .k-cart, .k-avatar, .k-genre, .k-chip, .k-more, .k-wish__btn, .k-theme, .gs-sort) { position: relative; }
 @media (max-width: 900px) {
   body.is-gbtn .k-theme { position: absolute; }
 }
 
 /* a light sheen sweeps across on hover. It moves a gradient inside the button, so nothing is drawn outside its edge */
-body.is-gbtn :is(.k-btn, .k-cart, .k-theme, .k-avatar, .k-genre, .k-chip, .k-more, .k-wish__btn)::before {
+body.is-gbtn :is(.k-btn, .k-cart, .k-theme, .k-avatar, .k-genre, .k-chip, .k-more, .k-wish__btn, .gs-sort)::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -78,10 +78,10 @@ body.is-gbtn :is(.k-btn, .k-cart, .k-theme, .k-avatar, .k-genre, .k-chip, .k-mor
   background-position: 170% 0;
   transition: background-position .9s var(--gb-ease);
 }
-body.is-gbtn :is(.k-btn, .k-cart, .k-theme, .k-avatar, .k-genre, .k-chip, .k-more, .k-wish__btn):hover::before { background-position: -70% 0; }
+body.is-gbtn :is(.k-btn, .k-cart, .k-theme, .k-avatar, .k-genre, .k-chip, .k-more, .k-wish__btn, .gs-sort):hover::before { background-position: -70% 0; }
 
-body.is-gbtn :is(.k-btn, .k-cart, .k-theme, .k-avatar, .k-genre, .k-chip, .k-more, .k-wish__btn):hover { transform: translateY(-2px); }
-body.is-gbtn :is(.k-btn, .k-cart, .k-theme, .k-avatar, .k-genre, .k-chip, .k-more, .k-wish__btn):active { transform: translateY(0) scale(.97); }
+body.is-gbtn :is(.k-btn, .k-cart, .k-theme, .k-avatar, .k-genre, .k-chip, .k-more, .k-wish__btn, .gs-sort):hover { transform: translateY(-2px); }
+body.is-gbtn :is(.k-btn, .k-cart, .k-theme, .k-avatar, .k-genre, .k-chip, .k-more, .k-wish__btn, .gs-sort):active { transform: translateY(0) scale(.97); }
 body.is-gbtn .k-btn:disabled { opacity: .42; cursor: not-allowed; transform: none; box-shadow: none; }
 
 /* ---------- sizes (the buttons keep their own sizes; only the big one and the chips change) ---------- */
@@ -92,17 +92,17 @@ body.is-gbtn .k-more:hover { text-decoration: none; }
 body.is-gbtn .k-cart__badge { top: 2px; right: 1px; box-shadow: 0 0 0 2px var(--gb-badge-ring); }
 
 /* ---------- milky glass ---------- */
-body.is-gbtn :is(.k-btn--outline, .k-cart, .k-theme, .k-wish__btn, .k-more, .k-genre, .k-chip) {
+body.is-gbtn :is(.k-btn--outline, .k-cart, .k-theme, .k-wish__btn, .k-more, .k-genre, .k-chip, .gs-sort) {
   color: var(--gb2-ink);
   border-color: var(--gb2-edge);
   background: var(--gb2-bg);
   box-shadow: var(--gb2-shadow);
 }
-body.is-gbtn :is(.k-btn--outline, .k-cart, .k-theme, .k-wish__btn, .k-more, .k-genre, .k-chip):hover {
+body.is-gbtn :is(.k-btn--outline, .k-cart, .k-theme, .k-wish__btn, .k-more, .k-genre, .k-chip, .gs-sort):hover {
   background: var(--gb2-bg-hover);
   box-shadow: var(--gb2-shadow-hover);
 }
-body.is-gbtn :is(.k-btn--outline, .k-cart, .k-theme, .k-wish__btn, .k-more, .k-genre, .k-chip):active { box-shadow: var(--gb2-shadow-press); }
+body.is-gbtn :is(.k-btn--outline, .k-cart, .k-theme, .k-wish__btn, .k-more, .k-genre, .k-chip, .gs-sort):active { box-shadow: var(--gb2-shadow-press); }
 /* the heart turns red on hover and while the book is saved */
 body.is-gbtn .k-wish__btn:hover,
 body.is-gbtn .k-wish__btn.is-on { color: var(--k-red); }
@@ -125,9 +125,9 @@ body.is-gbtn .k-chip.is-active { font-weight: 600; }
 
 /* ---------- people who asked for less motion get the glass without the movement ---------- */
 @media (prefers-reduced-motion: reduce) {
-  body.is-gbtn :is(.k-btn, .k-cart, .k-theme, .k-avatar, .k-genre, .k-chip, .k-more, .k-wish__btn) {
+  body.is-gbtn :is(.k-btn, .k-cart, .k-theme, .k-avatar, .k-genre, .k-chip, .k-more, .k-wish__btn, .gs-sort) {
     transition: background-color .2s, color .2s, border-color .2s;
   }
-  body.is-gbtn :is(.k-btn, .k-cart, .k-theme, .k-avatar, .k-genre, .k-chip, .k-more, .k-wish__btn)::before { display: none; }
-  body.is-gbtn :is(.k-btn, .k-cart, .k-theme, .k-avatar, .k-genre, .k-chip, .k-more, .k-wish__btn):is(:hover, :active) { transform: none; }
+  body.is-gbtn :is(.k-btn, .k-cart, .k-theme, .k-avatar, .k-genre, .k-chip, .k-more, .k-wish__btn, .gs-sort)::before { display: none; }
+  body.is-gbtn :is(.k-btn, .k-cart, .k-theme, .k-avatar, .k-genre, .k-chip, .k-more, .k-wish__btn, .gs-sort):is(:hover, :active) { transform: none; }
 }

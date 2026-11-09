@@ -1,0 +1,41 @@
+/* KITAB flat pages (from the design canvas): white and light-grey surfaces, hairline borders, one soft shadow.
+   Nothing here is glass. The glass buttons come from glass-buttons.css.
+   A page opts in by putting its content in <main class="fl">; every rule below sits under .fl or has an fl- name,
+   so no other page can pick it up. Colours are the k- tokens, so dark mode follows by itself.
+   Used by Home and Shop (page-specific parts: home-flat.css, shop-flat.css). */
+
+.fl { color: var(--k-ink); }
+.fl-wrap { width: 100%; max-width: 1280px; margin: 0 auto; padding: 0 40px; box-sizing: border-box; }
+
+/* ---------- type ---------- */
+.fl-h1 { margin: 0; font: 600 clamp(44px, 5.6vw, 72px)/1.02 var(--k-display); letter-spacing: -.03em; color: var(--k-ink); }
+.fl-h1 em { font-style: italic; font-weight: 500; padding: 0 .04em; background: linear-gradient(transparent 70%, rgba(242, 177, 52, .55) 70%, rgba(242, 177, 52, .55) 92%, transparent 92%); }
+.fl-h2 { margin: 0; font: 600 40px/1.1 var(--k-display); letter-spacing: -.02em; color: var(--k-ink); }
+.fl-sub { margin: 8px 0 0; font-size: 17px; line-height: 1.55; color: var(--k-muted); }
+.fl-lede { margin: 0; max-width: 520px; font-size: 19px; line-height: 1.6; color: var(--k-ink-2); }
+
+/* ---------- sections ---------- */
+.fl-sec { padding: 64px 0; }
+.fl-sec--band { background: var(--k-band); }
+.fl-head { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 24px; margin-bottom: 32px; }
+.fl-chips { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.fl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr)); gap: 24px; }
+
+/* ---------- book cards (the shared .k-book card from k_book_card(), styled for these pages only) ---------- */
+.fl .k-book { gap: 0; background: var(--k-white); border: 1px solid var(--k-line); border-radius: 16px; overflow: hidden; box-shadow: 0 1px 2px rgba(17, 18, 20, .04); }
+.fl .k-book__cover { border-radius: 0; padding: 30px 0 24px; }
+.fl .k-book__cover .k-cover { width: 142px; max-width: 100%; }
+.fl .k-book__info { gap: 3px; padding: 18px 20px 0; }
+.fl .k-book__cat { color: var(--k-muted); }
+.fl .k-book__title { margin-top: 4px; font-size: 20px; }
+.fl .k-book__foot { padding: 14px 20px 20px; }
+.fl .k-book__price { font-weight: 700; }
+.fl .k-wish { top: 12px; right: 12px; }
+
+@media (max-width: 600px) {
+  .fl-wrap { padding: 0 20px; }
+  .fl-sec { padding: 48px 0; }
+  .fl-h2 { font-size: 32px; }
+  .fl-lede { font-size: 17px; }
+  .fl-head { gap: 16px; margin-bottom: 24px; }
+}

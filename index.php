@@ -4,7 +4,7 @@ require_once 'includes/helpers.php';
 // The Home page is flat (white and light-grey surfaces, from the design canvas); only its buttons are glass.
 // is-gbtn switches the glass buttons on, and both stylesheets are loaded by this page alone.
 $body_class = 'is-gbtn';
-$extra_css = ['assets/css/glass-buttons.css', 'assets/css/home-flat.css'];
+$extra_css = ['assets/css/glass-buttons.css', 'assets/css/flat.css', 'assets/css/home-flat.css'];
 require_once 'includes/header.php';
 
 // Hero: three covers (books that have one) standing on a shelf
@@ -33,13 +33,13 @@ $genres = ['Fiction', 'Business', 'Tech', 'Science', 'History', 'Biography', 'Se
 $shelf_order = [2, 0, 1];
 ?>
 
-<main class="fh">
+<main class="fl">
 
     <!-- Hero -->
-    <section class="fh-wrap fh-hero">
+    <section class="fl-wrap fh-hero">
         <div class="fh-hero__copy">
-            <h1 class="fh-h1">Discover Your Next <em>Favorite Book</em></h1>
-            <p class="fh-lede">Fiction, business, history, art and more, brought to your door. Pay when it arrives.</p>
+            <h1 class="fl-h1">Discover Your Next <em>Favorite Book</em></h1>
+            <p class="fl-lede">Fiction, business, history, art and more, brought to your door. Pay when it arrives.</p>
             <div class="fh-hero__cta">
                 <a href="<?php echo BASE_URL; ?>frontend/shop.php" class="k-btn k-btn--primary k-btn--lg">Shop Now
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -64,15 +64,15 @@ $shelf_order = [2, 0, 1];
     </section>
 
     <!-- Collections -->
-    <section class="fh-sec fh-sec--band" aria-labelledby="fh-collections">
-        <div class="fh-wrap">
-            <div class="fh-head">
+    <section class="fl-sec fl-sec--band" aria-labelledby="fh-collections">
+        <div class="fl-wrap">
+            <div class="fl-head">
                 <div>
-                    <h2 class="fh-h2" id="fh-collections">Browse by collection</h2>
-                    <p class="fh-sub">Start from what you love to read.</p>
+                    <h2 class="fl-h2" id="fh-collections">Browse by collection</h2>
+                    <p class="fl-sub">Start from what you love to read.</p>
                 </div>
             </div>
-            <ul class="fh-chips">
+            <ul class="fl-chips">
                 <?php foreach ($genres as $genre): ?>
                     <li><a class="k-genre"
                             href="<?php echo BASE_URL; ?>frontend/shop.php?category=<?php echo urlencode($genre); ?>"><?php echo htmlspecialchars($genre); ?></a>
@@ -83,12 +83,12 @@ $shelf_order = [2, 0, 1];
     </section>
 
     <!-- New Arrivals -->
-    <section class="fh-sec" aria-labelledby="fh-new">
-        <div class="fh-wrap">
-            <div class="fh-head">
+    <section class="fl-sec" aria-labelledby="fh-new">
+        <div class="fl-wrap">
+            <div class="fl-head">
                 <div>
-                    <h2 class="fh-h2" id="fh-new">New Arrivals</h2>
-                    <p class="fh-sub">Fresh from the press</p>
+                    <h2 class="fl-h2" id="fh-new">New Arrivals</h2>
+                    <p class="fl-sub">Fresh from the press</p>
                 </div>
                 <a href="<?php echo BASE_URL; ?>frontend/shop.php" class="k-more">View all books
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -97,7 +97,7 @@ $shelf_order = [2, 0, 1];
                     </svg>
                 </a>
             </div>
-            <div class="fh-grid">
+            <div class="fl-grid">
                 <?php while ($row = $result_new->fetch_assoc()): ?>
                     <?php k_book_card($row, 'primary'); ?>
                 <?php endwhile; ?>
@@ -106,11 +106,11 @@ $shelf_order = [2, 0, 1];
     </section>
 
     <!-- Best Sellers -->
-    <section class="fh-sec fh-sec--band" aria-labelledby="fh-best">
-        <div class="fh-wrap fh-best">
+    <section class="fl-sec fl-sec--band" aria-labelledby="fh-best">
+        <div class="fl-wrap fh-best">
             <div class="fh-best__copy">
-                <h2 class="fh-h2" id="fh-best">Best Sellers</h2>
-                <p class="fh-lede">Books everyone is reading right now.</p>
+                <h2 class="fl-h2" id="fh-best">Best Sellers</h2>
+                <p class="fl-lede">Books everyone is reading right now.</p>
                 <a href="<?php echo BASE_URL; ?>frontend/shop.php" class="k-btn k-btn--primary">See all</a>
             </div>
             <div class="fh-best__row">
@@ -126,14 +126,14 @@ $shelf_order = [2, 0, 1];
     </section>
 
     <!-- Our Picks -->
-    <section class="fh-sec" aria-labelledby="fh-picks">
-        <div class="fh-wrap">
-            <div class="fh-head">
+    <section class="fl-sec" aria-labelledby="fh-picks">
+        <div class="fl-wrap">
+            <div class="fl-head">
                 <div>
-                    <h2 class="fh-h2" id="fh-picks">Our picks for you</h2>
-                    <p class="fh-sub">We have curated special book collection for you</p>
+                    <h2 class="fl-h2" id="fh-picks">Our picks for you</h2>
+                    <p class="fl-sub">We have curated special book collection for you</p>
                 </div>
-                <div class="fh-chips">
+                <div class="fl-chips">
                     <?php $first = true;
                     foreach ($curated_cats as $cat): ?>
                         <button type="button" class="k-chip<?php echo $first ? ' is-active' : ''; ?>"

@@ -1,9 +1,10 @@
 <?php
 require_once '../config/db.php';
 require_once '../includes/helpers.php';
-// The Shop page has the glass look (from the design canvas): a body class and a stylesheet only the redesigned pages load
-$body_class = 'is-glass is-shop';
-$extra_css = 'assets/css/glass.css';
+// The Shop page is flat (white and light-grey surfaces, from the design canvas); only its buttons are glass.
+// is-gbtn switches the glass buttons on, and these stylesheets are loaded by the redesigned pages only
+$body_class = 'is-gbtn';
+$extra_css = ['assets/css/glass-buttons.css', 'assets/css/flat.css', 'assets/css/shop-flat.css'];
 $meta_description = 'Browse the full KITAB catalog and filter by category, author or price.';
 require_once '../includes/header.php';
 
@@ -110,34 +111,18 @@ if ($min_price !== null && $max_price !== null) {
 } elseif ($max_price !== null) {
     $notes[] = 'up to ' . $money($max_price);
 }
-
-// Light from the books: the first two covers on the page glow softly behind the top of it
-$ambient = [];
-foreach ($books as $b) {
-    $img = trim((string) $b['image']);
-    if ($img !== '') {
-        $ambient[] = strpos($img, 'http') === 0 ? $img : BASE_URL . $img;
-        if (count($ambient) === 2) {
-            break;
-        }
-    }
-}
 ?>
 
-<div class="hg-ambient" aria-hidden="true">
-    <?php foreach ($ambient as $src): ?>
-        <img src="<?php echo htmlspecialchars($src); ?>" alt="">
-    <?php endforeach; ?>
-</div>
+<main class="fl">
 
-<section class="gs-head hg-wrap">
-    <h1 class="hg-h1 gs-title">All Books</h1>
-    <p class="hg-lede">Browse our complete catalog</p>
+<section class="gs-head fl-wrap">
+    <h1 class="fl-h1">All Books</h1>
+    <p class="fl-sub">Browse our complete catalog</p>
 </section>
 
-<div class="hg-wrap gs-main">
-    <nav class="gs-filter hg-panel" aria-label="Book categories">
-        <ul class="k-cats hg-chips">
+<div class="fl-wrap gs-main">
+    <nav class="gs-filter" aria-label="Book categories">
+        <ul class="k-cats fl-chips">
             <?php $all_href = $build(['category' => null, 'search' => null, 'author' => null]); ?>
             <li><a href="<?php echo htmlspecialchars($all_href); ?>" class="k-genre<?php echo $active_category === '' ? ' is-active' : ''; ?>"
                     <?php echo $active_category === '' ? 'aria-current="page"' : ''; ?>>All</a></li>
@@ -176,8 +161,10 @@ foreach ($books as $b) {
             <?php endforeach; ?>
 
             <label class="gs-sort">
-                <span>Sort by</span>
-                <select name="sort" class="gs-select" data-autosubmit>
+                <span aria-hidden="true">Sort by: <?php echo htmlspecialchars(str_replace(': ', ', ', $sorts[$sort][0])); ?></span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+                <select name="sort" class="gs-select" aria-label="Sort by" data-autosubmit>
                     <?php foreach ($sorts as $key => [$label]): ?>
                         <option value="<?php echo $key; ?>" <?php echo $sort === $key ? 'selected' : ''; ?>><?php echo $label; ?></option>
                     <?php endforeach; ?>
@@ -202,9 +189,9 @@ foreach ($books as $b) {
     </div>
 
     <?php if ($books): ?>
-        <div class="hg-grid">
+        <div class="fl-grid">
             <?php foreach ($books as $row): ?>
-                <?php k_glass_tile($row); ?>
+                <?php k_book_card($row, 'primary'); ?>
             <?php endforeach; ?>
         </div>
     <?php elseif ($filters_active): ?>
@@ -213,5 +200,7 @@ foreach ($books as $b) {
         <?php k_empty_state('cart', 'No books yet', 'The shelves are being filled. Please check back soon.', 'Back to Home', BASE_URL . 'index.php'); ?>
     <?php endif; ?>
 </div>
+
+</main>
 
 <?php require_once '../includes/footer.php'; ?>
