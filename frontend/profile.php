@@ -276,4 +276,7 @@ $plural = fn(int $n, string $one, string $many): string => $n . ' ' . ($n === 1 
     </div>
 </main>
 
-<?php require_once '../includes/footer.php'; ?>
+<?php
+$hide_footer = true; // the account page ends with its own content; the site script still loads
+require_once '../includes/footer.php';
+?>

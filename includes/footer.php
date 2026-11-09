@@ -1,3 +1,5 @@
+<?php // A page can leave the footer out by setting $hide_footer = true before it includes this file (the site script below still loads) ?>
+<?php if (empty($hide_footer)): ?>
 <footer class="k-footer">
     <div class="k-footer__inner">
         <div class="k-footer__top">
@@ -27,6 +29,9 @@
     </div>
     <script src="<?php echo BASE_URL; ?>assets/js/main.js"></script>
 </footer>
+<?php else: ?>
+<script src="<?php echo BASE_URL; ?>assets/js/main.js"></script>
+<?php endif; ?>
 
 </body>
 
