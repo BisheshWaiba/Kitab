@@ -74,3 +74,7 @@
   .pf-form--edit.fl-panel { padding: 0 20px 24px; }
   .pf-group { padding: 22px 0; }
 }
+
+/* a flat drop-down (same look as the inputs, one small arrow drawn in the muted text colour) and the date box */
+.pf-form select.k-input { height: 48px; appearance: none; -webkit-appearance: none; padding-right: 44px; cursor: pointer; background-image: linear-gradient(45deg, transparent 50%, var(--k-muted) 50%), linear-gradient(135deg, var(--k-muted) 50%, transparent 50%); background-position: calc(100% - 22px) 50%, calc(100% - 16px) 50%; background-size: 6px 6px, 6px 6px; background-repeat: no-repeat; }
+.pf-form input[type="date"].k-input { min-width: 0; }

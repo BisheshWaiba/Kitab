@@ -24,6 +24,38 @@ function k_genre_options(): array
     ];
 }
 
+// The gender choices on the Edit profile page (value stored => label shown). Leaving it empty means "not added".
+function k_gender_options(): array
+{
+    return ['female' => 'Female', 'male' => 'Male', 'other' => 'Other'];
+}
+
+// The optional account details added later (date of birth, gender, city). Created on first use, so an existing database
+// needs no manual step; database/update_schema_profile_details.php does the same thing by hand.
+function k_user_columns(mysqli $conn): void
+{
+    static $done = false;
+    if ($done) {
+        return;
+    }
+    $done = true;
+    $columns = [
+        'date_of_birth' => 'DATE NULL DEFAULT NULL',
+        'gender' => 'VARCHAR(20) NULL DEFAULT NULL',
+        'city' => 'VARCHAR(100) NULL DEFAULT NULL',
+    ];
+    try {
+        foreach ($columns as $name => $definition) {
+            $found = $conn->query("SHOW COLUMNS FROM users LIKE '$name'");
+            if ($found && $found->num_rows === 0) {
+                $conn->query("ALTER TABLE users ADD $name $definition");
+            }
+        }
+    } catch (Throwable $e) {
+        error_log('KITAB: could not add the account detail columns: ' . $e->getMessage());
+    }
+}
+
 // Readable payment method (cash_on_delivery -> Cash on Delivery); empty means the default
 function k_payment_label(?string $method): string
 {

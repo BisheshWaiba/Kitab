@@ -20,7 +20,8 @@ const PW_TRIES = 5;      // wrong "current password" tries allowed ...
 const PW_WINDOW = 600;   // ... in this many seconds (the same count the change-password page keeps)
 
 $user_id = (int) $_SESSION['user_id'];
-$stmt = $conn->prepare("SELECT name, email, phone, address, profile_picture, favorite_genres, password FROM users WHERE id = ?");
+k_user_columns($conn);
+$stmt = $conn->prepare("SELECT name, email, phone, address, city, date_of_birth, gender, profile_picture, favorite_genres, password FROM users WHERE id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $account = $stmt->get_result()->fetch_assoc();
@@ -36,7 +37,11 @@ $values = [
     'email' => trim((string) $account['email']),
     'phone' => trim((string) ($account['phone'] ?? '')),
     'address' => trim((string) ($account['address'] ?? '')),
+    'city' => trim((string) ($account['city'] ?? '')),
+    'dob' => trim((string) ($account['date_of_birth'] ?? '')),
+    'gender' => trim((string) ($account['gender'] ?? '')),
 ];
+$gender_options = k_gender_options();
 $old_picture = trim((string) ($account['profile_picture'] ?? ''));
 $errors = [];      // problems with one field, shown under it
 $error = '';       // a problem with the page as a whole
@@ -51,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!k_csrf_valid($_POST['csrf'] ?? '')) {
         $error = "Your session expired. Please try again.";
     } else {
-        foreach (['name', 'email', 'phone', 'address'] as $key) {
+        foreach (['name', 'email', 'phone', 'address', 'city', 'dob', 'gender'] as $key) {
             $values[$key] = trim($field($key));
         }
         $posted = isset($_POST['genres']) && is_array($_POST['genres']) ? $_POST['genres'] : [];
@@ -76,6 +81,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         if (mb_strlen($values['address']) > 500) {
             $errors['address'] = "Use 500 characters or fewer.";
+        }
+        if (mb_strlen($values['city']) > 100) {
+            $errors['city'] = "Use 100 characters or fewer.";
+        }
+        if ($values['dob'] !== '') {
+            $born = DateTime::createFromFormat('!Y-m-d', $values['dob']);
+            if (!$born || $born->format('Y-m-d') !== $values['dob']) {
+                $errors['dob'] = "Enter your date of birth as a real date, like 1998-03-24.";
+            } elseif ($born > new DateTime('today')) {
+                $errors['dob'] = "Your date of birth cannot be in the future.";
+            } elseif ($born < new DateTime('1900-01-01')) {
+                $errors['dob'] = "Enter a date of birth from the year 1900 onwards.";
+            }
+        }
+        if ($values['gender'] !== '' && !isset($gender_options[$values['gender']])) {
+            $errors['gender'] = "Choose one of the options.";
         }
 
         // A new email address changes how you sign in, so it needs the current password
@@ -114,10 +135,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $picture = $new_picture ?? ($remove_photo ? null : ($old_picture !== '' ? $old_picture : null));
             $phone = $values['phone'] !== '' ? $values['phone'] : null;
             $address = $values['address'] !== '' ? $values['address'] : null;
+            $city = $values['city'] !== '' ? $values['city'] : null;
+            $dob = $values['dob'] !== '' ? $values['dob'] : null;
+            $gender = $values['gender'] !== '' ? $values['gender'] : null;
             $genres = implode(',', $saved_genres);
 
-            $stmt = $conn->prepare("UPDATE users SET name = ?, email = ?, phone = ?, address = ?, favorite_genres = ?, profile_picture = ? WHERE id = ?");
-            $stmt->bind_param("ssssssi", $values['name'], $values['email'], $phone, $address, $genres, $picture, $user_id);
+            $stmt = $conn->prepare("UPDATE users SET name = ?, email = ?, phone = ?, address = ?, city = ?, date_of_birth = ?, gender = ?, favorite_genres = ?, profile_picture = ? WHERE id = ?");
+            $stmt->bind_param("sssssssssi", $values['name'], $values['email'], $phone, $address, $city, $dob, $gender, $genres, $picture, $user_id);
             if ($stmt->execute()) {
                 if ($old_picture !== '' && $old_picture !== $picture) {
                     k_delete_upload($old_picture, 'profiles'); // the replaced or removed photo is no longer used
@@ -203,13 +227,41 @@ require_once '../includes/header.php';
                     <?php k_field_error($errors, 'current'); ?>
                 </div>
 
-                <div class="k-field">
-                    <label for="phone">Phone number <span class="k-field__hint">(optional)</span></label>
-                    <input type="tel" id="phone" name="phone" class="k-input" autocomplete="tel" maxlength="20"
-                        placeholder="+977 98XXXXXXXX" pattern="[+0-9 \(\)\-]{7,20}"
-                        data-msg-invalid="Enter a phone number with 7 to 15 digits, like +977 98XXXXXXXX."
-                        value="<?php echo htmlspecialchars($values['phone']); ?>" <?php k_field_invalid($errors, 'phone'); ?>>
-                    <?php k_field_error($errors, 'phone'); ?>
+                <div class="k-fields">
+                    <div class="k-field">
+                        <label for="phone">Phone number <span class="k-field__hint">(optional)</span></label>
+                        <input type="tel" id="phone" name="phone" class="k-input" autocomplete="tel" maxlength="20"
+                            placeholder="+977 98XXXXXXXX" pattern="[+0-9 \(\)\-]{7,20}"
+                            data-msg-invalid="Enter a phone number with 7 to 15 digits, like +977 98XXXXXXXX."
+                            value="<?php echo htmlspecialchars($values['phone']); ?>" <?php k_field_invalid($errors, 'phone'); ?>>
+                        <?php k_field_error($errors, 'phone'); ?>
+                    </div>
+                    <div class="k-field">
+                        <label for="city">City <span class="k-field__hint">(optional)</span></label>
+                        <input type="text" id="city" name="city" class="k-input" autocomplete="address-level2" maxlength="100"
+                            placeholder="Kathmandu"
+                            value="<?php echo htmlspecialchars($values['city']); ?>" <?php k_field_invalid($errors, 'city'); ?>>
+                        <?php k_field_error($errors, 'city'); ?>
+                    </div>
+                </div>
+                <div class="k-fields">
+                    <div class="k-field">
+                        <label for="dob">Date of birth <span class="k-field__hint">(optional)</span></label>
+                        <input type="date" id="dob" name="dob" class="k-input" autocomplete="bday" min="1900-01-01" max="<?php echo date('Y-m-d'); ?>"
+                            data-msg-invalid="Enter a real date of birth, not one in the future."
+                            value="<?php echo htmlspecialchars($values['dob']); ?>" <?php k_field_invalid($errors, 'dob'); ?>>
+                        <?php k_field_error($errors, 'dob'); ?>
+                    </div>
+                    <div class="k-field">
+                        <label for="gender">Gender <span class="k-field__hint">(optional)</span></label>
+                        <select id="gender" name="gender" class="k-input" autocomplete="sex" <?php k_field_invalid($errors, 'gender'); ?>>
+                            <option value="">Not specified</option>
+                            <?php foreach ($gender_options as $key => $label): ?>
+                                <option value="<?php echo htmlspecialchars($key); ?>"<?php echo $values['gender'] === $key ? ' selected' : ''; ?>><?php echo htmlspecialchars($label); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <?php k_field_error($errors, 'gender'); ?>
+                    </div>
                 </div>
                 <div class="k-field">
                     <label for="address">Address <span class="k-field__hint">(optional)</span></label>

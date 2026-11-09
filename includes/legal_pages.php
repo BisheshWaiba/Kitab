@@ -29,7 +29,7 @@ return [
                 ]],
                 ['h' => 'What we collect', 'ul' => [
                     'Account details: your name, email address and password. Passwords are stored only in scrambled (hashed) form, so nobody at {site} can read them.',
-                    'Profile details you choose to add, such as a profile photo and your favourite genres.',
+                    'Profile details you choose to add, such as a profile photo, phone number, address, city, date of birth, gender and your favourite genres. All of these are optional.',
                     'Order details: your name, email address, delivery address, the books you ordered and the order total.',
                     'Books you list for sale: the title, author, price, description, cover image and any other details you enter. These are shown publicly on the site.',
                     'Reviews you write: your rating and comment. They are shown publicly on the book\'s page with your first name and the first letter of your last name.',

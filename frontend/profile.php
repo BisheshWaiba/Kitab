@@ -20,7 +20,8 @@ $notice = (string) ($_SESSION['account_notice'] ?? '');
 unset($_SESSION['account_notice']);
 
 // The account details, read fresh so a new photo or genre choice shows at once
-$stmt = $conn->prepare("SELECT name, email, phone, address, profile_picture, favorite_genres, created_at FROM users WHERE id = ?");
+k_user_columns($conn);
+$stmt = $conn->prepare("SELECT name, email, phone, address, city, date_of_birth, gender, profile_picture, favorite_genres, created_at FROM users WHERE id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $user = $stmt->get_result()->fetch_assoc() ?: [];
@@ -29,6 +30,10 @@ $name = trim((string) ($user['name'] ?? $_SESSION['user_name'] ?? ''));
 $email = trim((string) ($user['email'] ?? ''));
 $phone = trim((string) ($user['phone'] ?? ''));
 $address = trim((string) ($user['address'] ?? ''));
+$city = trim((string) ($user['city'] ?? ''));
+$gender = k_gender_options()[(string) ($user['gender'] ?? '')] ?? '';
+$born = trim((string) ($user['date_of_birth'] ?? ''));
+$birthday = $born !== '' && strtotime($born) ? date('F j, Y', strtotime($born)) : '';
 $initial = strtoupper(mb_substr($name, 0, 1));
 $member_since = !empty($user['created_at']) ? date('F Y', strtotime($user['created_at'])) : '';
 
@@ -76,6 +81,18 @@ foreach (array_filter(explode(',', (string) ($user['favorite_genres'] ?? ''))) a
                 <div class="pf-row">
                     <dt>Phone</dt>
                     <dd><?php echo $phone !== '' ? htmlspecialchars($phone) : '<span class="pf-empty">Not added yet</span>'; ?></dd>
+                </div>
+                <div class="pf-row">
+                    <dt>Date of birth</dt>
+                    <dd><?php echo $birthday !== '' ? htmlspecialchars($birthday) : '<span class="pf-empty">Not added yet</span>'; ?></dd>
+                </div>
+                <div class="pf-row">
+                    <dt>Gender</dt>
+                    <dd><?php echo $gender !== '' ? htmlspecialchars($gender) : '<span class="pf-empty">Not added yet</span>'; ?></dd>
+                </div>
+                <div class="pf-row">
+                    <dt>City</dt>
+                    <dd><?php echo $city !== '' ? htmlspecialchars($city) : '<span class="pf-empty">Not added yet</span>'; ?></dd>
                 </div>
                 <div class="pf-row">
                     <dt>Address</dt>
