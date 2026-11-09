@@ -8,6 +8,22 @@ function k_order_address(array $order): string
     return $address !== '' ? $address : trim((string) ($order['shipping_address'] ?? ''));
 }
 
+// The favourite genres a customer can pick (value stored in the database => label shown on the page).
+// Used by the Preferences page, where they are chosen, and the Profile page, where they are shown.
+function k_genre_options(): array
+{
+    return [
+        'Arts' => 'Arts & Photography',
+        'Business' => 'Business & Investing',
+        'Fiction' => 'Fiction & Literature',
+        'Languages' => 'Foreign Languages',
+        'History' => 'History & Social Science',
+        'Kids' => 'Kids & Teens',
+        'Wellness' => 'Lifestyle & Wellness',
+        'Graphic Novels' => 'Manga & Graphic Novels',
+    ];
+}
+
 // Readable payment method (cash_on_delivery -> Cash on Delivery); empty means the default
 function k_payment_label(?string $method): string
 {

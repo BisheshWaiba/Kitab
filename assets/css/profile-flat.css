@@ -1,5 +1,84 @@
-/* The flat Profile page. It was already flat (the legacy account layout in kitab.css); this makes "My Listings" use the same flat
-   book cards as the Shop (those come from flat.css) and keeps the rest as it was. The glass on Settings, Sell a Book, Logout,
-   Add New and View is in glass-buttons.css. Everything is under .fl, so no other page picks it up. */
+/* The flat Profile page: who you are and what you can do on the left, then your orders (with the covers of the books you ordered),
+   the books you saved, and your listings. Shared pieces (wrap, headings, panel, the book cards) are in flat.css; the glass on the
+   buttons is in glass-buttons.css. Everything here has a pf- name or sits under .pf, so no other page picks it up. */
 
-.fl .k-account .k-grid { grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr)); gap: 24px; }
+.pf { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 64px; align-items: start; padding-top: 56px; padding-bottom: 96px; }
+.pf a:focus-visible { outline: 3px solid var(--k-accent); outline-offset: 2px; border-radius: 4px; }
+
+/* ---------- who you are ---------- */
+.pf-side { position: sticky; top: 100px; display: flex; flex-direction: column; gap: 28px; }
+.pf-id { display: flex; flex-direction: column; align-items: flex-start; gap: 18px; }
+.pf-avatar { flex: none; display: flex; align-items: center; justify-content: center; width: 104px; height: 104px; border-radius: 50%; object-fit: cover; font: 600 44px/1 var(--k-display); color: #1B1305; background: linear-gradient(135deg, #FFD06E, #F2B134); box-shadow: 0 0 0 1px rgba(168, 104, 0, .25), 0 12px 24px -14px rgba(214, 140, 10, .7); }
+.pf-id__text { min-width: 0; }
+.pf-name { margin: 0; font: 600 28px/1.15 var(--k-display); letter-spacing: -.01em; overflow-wrap: anywhere; }
+.pf-meta { margin: 6px 0 0; font-size: 15px; color: var(--k-muted); overflow-wrap: anywhere; }
+.pf-meta + .pf-meta { margin-top: 2px; }
+.pf-tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.pf-hint { margin: 0; font-size: 15px; line-height: 1.55; color: var(--k-ink-2); }
+.pf-hint a { font-weight: 600; color: var(--k-ink); text-decoration: underline; text-underline-offset: 3px; }
+.pf-actions { display: flex; flex-direction: column; gap: 12px; }
+.pf-actions .k-btn--block { height: 52px; font-size: 16px; }
+
+/* ---------- the page ---------- */
+.pf-main { min-width: 0; display: flex; flex-direction: column; gap: 72px; }
+.pf-hello { display: flex; flex-direction: column; gap: 16px; }
+.pf-hello .fl-h1 { font-size: clamp(36px, 4.2vw, 56px); overflow-wrap: anywhere; }
+.pf-hello .fl-lede a { font-weight: 600; color: var(--k-ink); text-decoration: underline; text-underline-offset: 3px; }
+.pf-sec .fl-head { margin-bottom: 24px; }
+
+/* ---------- orders ---------- */
+.pf-orders { margin: 0; padding: 4px 28px; list-style: none; }
+.pf-order { display: grid; grid-template-columns: 96px minmax(0, 1fr) auto; gap: 20px 28px; align-items: center; padding: 24px 0; border-bottom: 1px solid var(--k-line); }
+.pf-order:last-child { border-bottom: 0; }
+
+/* the covers of the books in the order, overlapping; the first one is on top */
+.pf-stack { --step: 24px; position: relative; display: block; width: 96px; height: 72px; color: var(--k-muted); }
+.pf-stack__book { position: absolute; top: 0; left: calc(var(--i) * var(--step)); z-index: calc(10 - var(--i)); width: 48px; height: 72px; }
+.pf-stack__img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 3px; box-shadow: 0 0 0 2px var(--k-white), 0 6px 12px -6px rgba(17, 18, 20, .55); }
+.pf-stack__img.k-cover--empty { overflow: hidden; padding: 3px; font-size: 7px; line-height: 1.2; }
+.pf-stack__more { position: absolute; right: 0; bottom: 0; z-index: 20; display: grid; place-items: center; min-width: 28px; height: 24px; padding: 0 6px; box-sizing: border-box; border-radius: 12px; background: var(--k-ink); color: var(--k-on-ink); font-size: 12px; font-weight: 700; box-shadow: 0 0 0 2px var(--k-white); }
+.pf-stack--empty { display: flex; align-items: center; justify-content: center; width: 56px; height: 72px; border-radius: 8px; background: var(--k-band); }
+
+.pf-order__main { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.pf-order__id { width: fit-content; font-size: 18px; font-weight: 700; color: var(--k-ink); }
+.pf-order__id:hover { text-decoration: underline; text-underline-offset: 3px; }
+.pf-order__meta { margin: 0; font-size: 14px; color: var(--k-muted); }
+.pf-order__ship { margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; color: var(--k-ink-2); }
+.pf-track { display: flex; gap: 4px; max-width: 220px; margin-top: 10px; }
+.pf-track i { flex: 1; height: 4px; border-radius: 2px; background: var(--k-line); }
+.pf-track i.is-on { background: var(--k-ink); }
+
+.pf-order__side { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.pf-order__total { font: 600 22px/1 var(--k-display); letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+.pf-order__side .k-btn { margin-right: -12px; padding: 0 12px; }
+
+/* ---------- saved for later ---------- */
+.pf-saved { display: flex; flex-wrap: wrap; gap: 20px; margin: 0; padding: 28px; list-style: none; border-radius: 16px; background: var(--k-band); }
+.pf-saved a { display: block; width: 112px; }
+.pf-saved__img { display: block; width: 100%; height: auto; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 4px; box-shadow: var(--k-cover-shadow); transition: transform .2s; }
+.pf-saved__img.k-cover--empty { overflow: hidden; padding: 8px; font-size: 12px; }
+.pf-saved a:hover .pf-saved__img { transform: translateY(-4px); }
+
+/* ---------- tablets and phones ---------- */
+@media (max-width: 1000px) {
+  .pf { grid-template-columns: minmax(0, 1fr); gap: 48px; padding-top: 36px; padding-bottom: 64px; }
+  .pf-side { position: static; gap: 20px; }
+  .pf-id { flex-direction: row; align-items: center; gap: 20px; }
+  .pf-avatar { width: 80px; height: 80px; font-size: 34px; }
+  .pf-actions { flex-direction: row; flex-wrap: wrap; }
+  .pf-actions .k-btn--block { width: auto; flex: 1 1 160px; }
+  .pf-main { gap: 56px; }
+}
+@media (max-width: 640px) {
+  .pf-orders { padding: 4px 20px; }
+  .pf-order { grid-template-columns: 88px minmax(0, 1fr); gap: 14px 16px; padding: 20px 0; }
+  .pf-stack { --step: 20px; width: 88px; }
+  .pf-order__side { grid-column: 1 / -1; flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+  .pf-order__total { order: -1; }
+  .pf-order__side .k-btn { margin-right: -12px; }
+  .pf-saved { padding: 20px; gap: 14px; }
+  .pf-saved a { width: 88px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pf-saved a:hover .pf-saved__img { transform: none; }
+}

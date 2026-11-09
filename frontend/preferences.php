@@ -14,16 +14,7 @@ $error_message = '';   // a problem with saving (shown at the top)
 $errors = [];          // a problem with the photo, shown under it
 
 // value stored in the database => label shown on the page
-$genre_options = [
-    'Arts' => 'Arts & Photography',
-    'Business' => 'Business & Investing',
-    'Fiction' => 'Fiction & Literature',
-    'Languages' => 'Foreign Languages',
-    'History' => 'History & Social Science',
-    'Kids' => 'Kids & Teens',
-    'Wellness' => 'Lifestyle & Wellness',
-    'Graphic Novels' => 'Manga & Graphic Novels',
-];
+$genre_options = k_genre_options();
 
 // Current settings, so this page also works as "Settings" without wiping what is already saved
 $current = $conn->query("SELECT profile_picture, favorite_genres FROM users WHERE id = $user_id");
