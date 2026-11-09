@@ -2,9 +2,10 @@
 require_once '../config/db.php';
 require_once '../includes/helpers.php';
 require_once '../includes/reviews.php';
-// The Product page has the glass look (from the design canvas): a body class and a stylesheet only the redesigned pages load
-$body_class = 'is-glass is-product';
-$extra_css = 'assets/css/glass.css';
+// The Book page is flat (white and light-grey surfaces, from the design canvas); only its buttons are glass.
+// is-gbtn switches the glass buttons on, and these stylesheets are loaded by the redesigned pages only
+$body_class = 'is-gbtn';
+$extra_css = ['assets/css/glass-buttons.css', 'assets/css/flat.css', 'assets/css/product-flat.css'];
 $legal = require '../includes/legal_pages.php'; // for the return period, so it is only ever written in one place
 $return_days = (int) $legal['site']['return_days'];
 // The book is looked up (and add-to-cart handled) before the header is output, so the tab title
@@ -109,32 +110,22 @@ $cover_img = trim((string) ($book['image'] ?? ''));
 $cover_url = $cover_img === '' ? '' : (strpos($cover_img, 'http') === 0 ? $cover_img : BASE_URL . $cover_img);
 $category = trim((string) ($book['category'] ?? ''));
 ?>
-<!-- Light from the book: its own cover, blurred, behind the top of the page -->
-<div class="hg-ambient" aria-hidden="true">
-    <?php if ($cover_url !== ''): ?>
-        <img src="<?php echo htmlspecialchars($cover_url); ?>" alt="">
-        <img src="<?php echo htmlspecialchars($cover_url); ?>" alt="">
-    <?php endif; ?>
-</div>
+<main class="fl">
 
-<section class="gp-product hg-wrap">
+<section class="gp-product fl-wrap">
     <div class="gp-stage">
-        <?php if ($cover_url !== ''): ?>
-            <img class="gp-stage__bg" src="<?php echo htmlspecialchars($cover_url); ?>" alt="">
-        <?php endif; ?>
-        <span class="gp-stage__frost"></span>
         <?php k_cover($book, 'gp-stage__cover', false); ?>
         <?php if ($category !== ''): ?>
-            <span class="hg-tile__tag gp-stage__tag"><?php echo htmlspecialchars($category); ?></span>
+            <span class="gp-tag"><?php echo htmlspecialchars($category); ?></span>
         <?php endif; ?>
     </div>
 
-    <div class="gp-buy hg-panel">
-        <h1 class="hg-h1 gp-title"><?php echo htmlspecialchars($book['title']); ?></h1>
+    <div class="gp-buy">
+        <h1 class="fl-h1 gp-title"><?php echo htmlspecialchars($book['title']); ?></h1>
         <p class="gp-by">by <a href="shop.php?author=<?php echo urlencode(trim($book['author'])); ?>"><?php echo htmlspecialchars($book['author']); ?></a></p>
         <p class="gp-rating">
             <?php if ($review_count > 0): ?>
-                <a href="#reviews"><?php echo k_glass_stars($review_avg); ?>
+                <a href="#reviews"><?php echo k_stars($review_avg); ?>
                     <span><?php echo number_format($review_avg, 1); ?> &middot; <?php echo $review_count . ($review_count === 1 ? ' review' : ' reviews'); ?></span></a>
             <?php else: ?>
                 <a href="#reviews" class="gp-rating__none">No reviews yet</a>
@@ -184,7 +175,7 @@ $category = trim((string) ($book['category'] ?? ''));
                         </svg>
                     </button>
                 </div>
-                <button type="submit" name="add_to_cart" class="k-btn k-btn--primary">
+                <button type="submit" name="add_to_cart" class="k-btn k-btn--primary k-btn--lg">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M3 4h2.2l2.1 10.2a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1L20.5 8H6.2" />
@@ -244,7 +235,7 @@ $category = trim((string) ($book['category'] ?? ''));
                 <div class="k-card k-ratingbox">
                     <div class="k-ratingbox__score">
                         <span class="k-ratingbox__num"><?php echo number_format($review_avg, 1); ?></span>
-                        <?php echo k_glass_stars($review_avg); ?>
+                        <?php echo k_stars($review_avg); ?>
                         <span class="k-ratingbox__count">Based on <?php echo $review_count . ($review_count === 1 ? ' review' : ' reviews'); ?></span>
                     </div>
                     <ul class="k-bars">
@@ -323,7 +314,7 @@ $category = trim((string) ($book['category'] ?? ''));
                             <div class="k-review__head">
                                 <span class="k-review__who"><?php echo htmlspecialchars(k_review_name((string) $rv['name'])); ?></span>
                                 <?php if ($mine): ?><span class="k-tag">You</span><?php endif; ?>
-                                <?php echo k_glass_stars((float) $rv['rating']); ?>
+                                <?php echo k_stars((float) $rv['rating']); ?>
                                 <time class="k-review__date" datetime="<?php echo htmlspecialchars(date('Y-m-d', strtotime($rv['created_at']))); ?>"><?php echo date('F j, Y', strtotime($rv['created_at'])); ?></time>
                             </div>
                             <?php if (trim((string) $rv['comment']) !== ''): ?>
@@ -364,15 +355,17 @@ $result_related = $conn->query($sql_related);
 
 if ($result_related->num_rows > 0):
     ?>
-    <section class="hg-wrap gp-related">
-        <h2 class="hg-h2">You May Also Like</h2>
-        <div class="hg-grid">
+    <section class="fl-wrap gp-related">
+        <h2 class="fl-h2">You May Also Like</h2>
+        <div class="fl-grid">
             <?php while ($row = $result_related->fetch_assoc()): ?>
-                <?php k_glass_tile($row); ?>
+                <?php k_book_card($row, 'primary'); ?>
             <?php endwhile; ?>
         </div>
     </section>
 <?php endif; ?>
+
+</main>
 
 <!-- "Added to your cart" message (main.js shows the same one without reloading the page) -->
 <div class="gt-toasts" aria-live="polite">

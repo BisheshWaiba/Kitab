@@ -1,0 +1,106 @@
+/* The flat Book page (from the design canvas): the cover on a light stage, the book's details, reviews and "You May Also Like".
+   Shared pieces (wrap, headings, book cards) are in flat.css; the glass on Add to Cart, the quantity stepper, the wishlist button
+   and the rest is in glass-buttons.css. Everything sits under .fl or has a gp-/gt- name, so no other page picks it up. */
+
+/* ---------- the book ---------- */
+.gp-product { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; padding-top: 48px; padding-bottom: 56px; }
+
+/* the cover on a light stage. The cover keeps the class gp-stage__cover: the page-to-page glide (includes/page_transitions.php) lands on it */
+.gp-stage { position: relative; display: flex; align-items: center; justify-content: center; align-self: stretch; min-height: 620px; border-radius: 24px; background: var(--k-band); }
+.gp-stage__cover { display: block; width: min(320px, 62%); height: auto; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 6px; box-shadow: 0 3px 6px rgba(17, 18, 20, .3), 0 40px 56px -20px rgba(17, 18, 20, .6); }
+.gp-stage__cover.k-cover--empty { font-size: 24px; }
+.gp-tag { position: absolute; top: 20px; left: 20px; display: inline-flex; align-items: center; height: 30px; padding: 0 14px; border-radius: 999px; background: var(--k-white); border: 1px solid var(--k-line); font-size: 12px; font-weight: 600; letter-spacing: .02em; color: var(--k-ink); }
+
+.gp-buy { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+.gp-title { font-size: clamp(40px, 4.4vw, 56px); overflow-wrap: anywhere; }
+.gp-by { margin: -10px 0 0; font-size: 18px; color: var(--k-ink-2); }
+.gp-by a { text-decoration: underline; text-underline-offset: 3px; }
+.gp-rating { margin: 0; }
+.gp-rating a { display: inline-flex; align-items: center; gap: 10px; font-size: 15px; color: var(--k-ink-2); }
+.gp-rating a:hover { color: var(--k-ink); text-decoration: underline; text-underline-offset: 3px; }
+.gp-rating .k-stars { font-size: 16px; letter-spacing: 2px; }
+.gp-rating__none { color: var(--k-muted); }
+.gp-price { margin: 0; font: 600 38px/1 var(--k-display); letter-spacing: -.02em; }
+.gp-desc { margin: 0; font-size: 17px; line-height: 1.6; color: var(--k-ink-2); }
+.gp-specs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 24px; margin: 0; padding: 22px 0; border-top: 1px solid var(--k-line); border-bottom: 1px solid var(--k-line); }
+.gp-specs dt { font-size: 13px; color: var(--k-muted); }
+.gp-specs dd { margin: 2px 0 0; font-size: 16px; font-weight: 600; overflow-wrap: anywhere; }
+
+/* quantity and Add to Cart on one row, the wishlist button under them */
+.gp-actions { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+.gp-buyform { display: flex; align-items: center; gap: 12px; width: 100%; margin: 0; }
+.gp-buyform .k-btn { flex: 1 1 auto; }
+.fl .k-wishrow { margin: 0; }
+.fl .gp-actions .k-wishbtn { width: auto; height: 56px; padding: 0 34px; font-size: 16px; } /* a button for customers, a link to Log In for guests */
+
+/* the quantity stepper is one glass pill (the glass is in glass-buttons.css) holding two round buttons and the number */
+.gp-qty { display: inline-flex; align-items: center; gap: 2px; height: 52px; padding: 0 6px; box-sizing: border-box; cursor: default; }
+body.is-gbtn .gp-qty:hover,
+body.is-gbtn .gp-qty:active { transform: none; }
+.gp-qty:focus-within { outline: 3px solid var(--k-accent); outline-offset: 3px; }
+.gp-qty__btn { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; margin: 0; padding: 0; border: 0; border-radius: 50%; background: transparent; color: inherit; cursor: pointer; transition: background-color .2s; }
+.gp-qty__btn:hover { background: color-mix(in srgb, var(--k-ink) 9%, transparent); }
+.gp-qty__btn:focus-visible { outline: 3px solid var(--k-accent); outline-offset: 1px; }
+.gp-qty input { width: 40px; padding: 0; border: 0; outline: 0; background: none; color: inherit; text-align: center; font: 600 16px var(--k-body); font-variant-numeric: tabular-nums; -moz-appearance: textfield; }
+.gp-qty input::-webkit-inner-spin-button,
+.gp-qty input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+.gp-trust { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; }
+.gp-trust li { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; border-radius: 12px; background: var(--k-band); font-size: 14px; line-height: 1.4; color: var(--k-ink-2); }
+.gp-trust svg { color: var(--k-ink); }
+.gp-trust a { text-decoration: underline; text-underline-offset: 3px; }
+
+/* ---------- reviews: the legacy flat review styles, with the reviews as cards like the canvas ---------- */
+.fl .k-reviews { padding-top: 8px; padding-bottom: 64px; }
+.fl .k-reviewlist { gap: 16px; }
+.fl .k-review,
+.fl .k-review:first-child { padding: 24px 28px; border: 1px solid var(--k-line); border-radius: 16px; background: var(--k-white); }
+.fl .k-bars__track { background: var(--k-line); }
+
+/* ---------- You May Also Like ---------- */
+.gp-related { padding-bottom: 80px; }
+.gp-related .fl-h2 { margin-bottom: 28px; }
+
+/* ---------- "Added to your cart": the message that slides in, and the badge that pops (flat card, glass buttons) ---------- */
+.gt-toasts { position: fixed; z-index: 200; top: 136px; right: 24px; display: flex; flex-direction: column; gap: 12px; width: min(420px, calc(100vw - 32px)); pointer-events: none; }
+.gt-toast { pointer-events: auto; display: flex; align-items: center; gap: 14px; padding: 14px; border-radius: 16px; background: var(--k-white); border: 1px solid var(--k-line); box-shadow: 0 18px 40px -18px rgba(17, 18, 20, .35), 0 2px 8px rgba(17, 18, 20, .08); }
+.gt-toast__img { flex: none; width: 44px; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 4px rgba(17, 18, 20, .25), 0 10px 18px -8px rgba(17, 18, 20, .5); }
+.gt-toast__text { flex: 1; min-width: 0; display: flex; flex-direction: column; font-size: 14px; color: var(--k-ink-2); }
+.gt-toast__text strong { font-size: 15px; color: var(--k-ink); }
+.gt-toast__text span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gt-toast .k-btn { flex: none; }
+.gt-toast__close { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; padding: 0; cursor: pointer; }
+.gt-toast.is-out { opacity: 0; transform: translateX(24px); transition: opacity .2s ease-in, transform .2s ease-in; }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes gt-in { from { opacity: 0; transform: translateX(36px); } to { opacity: 1; transform: none; } }
+  @keyframes gt-bump { 0% { transform: scale(.4); } 60% { transform: scale(1.35); } 100% { transform: scale(1); } }
+  .gt-toast { animation: gt-in .55s var(--k-ease) backwards; }
+  .k-cart__badge--bump { animation: gt-bump .5s var(--k-ease); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gt-toast.is-out { transform: none; transition: opacity .2s; }
+}
+
+/* ---------- tablets and phones ---------- */
+@media (max-width: 900px) {
+  .gp-product { grid-template-columns: minmax(0, 1fr); gap: 32px; padding-top: 32px; padding-bottom: 40px; }
+  .gp-stage { min-height: 460px; }
+  /* on a phone the message rises from the bottom, where the thumb is */
+  .gt-toasts { top: auto; bottom: max(16px, env(safe-area-inset-bottom)); left: 16px; right: 16px; width: auto; }
+  .gt-toast.is-out { transform: translateY(24px); }
+}
+@media (max-width: 900px) and (prefers-reduced-motion: no-preference) {
+  @keyframes gt-up { from { opacity: 0; transform: translateY(36px); } to { opacity: 1; transform: none; } }
+  .gt-toast { animation-name: gt-up; }
+}
+@media (max-width: 600px) {
+  .gp-stage { min-height: 400px; }
+  .gp-trust { grid-template-columns: minmax(0, 1fr); }
+  .gp-price { font-size: 34px; }
+  .fl .k-reviews { padding-bottom: 48px; }
+  .gp-related { padding-bottom: 56px; }
+}
+@media (max-width: 380px) {
+  .gp-buyform { flex-wrap: wrap; }
+  .gp-buyform .k-btn { flex: 1 1 100%; }
+}
