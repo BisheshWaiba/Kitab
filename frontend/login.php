@@ -1,6 +1,10 @@
 <?php
 require_once '../config/db.php';
 require_once '../includes/helpers.php';
+// The Login page is flat (from the design canvas); only its buttons are glass.
+// is-gbtn switches the glass buttons on, and these stylesheets are loaded by the redesigned pages only
+$body_class = 'is-gbtn';
+$extra_css = ['assets/css/glass-buttons.css', 'assets/css/login-flat.css'];
 require_once '../includes/header.php';
 
 $error = '';
@@ -40,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 
-<div class="k-authpage">
+<main class="k-authpage">
     <?php k_auth_art($conn, 0); ?>
 
     <div class="k-authpage__main">
@@ -76,6 +80,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </p>
         </form>
     </div>
-</div>
+</main>
 
 <?php require_once '../includes/footer.php'; ?>
