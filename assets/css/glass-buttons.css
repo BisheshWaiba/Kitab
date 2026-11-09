@@ -1,23 +1,23 @@
-/* KITAB glass buttons ("Frost", from the design canvas).
+/* KITAB glass buttons ("Amber", direction B from the design canvas): the main action is the brand's gold as glass, the rest is milky.
    Only the buttons are glass. Everything else on the page stays flat.
    A page opts in with <body class="is-gbtn">, so no other page is touched. The buttons keep their existing classes:
-     main action   .k-btn--primary, .k-btn--light, .k-avatar, a chip that is switched on -> smoked glass
+     main action   .k-btn--primary, .k-btn--light, .k-avatar, a chip that is switched on -> amber glass (a lit gold lens)
      everything    .k-btn--outline, .k-btn--ghost-light, .k-cart, .k-theme, .k-wish__btn, .k-more,
      else          .k-genre, .k-chip                                                       -> milky glass
      small actions .k-btn--ghost (no glass until hovered)   Logout .k-btn--danger-light (red glass)
-   The two looks are written once, as the variables below; dark mode only swaps the variables. */
+   The looks are written once, as the variables below; dark mode only swaps the variables. */
 
 body.is-gbtn {
   --gb-ease: cubic-bezier(.16, 1, .3, 1);
 
-  /* main action: smoked glass with a bright top edge */
-  --gb1-ink: #fff;
-  --gb1-edge: rgba(255, 255, 255, .22);
-  --gb1-bg: linear-gradient(180deg, rgba(255, 255, 255, .26), rgba(255, 255, 255, .05) 46%, rgba(255, 255, 255, 0)), rgba(17, 18, 20, .76);
-  --gb1-bg-hover: linear-gradient(180deg, rgba(255, 255, 255, .32), rgba(255, 255, 255, .06) 46%, rgba(255, 255, 255, 0)), rgba(17, 18, 20, .86);
-  --gb1-shadow: inset 0 1px 0 rgba(255, 255, 255, .4), inset 0 -12px 20px -12px rgba(0, 0, 0, .45), 0 14px 26px -12px rgba(17, 18, 20, .6), 0 2px 6px rgba(17, 18, 20, .2);
-  --gb1-shadow-hover: inset 0 1px 0 rgba(255, 255, 255, .5), inset 0 -12px 20px -12px rgba(0, 0, 0, .45), 0 22px 34px -14px rgba(17, 18, 20, .7), 0 2px 6px rgba(17, 18, 20, .2);
-  --gb1-shadow-press: inset 0 2px 8px rgba(0, 0, 0, .5), 0 6px 12px -8px rgba(17, 18, 20, .6);
+  /* main action: amber glass. The brand's gold lit from above, with dark text */
+  --gb1-ink: #1B1305;
+  --gb1-edge: rgba(255, 255, 255, .72);
+  --gb1-bg: linear-gradient(180deg, rgba(255, 255, 255, .6), rgba(255, 255, 255, 0) 54%), linear-gradient(135deg, rgba(255, 208, 110, .9), rgba(242, 177, 52, .72));
+  --gb1-bg-hover: linear-gradient(180deg, rgba(255, 255, 255, .7), rgba(255, 255, 255, 0) 54%), linear-gradient(135deg, rgba(255, 216, 130, .96), rgba(246, 184, 60, .8));
+  --gb1-shadow: inset 0 1px 0 rgba(255, 255, 255, .95), inset 0 -12px 20px -12px rgba(168, 104, 0, .5), 0 14px 28px -12px rgba(214, 140, 10, .7), 0 2px 6px rgba(120, 80, 0, .2);
+  --gb1-shadow-hover: inset 0 1px 0 #fff, inset 0 -12px 20px -12px rgba(168, 104, 0, .5), 0 22px 36px -14px rgba(214, 140, 10, .8), 0 2px 6px rgba(120, 80, 0, .2);
+  --gb1-shadow-press: inset 0 2px 8px rgba(140, 86, 0, .45), 0 6px 12px -8px rgba(214, 140, 10, .6);
 
   /* everything else: milky glass */
   --gb2-ink: var(--k-ink);
@@ -47,15 +47,11 @@ body.is-gbtn {
   --gb-badge-ring: rgba(255, 255, 255, .5);
 }
 
-/* dark mode: the main action turns into bright glass, the rest into smoke */
+/* dark mode: the gold stays gold (a warm glow on the dark page), the rest turns into smoke */
 :root[data-theme="dark"] body.is-gbtn {
-  --gb1-ink: #111214;
-  --gb1-edge: rgba(255, 255, 255, .6);
-  --gb1-bg: linear-gradient(180deg, rgba(255, 255, 255, .96), rgba(255, 255, 255, .62)), rgba(243, 242, 238, .7);
-  --gb1-bg-hover: linear-gradient(180deg, #fff, rgba(255, 255, 255, .76)), rgba(243, 242, 238, .8);
-  --gb1-shadow: inset 0 1px 0 #fff, inset 0 -10px 16px -10px rgba(17, 18, 20, .22), 0 14px 30px -12px rgba(0, 0, 0, .85), 0 0 0 1px rgba(255, 255, 255, .06);
-  --gb1-shadow-hover: inset 0 1px 0 #fff, inset 0 -10px 16px -10px rgba(17, 18, 20, .22), 0 22px 36px -14px rgba(0, 0, 0, .9);
-  --gb1-shadow-press: inset 0 2px 8px rgba(17, 18, 20, .3), 0 6px 12px -8px rgba(0, 0, 0, .8);
+  --gb1-edge: rgba(255, 236, 190, .6);
+  --gb1-shadow: inset 0 1px 0 rgba(255, 255, 255, .9), inset 0 -12px 20px -12px rgba(168, 104, 0, .5), 0 16px 34px -12px rgba(242, 177, 52, .5), 0 2px 8px rgba(0, 0, 0, .5);
+  --gb1-shadow-hover: inset 0 1px 0 #fff, inset 0 -12px 20px -12px rgba(168, 104, 0, .5), 0 22px 40px -14px rgba(242, 177, 52, .62), 0 2px 8px rgba(0, 0, 0, .5);
 
   --gb2-edge: rgba(255, 255, 255, .2);
   --gb2-bg: linear-gradient(135deg, rgba(255, 255, 255, .17), rgba(255, 255, 255, .05));
@@ -137,7 +133,7 @@ body.is-gbtn :is(.k-btn--outline, .k-btn--ghost-light, .k-cart, .k-theme, .k-wis
 body.is-gbtn .k-wish__btn:hover,
 body.is-gbtn .k-wish__btn.is-on { color: var(--k-red); }
 
-/* ---------- smoked glass (written after the milky glass so a switched-on chip wins) ---------- */
+/* ---------- amber glass (written after the milky glass so a switched-on chip wins) ---------- */
 body.is-gbtn :is(.k-btn--primary, .k-btn--light, .k-avatar, .k-chip.is-active, .k-genre.is-active) {
   color: var(--gb1-ink);
   border-color: var(--gb1-edge);
