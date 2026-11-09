@@ -5,6 +5,7 @@ require_once __DIR__ . '/config/db.php';
 require_once __DIR__ . '/includes/helpers.php';
 // Flat page; only the buttons are glass: is-gbtn switches them on (see assets/css/glass-buttons.css)
 $body_class = 'is-gbtn';
+$hide_footer = true; // this page has no footer (the footer stays on Home, Shop, the Book page and Wishlist; see includes/footer.php)
 $extra_css = ['assets/css/glass-buttons.css', 'assets/css/flat.css', 'assets/css/pages-flat.css'];
 http_response_code(404);
 

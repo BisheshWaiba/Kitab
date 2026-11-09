@@ -4,6 +4,7 @@ require_once '../includes/helpers.php';
 // The Cart page is flat (white and light-grey surfaces, from the design canvas); only its buttons are glass.
 // is-gbtn switches the glass buttons on, and these stylesheets are loaded by the redesigned pages only
 $body_class = 'is-gbtn';
+$hide_footer = true; // this page has no footer (the footer stays on Home, Shop, the Book page and Wishlist; see includes/footer.php)
 $extra_css = ['assets/css/glass-buttons.css', 'assets/css/flat.css', 'assets/css/cart-flat.css'];
 $page_title = 'Shopping Cart';
 require_once '../includes/header.php';
