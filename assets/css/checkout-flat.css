@@ -1,0 +1,61 @@
+/* The flat Checkout page (from the design canvas): the billing form and payment on one card, the order summary on another, and the
+   "Order placed" card. Shared pieces (wrap, headings, cards, the Cart > Details > Done line) are in flat.css; the glass on Place Order,
+   View Order and Continue Shopping is in glass-buttons.css. Everything here has a gk- name or sits under .gk-form. */
+
+.gk-head { padding-top: 56px; padding-bottom: 28px; }
+.gk-head .fl-sub { margin-top: 8px; }
+.gk-main { padding-bottom: 80px; }
+
+/* the form on the left, the summary on the right (it drops below on narrow screens) */
+.gk-grid { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 32px; }
+
+/* ---------- billing details and payment ---------- */
+.gk-form { flex: 999 1 560px; min-width: 0; padding: 40px; display: flex; flex-direction: column; gap: 20px; }
+.gk-form .fl-h2,
+.gk-summary .fl-h2 { font-size: 28px; }
+.gk-form__sub { margin-top: 8px; }
+.gk-form__note { margin: -8px 0 0; font-size: 15px; line-height: 1.5; color: var(--k-muted); }
+.gk-form input.k-input { height: 48px; }
+.gk-pay { display: flex; align-items: center; gap: 16px; padding: 16px 18px; border: 1.5px solid var(--k-border); border-radius: 12px; background: var(--k-white); cursor: pointer; transition: border-color .2s; }
+.gk-pay input { flex: none; width: 20px; height: 20px; margin: 0; accent-color: var(--k-ink); }
+.gk-pay strong { display: block; font-size: 16px; }
+.gk-pay small { font-size: 14px; color: var(--k-muted); }
+.gk-pay:has(input:checked) { border-color: var(--k-ink); }
+.gk-pay:has(input:focus-visible) { outline: 3px solid var(--k-accent); outline-offset: 3px; }
+
+/* ---------- order summary ---------- */
+.gk-summary { flex: 1 1 380px; min-width: 0; padding: 32px; display: flex; flex-direction: column; gap: 22px; }
+.gk-items { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 20px; }
+.gk-item { display: flex; align-items: center; gap: 16px; }
+.gk-item__img { flex: none; display: block; width: 56px; height: auto; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 4px rgba(17, 18, 20, .22), 0 12px 20px -10px rgba(17, 18, 20, .5); }
+.gk-item__img.k-cover--empty { font-size: 9px; padding: 4px; }
+.gk-item__text { flex: 1; min-width: 0; }
+.gk-item__title { font: 600 17px/1.25 var(--k-display); overflow-wrap: anywhere; }
+.gk-item__qty { font-size: 14px; color: var(--k-muted); }
+.gk-item__price { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.gk-total { display: flex; justify-content: space-between; align-items: baseline; padding-top: 18px; border-top: 1px solid var(--k-line); font-weight: 600; }
+.gk-total strong { font: 600 34px/1 var(--k-display); letter-spacing: -.02em; }
+.gk-edit { align-self: flex-start; display: inline-flex; align-items: center; min-height: 44px; font-size: 15px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.gk-edit:hover { text-decoration-thickness: 2px; }
+
+/* ---------- order placed ---------- */
+.gk-success { max-width: 640px; margin: 0 auto; padding: 64px 32px; display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; }
+.gk-success__icon { display: flex; align-items: center; justify-content: center; width: 80px; height: 80px; border-radius: 50%; background: rgba(242, 177, 52, .3); color: var(--k-ink); box-shadow: 0 0 0 8px rgba(242, 177, 52, .15); }
+.gk-success p { margin: 0 0 8px; max-width: 460px; font-size: 17px; line-height: 1.6; color: var(--k-ink-2); }
+.gk-success__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes gk-rise { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: none; } }
+  .gk-success__icon { animation: gk-pop .7s var(--k-ease) backwards; }
+  .gk-success > :not(.gk-success__icon) { animation: gk-rise .8s var(--k-ease) backwards; }
+}
+
+/* ---------- tablets and phones ---------- */
+@media (max-width: 900px) {
+  .gk-head { padding-top: 40px; }
+  .gk-form { padding: 28px 22px; }
+}
+@media (max-width: 600px) {
+  .gk-main { padding-bottom: 48px; }
+  .gk-summary { padding: 24px 22px; }
+  .gk-success { padding: 48px 22px; }
+}

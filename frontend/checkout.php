@@ -138,47 +138,32 @@ $price)";
     }
 }
 
-// The Checkout page has the glass look (from the design canvas): a body class and a stylesheet only the redesigned pages load
-$body_class = 'is-glass is-checkout';
-$extra_css = 'assets/css/glass.css';
+// The Checkout page is flat (white and light-grey surfaces, from the design canvas); only its buttons are glass.
+// is-gbtn switches the glass buttons on, and these stylesheets are loaded by the redesigned pages only
+$body_class = 'is-gbtn';
+$extra_css = ['assets/css/glass-buttons.css', 'assets/css/flat.css', 'assets/css/checkout-flat.css'];
 $page_title = $order_placed ? 'Order placed' : 'Checkout';
 require_once '../includes/header.php';
-
-// Light from the books: the first two covers in the order glow softly behind the top of the page
-$ambient = [];
-foreach ($cart_items as $b) {
-    $img = trim((string) $b['image']);
-    if ($img !== '') {
-        $ambient[] = strpos($img, 'http') === 0 ? $img : BASE_URL . $img;
-        if (count($ambient) === 2) {
-            break;
-        }
-    }
-}
 ?>
 
-<div class="hg-ambient" aria-hidden="true">
-    <?php foreach ($ambient as $src): ?>
-        <img src="<?php echo htmlspecialchars($src); ?>" alt="">
-    <?php endforeach; ?>
-</div>
+<main class="fl">
 
-<section class="gs-head hg-wrap">
-    <h1 class="hg-h1 gs-title">Checkout</h1>
-    <p class="hg-lede">You pay in cash when your order arrives.</p>
+<section class="gk-head fl-wrap">
+    <h1 class="fl-h1">Checkout</h1>
+    <p class="fl-sub">You pay in cash when your order arrives.</p>
     <?php k_checkout_steps($order_placed ? 'done' : 'details'); ?>
 </section>
 
-<div class="hg-wrap gs-main">
+<div class="fl-wrap gk-main">
     <?php if ($order_placed): ?>
-        <div class="gk-success hg-panel">
+        <div class="gk-success fl-panel">
             <div class="gk-success__icon" aria-hidden="true">
                 <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
                     stroke-linecap="round" stroke-linejoin="round">
                     <path d="m5 12.5 4.5 4.5L19 7.5" />
                 </svg>
             </div>
-            <h2 class="hg-h2">Order Placed Successfully!</h2>
+            <h2 class="fl-h2">Order Placed Successfully!</h2>
             <p>Thank you, <?php echo htmlspecialchars(trim((string) $_POST['name'])); ?>. Your order #<?php echo (int) $order_id; ?> has been received.</p>
             <div class="gk-success__actions">
                 <?php if ($user_id !== null): ?>
@@ -189,8 +174,8 @@ foreach ($cart_items as $b) {
         </div>
     <?php else: ?>
         <div class="gk-grid">
-            <form method="POST" class="gk-form hg-panel" data-validate>
-                <h2 class="hg-h2">Billing Details</h2>
+            <form method="POST" class="gk-form fl-panel" data-validate>
+                <h2 class="fl-h2">Billing Details</h2>
                 <?php if ($prefilled): ?>
                     <p class="gk-form__note">We filled this in from your account and your last order. Change anything that is different.</p>
                 <?php endif; ?>
@@ -228,7 +213,7 @@ foreach ($cart_items as $b) {
                     <?php k_field_error($errors, 'address'); ?>
                 </div>
 
-                <h2 class="hg-h2 gk-form__sub">Payment</h2>
+                <h2 class="fl-h2 gk-form__sub">Payment</h2>
                 <label class="gk-pay">
                     <input type="radio" name="payment" value="cash_on_delivery" checked>
                     <span>
@@ -241,8 +226,8 @@ foreach ($cart_items as $b) {
                     <?php echo number_format($total_price); ?>)</button>
             </form>
 
-            <aside class="gk-summary hg-panel" aria-label="Order summary">
-                <h2 class="hg-h2">Order Summary</h2>
+            <aside class="gk-summary fl-panel" aria-label="Order summary">
+                <h2 class="fl-h2">Order Summary</h2>
                 <ul class="gk-items">
                     <?php foreach ($cart_items as $item): ?>
                         <li class="gk-item">
@@ -264,5 +249,7 @@ foreach ($cart_items as $b) {
         </div>
     <?php endif; ?>
 </div>
+
+</main>
 
 <?php require_once '../includes/footer.php'; ?>
