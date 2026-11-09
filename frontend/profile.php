@@ -15,6 +15,10 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = (int) $_SESSION['user_id'];
 
+// A message left by the page that changed something (shown once)
+$notice = (string) ($_SESSION['account_notice'] ?? '');
+unset($_SESSION['account_notice']);
+
 // The account details, read fresh so a new photo or genre choice shows at once
 $stmt = $conn->prepare("SELECT name, email, phone, address, profile_picture, favorite_genres, created_at FROM users WHERE id = ?");
 $stmt->bind_param("i", $user_id);
@@ -44,6 +48,10 @@ foreach (array_filter(explode(',', (string) ($user['favorite_genres'] ?? ''))) a
 <main class="fl">
     <div class="fl-wrap pf">
         <h1 class="fl-h1">Account details</h1>
+
+        <?php if ($notice !== ''): ?>
+            <div class="k-alert k-alert--success pf-notice" role="status"><?php echo htmlspecialchars($notice); ?></div>
+        <?php endif; ?>
 
         <section class="pf-card fl-panel" aria-label="Account details">
             <div class="pf-id">
@@ -85,6 +93,20 @@ foreach (array_filter(explode(',', (string) ($user['favorite_genres'] ?? ''))) a
                         <?php else: ?>
                             <span class="pf-empty">None chosen yet</span>
                         <?php endif; ?>
+                    </dd>
+                </div>
+                <div class="pf-row">
+                    <dt>Password</dt>
+                    <dd>
+                        <span class="pf-secret" aria-hidden="true">&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</span><span class="k-sr">Hidden</span>
+                        <div class="pf-row__actions">
+                            <a href="change_password.php" class="k-btn k-btn--outline k-btn--sm">Change password</a>
+                            <form method="POST" action="change_password.php">
+                                <input type="hidden" name="csrf" value="<?php echo k_csrf_token(); ?>">
+                                <input type="hidden" name="do" value="reset">
+                                <button type="submit" class="k-btn k-btn--ghost k-btn--sm">Email me a reset link</button>
+                            </form>
+                        </div>
                     </dd>
                 </div>
             </dl>

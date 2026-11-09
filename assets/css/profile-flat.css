@@ -33,3 +33,26 @@
   .pf-row { grid-template-columns: minmax(0, 1fr); padding: 16px 0; }
   .pf-actions .k-btn { flex: 1 1 160px; }
 }
+
+/* ---------- password: the row on the account page, and the change-password page ---------- */
+.pf-notice { margin: -8px 0 24px; }
+.pf-secret { letter-spacing: .18em; color: var(--k-ink); }
+.pf-row__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-top: 12px; }
+.pf-row__actions form { margin: 0; }
+.pf-row__actions .k-btn--ghost { padding: 0 12px; }
+
+.pf--narrow { max-width: 640px; }
+.pf-form { display: flex; flex-direction: column; gap: 22px; }
+.pf-form.fl-panel { padding: 32px; }
+.pf-form input.k-input { height: 48px; }
+.pf-form__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px; }
+.pf-text { margin: 0; font-size: 17px; line-height: 1.6; color: var(--k-ink-2); overflow-wrap: anywhere; }
+.pf-text strong { color: var(--k-ink); }
+.pf-forgot { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; margin-top: 48px; }
+.pf-forgot h2 { margin: 0; font: 600 24px/1.2 var(--k-display); letter-spacing: -.01em; color: var(--k-ink); }
+.pf-forgot form { margin-top: 4px; }
+
+@media (max-width: 640px) {
+  .pf-form.fl-panel { padding: 22px 20px; }
+  .pf-form__actions .k-btn { flex: 1 1 160px; }
+}
