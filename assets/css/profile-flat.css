@@ -56,3 +56,21 @@
   .pf-form.fl-panel { padding: 22px 20px; }
   .pf-form__actions .k-btn { flex: 1 1 160px; }
 }
+
+/* ---------- edit profile ---------- */
+.pf-form--edit.fl-panel { gap: 0; padding: 4px 32px 32px; }
+.pf-form--edit > .k-alert { margin-top: 28px; }
+.pf-group { display: flex; flex-direction: column; gap: 20px; min-width: 0; margin: 0; padding: 28px 0; border: 0; border-bottom: 1px solid var(--k-line); }
+.pf-group--photo .k-avatar-upload { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 14px 24px; }
+.pf-group--photo .k-field__error { flex: 1 1 100%; }
+.pf-check { display: inline-flex; align-items: center; gap: 8px; font-size: 15px; color: var(--k-ink-2); cursor: pointer; }
+.pf-check input { width: 18px; height: 18px; margin: 0; accent-color: var(--k-ink); }
+.pf-confirm[hidden] { display: none; }
+.pf-genres legend { padding: 0; margin-bottom: 0; font: 600 20px/1.2 var(--k-display); letter-spacing: -.01em; color: var(--k-ink); float: left; width: 100%; }
+.pf-genres legend + * { clear: both; }
+.pf-form--edit .pf-form__actions { margin-top: 28px; }
+
+@media (max-width: 640px) {
+  .pf-form--edit.fl-panel { padding: 0 20px 24px; }
+  .pf-group { padding: 22px 0; }
+}

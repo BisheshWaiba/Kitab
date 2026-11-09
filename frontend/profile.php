@@ -113,7 +113,7 @@ foreach (array_filter(explode(',', (string) ($user['favorite_genres'] ?? ''))) a
         </section>
 
         <div class="pf-actions">
-            <a href="preferences.php" class="k-btn k-btn--outline">Edit Profile</a>
+            <a href="edit_profile.php" class="k-btn k-btn--outline">Edit Profile</a>
             <a href="logout.php" class="k-btn k-btn--danger-light">Logout</a>
         </div>
     </div>

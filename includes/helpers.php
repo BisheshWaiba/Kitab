@@ -63,15 +63,16 @@ function k_csrf_valid($token): bool
     return is_string($token) && !empty($_SESSION['csrf']) && hash_equals($_SESSION['csrf'], $token);
 }
 
-// Remove a cover that was uploaded to uploads/books/. Anything else (the bundled assets/ covers, outside paths) is left alone.
-function k_delete_upload(?string $path): void
+// Remove a picture that was uploaded to uploads/<subdir>/ (book covers in 'books', profile photos in 'profiles').
+// Anything else (the bundled assets/ covers, outside paths) is left alone.
+function k_delete_upload(?string $path, string $subdir = 'books'): void
 {
     $path = (string) $path;
     $name = basename($path);
-    if ($name === '' || $path !== 'uploads/books/' . $name) {
+    if ($name === '' || $path !== 'uploads/' . $subdir . '/' . $name) {
         return;
     }
-    $file = dirname(__DIR__) . '/uploads/books/' . $name;
+    $file = dirname(__DIR__) . '/uploads/' . $subdir . '/' . $name;
     if (is_file($file)) {
         @unlink($file);
     }
