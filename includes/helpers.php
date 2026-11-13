@@ -358,10 +358,38 @@ function k_checkout_steps(string $current): void
     <?php
 }
 
+// Published review count and average for every book that has any: [book_id => [count, average]]. One query per page, so a
+// grid of cards does not ask the database once per card. Same rule as k_review_summary(): only 'approved' reviews count.
+function k_card_ratings(): array
+{
+    static $ratings = null;
+    if ($ratings !== null) {
+        return $ratings;
+    }
+    $ratings = [];
+    $conn = $GLOBALS['conn'] ?? null;
+    if ($conn instanceof mysqli) {
+        try {
+            $rows = $conn->query("SELECT book_id, COUNT(*) AS n, AVG(rating) AS avg_rating FROM reviews WHERE status = 'approved' GROUP BY book_id");
+            foreach ($rows ? $rows->fetch_all(MYSQLI_ASSOC) : [] as $r) {
+                $ratings[(int) $r['book_id']] = [(int) $r['n'], (float) $r['avg_rating']];
+            }
+        } catch (Throwable $e) {
+            error_log('KITAB: could not read the book ratings: ' . $e->getMessage());
+        }
+    }
+    return $ratings;
+}
+
 // $cta is the look of the Add to Cart button: 'outline' (Shop and Wishlist) or 'primary' (the Home page)
 function k_book_card(array $b, string $cta = 'outline'): void
 {
     $href = BASE_URL . 'frontend/product.php?id=' . (int) $b['id'];
+    [$rating_count, $rating_avg] = k_card_ratings()[(int) $b['id']] ?? [0, 0.0];
+    $rating_pct = round($rating_avg / 5 * 100, 1);
+    $rating_say = $rating_count > 0
+        ? rtrim(rtrim(number_format($rating_avg, 1), '0'), '.') . ' out of 5 stars, ' . $rating_count . ($rating_count === 1 ? ' review' : ' reviews')
+        : 'No reviews yet';
     ?>
     <article class="k-book">
         <div class="k-book__media">
@@ -371,7 +399,10 @@ function k_book_card(array $b, string $cta = 'outline'): void
             <?php k_wish_button($b); ?>
         </div>
         <div class="k-book__info">
-            <span class="k-book__cat"><?php echo htmlspecialchars($b['category']); ?></span>
+            <span class="k-book__rating">
+                <span class="k-stars" style="--pct:<?php echo $rating_pct; ?>%" role="img" aria-label="<?php echo $rating_say; ?>">&#9733;&#9733;&#9733;&#9733;&#9733;</span>
+                <?php if ($rating_count > 0): ?><span class="k-book__rating-n" aria-hidden="true">(<?php echo $rating_count; ?>)</span><?php endif; ?>
+            </span>
             <a class="k-book__title" href="<?php echo $href; ?>"><?php echo htmlspecialchars($b['title']); ?></a>
             <span class="k-book__author">by <?php echo htmlspecialchars($b['author']); ?></span>
         </div>
