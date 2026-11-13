@@ -13,8 +13,12 @@ at least 4 MB (`max_allowed_packet`), because pictures are stored in it. Note it
 
 ```powershell
 # a copy of your local database (never commit this file: it holds emails and password hashes)
-& "C:\xampp\mysql\bin\mysqldump.exe" -u root --result-file=kitab.sql 25123794
+& "C:\xampp\mysql\bin\mysqldump.exe" -u root --skip-add-locks --skip-lock-tables --skip-comments --default-character-set=utf8mb4 --result-file=kitab.sql 25123794
 ```
+
+**Before importing, look at the accounts in it.** Any account whose password is guessable (`admin123`, `password`,
+`12345678`, ...) would be open to anyone once the site is public. Replace those password hashes in `kitab.sql` (not in
+your local database) with new ones, or import without those users.
 
 Import `kitab.sql` into the hosted database with the host's import tool, or HeidiSQL / DBeaver. Then delete `kitab.sql`.
 
