@@ -20,3 +20,6 @@ database/seed_curated.php
 database/migrate_database_name.php
 *.sql
 *.md
+
+# The demo database for the Docker image (books, categories, one admin: no private data) is needed
+!docker/seed.sql
