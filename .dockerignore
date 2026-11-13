@@ -1,0 +1,22 @@
+.git
+.gitignore
+.vercel
+.env*
+node_modules
+Dockerfile
+.dockerignore
+# everything that stays on your computer
+uploads
+TEST_CREDENTIALS.txt
+make_admin.php
+check_db.php
+books_schema.txt
+categories_dump.txt
+router.php
+database/setup.php
+database/fix_db.php
+database/master_fix.php
+database/seed_curated.php
+database/migrate_database_name.php
+*.sql
+*.md

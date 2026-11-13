@@ -28,9 +28,20 @@ function k_reset_table(mysqli $conn): void
     );
 }
 
-// True for a request that comes from this very computer (never for a visitor over the network)
+// True for a request that comes from this very computer (never for a visitor over the network).
+// Used to show a reset link on screen when this machine cannot send email. Online, a request often reaches PHP through
+// the host's own proxy, which can look like 127.0.0.1, so a site that is online (KITAB_ONLINE is set) or any request that
+// came through a proxy is never treated as local: the link must never be shown to a stranger.
 function k_is_loopback(): bool
 {
+    if (getenv('KITAB_ONLINE') !== false && getenv('KITAB_ONLINE') !== '') {
+        return false;
+    }
+    foreach (['HTTP_X_FORWARDED_FOR', 'HTTP_X_FORWARDED_HOST', 'HTTP_X_FORWARDED_PROTO', 'HTTP_X_REAL_IP', 'HTTP_FORWARDED', 'HTTP_X_VERCEL_ID'] as $proxy_header) {
+        if (!empty($_SERVER[$proxy_header])) {
+            return false;
+        }
+    }
     return in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1'], true);
 }
 

@@ -6,3 +6,20 @@ Thumbs.db
 
 # Config files with sensitive info (if applicable)
 # config/db.php
+.vercel
+.env*
+
+# Development-only files: they must never be public (they list users, create an admin account or change the database)
+/TEST_CREDENTIALS.txt
+/make_admin.php
+/check_db.php
+/books_schema.txt
+/categories_dump.txt
+/database/setup.php
+/database/fix_db.php
+/database/master_fix.php
+/database/seed_curated.php
+/database/migrate_database_name.php
+
+# A copy of the database (emails, password hashes): never public
+/kitab*.sql

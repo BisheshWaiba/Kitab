@@ -1,7 +1,21 @@
-# Apache: show the custom 404 page for addresses that do not exist.
-# (PHP's built-in server does the same through router.php.)
+# Apache (XAMPP and the Docker image).
+# (PHP's built-in server does the same jobs through router.php.)
 <IfModule mod_rewrite.c>
     RewriteEngine On
+
+    # Never public: server code and settings, database scripts, hidden files, dumps, notes and the Docker files.
+    # They get the normal 404 page, as if they did not exist.
+    RewriteRule ^(.*/)?(config|includes|database)/ 404.php [L]
+    RewriteRule (^|/)\. 404.php [L]
+    RewriteRule \.(sql|md|txt|ini|log|bak)$ 404.php [L]
+    RewriteRule ^(Dockerfile|router\.php|make_admin\.php|check_db\.php)$ 404.php [L]
+    RewriteRule ^uploads/.*\.(php|phtml|phar)$ 404.php [L]
+
+    # A picture kept in the database (UPLOAD_STORE=db) has no file on disk: serve_upload.php hands it out
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(uploads/.+)$ serve_upload.php?path=$1 [L]
+
+    # Show the custom 404 page for addresses that do not exist.
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^ 404.php [L]

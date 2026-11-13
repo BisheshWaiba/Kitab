@@ -10,6 +10,14 @@ $root = realpath(__DIR__);
 $path = rawurldecode((string) parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH));
 $target = strpos($path, "\0") === false ? realpath($root . $path) : false;
 
+// A picture kept in the database (UPLOAD_STORE=db) has no file on disk: serve_upload.php hands it out (Apache: .htaccess)
+if (strncmp($path, '/uploads/', 9) === 0 && strpos($path, "\0") === false && !is_file($root . $path)) {
+    $_GET['path'] = ltrim($path, '/');
+    $_SERVER['SCRIPT_NAME'] = $_SERVER['PHP_SELF'] = '/serve_upload.php';
+    require __DIR__ . '/serve_upload.php';
+    return true;
+}
+
 $exists = $path === '/' || (
     strpos($path, "\0") === false
     && $target !== false

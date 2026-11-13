@@ -95,6 +95,31 @@ function k_csrf_valid($token): bool
     return is_string($token) && !empty($_SESSION['csrf']) && hash_equals($_SESSION['csrf'], $token);
 }
 
+// Where uploaded pictures are kept: 'files' (the uploads/ folder, as on XAMPP) or 'db' (the database, for an online host
+// whose disk is thrown away between visits; the Docker image sets UPLOAD_STORE=db). Either way a picture keeps the same
+// address, uploads/<subdir>/<name>; with 'db' the page serve_upload.php hands it out (see .htaccess and router.php).
+function k_upload_store(): string
+{
+    return getenv('UPLOAD_STORE') === 'db' ? 'db' : 'files';
+}
+
+// The table that holds the pictures when they are kept in the database (created the first time it is needed)
+function k_upload_table(): mysqli
+{
+    static $ready = false;
+    $conn = $GLOBALS['conn'] ?? kitab_db_connect();
+    if (!$ready) {
+        $ready = true;
+        $conn->query("CREATE TABLE IF NOT EXISTS kitab_uploads (
+            path VARCHAR(255) NOT NULL PRIMARY KEY,
+            mime VARCHAR(50) NOT NULL,
+            data MEDIUMBLOB NOT NULL,
+            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+    }
+    return $conn;
+}
+
 // Remove a picture that was uploaded to uploads/<subdir>/ (book covers in 'books', profile photos in 'profiles').
 // Anything else (the bundled assets/ covers, outside paths) is left alone.
 function k_delete_upload(?string $path, string $subdir = 'books'): void
@@ -107,6 +132,15 @@ function k_delete_upload(?string $path, string $subdir = 'books'): void
     $file = dirname(__DIR__) . '/uploads/' . $subdir . '/' . $name;
     if (is_file($file)) {
         @unlink($file);
+    }
+    if (k_upload_store() === 'db') {
+        try {
+            $stmt = k_upload_table()->prepare("DELETE FROM kitab_uploads WHERE path = ?");
+            $stmt->bind_param("s", $path);
+            $stmt->execute();
+        } catch (Throwable $e) {
+            error_log('KITAB: could not delete an uploaded picture: ' . $e->getMessage());
+        }
     }
 }
 
@@ -131,11 +165,39 @@ function k_upload_image(array $file, string $subdir, string $prefix, int $max_by
         return [null, 'Please upload a JPG, PNG, GIF or WebP image.'];
     }
 
+    $name = $prefix . '_' . time() . '_' . bin2hex(random_bytes(3)) . '.' . $types[$info[2]];
+
+    if (k_upload_store() === 'db') {
+        $path = 'uploads/' . $subdir . '/' . $name;
+        $mime = image_type_to_mime_type($info[2]);
+        $bytes = is_uploaded_file($file['tmp_name']) ? file_get_contents($file['tmp_name']) : false;
+        if ($bytes === false) {
+            return [null, 'Sorry, the image could not be saved. Please try again.'];
+        }
+        try {
+            $conn = k_upload_table();
+            // A picture bigger than the database accepts in one go would make it drop the connection, so check first
+            $limit = (int) ($conn->query("SELECT @@max_allowed_packet")->fetch_row()[0] ?? 0);
+            if ($limit > 0 && strlen($bytes) + 4096 > $limit) {
+                error_log('KITAB: a picture of ' . strlen($bytes) . ' bytes does not fit max_allowed_packet (' . $limit . ')');
+                return [null, 'Sorry, the image could not be saved. Please try a smaller one.'];
+            }
+            $stmt = $conn->prepare("INSERT INTO kitab_uploads (path, mime, data) VALUES (?, ?, ?)");
+            $stmt->bind_param("sss", $path, $mime, $bytes);
+            if (!$stmt->execute()) {
+                throw new RuntimeException($stmt->error);
+            }
+        } catch (Throwable $e) {
+            error_log('KITAB: could not store an uploaded picture: ' . $e->getMessage());
+            return [null, 'Sorry, the image could not be saved. Please try again.'];
+        }
+        return [$path, ''];
+    }
+
     $dir = dirname(__DIR__) . '/uploads/' . $subdir . '/';
     if (!file_exists($dir)) {
         mkdir($dir, 0777, true);
     }
-    $name = $prefix . '_' . time() . '_' . bin2hex(random_bytes(3)) . '.' . $types[$info[2]];
     if (!move_uploaded_file($file['tmp_name'], $dir . $name)) {
         return [null, 'Sorry, the image could not be saved. Please try again.'];
     }
