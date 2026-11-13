@@ -22,15 +22,20 @@
 .fl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr)); gap: 24px; }
 
 /* ---------- book cards (the shared .k-book card from k_book_card(), styled for these pages only) ---------- */
-.fl .k-book { gap: 0; background: var(--k-white); border: 1px solid var(--k-line); border-radius: 16px; overflow: hidden; box-shadow: 0 1px 2px rgba(17, 18, 20, .04); }
-.fl .k-book__cover { border-radius: 0; padding: 30px 0 24px; }
-.fl .k-book__cover .k-cover { width: 142px; max-width: 100%; }
-.fl .k-book__info { gap: 3px; padding: 18px 20px 0; }
-.fl .k-book__cat { color: var(--k-muted); }
-.fl .k-book__title { margin-top: 4px; font-size: 20px; }
-.fl .k-book__foot { padding: 14px 20px 20px; }
-.fl .k-book__price { font-weight: 700; }
+.fl .k-book { gap: 0; background: var(--k-white); border: 1px solid var(--k-line); border-radius: 16px; overflow: hidden; box-shadow: 0 1px 2px rgba(17, 18, 20, .04); transition: border-color .2s, box-shadow .2s; }
+.fl .k-book:hover,
+.fl .k-book:focus-within { border-color: color-mix(in srgb, var(--k-ink) 16%, var(--k-line)); box-shadow: 0 1px 2px rgba(17, 18, 20, .05), 0 16px 32px -18px rgba(17, 18, 20, .3); }
+.fl .k-book__cover { border-radius: 0; padding: 32px 0 28px; }
+.fl .k-book__cover .k-cover { width: 156px; max-width: 100%; }
+.fl .k-book__info { gap: 4px; padding: 20px 20px 18px; }
+.fl .k-book__cat { font-size: 11.5px; letter-spacing: .07em; color: var(--k-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fl .k-book__title { margin-top: 2px; font-size: 20px; line-height: 1.2; letter-spacing: -.01em; }
+.fl .k-book__author { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* the price row always sits at the bottom of the card, under a short hairline, so every card in a row lines up */
+.fl .k-book__foot { margin: auto 20px 0; padding: 16px 0 20px; border-top: 1px solid var(--k-line); }
+.fl .k-book__price { font-weight: 700; letter-spacing: -.01em; }
 .fl .k-wish { top: 12px; right: 12px; }
+@media (prefers-reduced-motion: reduce) { .fl .k-book { transition: none; } }
 
 @media (max-width: 600px) {
   .fl-wrap { padding: 0 20px; }
