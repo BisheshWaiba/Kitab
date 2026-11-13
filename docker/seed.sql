@@ -1,6 +1,6 @@
 -- Demo database for the Docker image (docker/start.sh loads it when no DB_HOST is set).
--- Tables are empty except: the store's books and categories, and one admin account.
--- Generated from the local database. It holds no customers, orders or private data.
+-- Tables are empty except: the store's books and categories, one admin account, and sample star ratings (see the end of this file).
+-- Generated from the local database. It holds no real customers, orders or private data.
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -247,4 +247,63 @@ INSERT INTO `categories` VALUES (1,'Fiction','bi-book','Fictional novels and sto
 
 SET FOREIGN_KEY_CHECKS=0;
 INSERT INTO users (name, email, password, role) VALUES ('Bishesh Waiba', 'bishesh@admin.com', '$2y$10$iHxMmBoWi4CabI7UviJe0OgvqHY4C38YqD.flD53VazbWC3xh14za', 'admin');
+SET FOREIGN_KEY_CHECKS=1;
+
+-- Sample readers and their star ratings, so the demo shows ratings on every book.
+-- They are sample data, not real customers (nobody can log in as them). Remove them before a real launch with:
+--     DELETE FROM users WHERE email LIKE '%@sample.invalid';   (their ratings go with them)
+SET FOREIGN_KEY_CHECKS=0;
+INSERT INTO users (name, email, password, role) VALUES
+  ('Sample Reader', 'sample.reader1@sample.invalid', '$2y$10$/HEptVCXp672AxpmxqINIeLqKtpbo/AFCT127ddRGwxh9gWabEwdu', 'customer'),
+  ('Sample Reader', 'sample.reader2@sample.invalid', '$2y$10$owN6omd8p38fF9QcPayPbOKbrMSW3cPR9LO.155gEreGEVzc2ejje', 'customer'),
+  ('Sample Reader', 'sample.reader3@sample.invalid', '$2y$10$jKXgolceg6PUSFLVFEctsefPSQI8foao2djGOTfmKt5l3mT2p8fVe', 'customer');
+INSERT INTO reviews (book_id, user_id, rating, comment, status, created_at) VALUES
+  (1, (SELECT id FROM users WHERE email = 'sample.reader1@sample.invalid'), 4, NULL, 'approved', NOW() - INTERVAL 7 DAY),
+  (1, (SELECT id FROM users WHERE email = 'sample.reader2@sample.invalid'), 5, NULL, 'approved', NOW() - INTERVAL 12 DAY),
+  (1, (SELECT id FROM users WHERE email = 'sample.reader3@sample.invalid'), 4, NULL, 'approved', NOW() - INTERVAL 17 DAY),
+  (2, (SELECT id FROM users WHERE email = 'sample.reader1@sample.invalid'), 3, NULL, 'approved', NOW() - INTERVAL 10 DAY),
+  (2, (SELECT id FROM users WHERE email = 'sample.reader2@sample.invalid'), 3, NULL, 'approved', NOW() - INTERVAL 15 DAY),
+  (2, (SELECT id FROM users WHERE email = 'sample.reader3@sample.invalid'), 5, NULL, 'approved', NOW() - INTERVAL 20 DAY),
+  (3, (SELECT id FROM users WHERE email = 'sample.reader1@sample.invalid'), 5, NULL, 'approved', NOW() - INTERVAL 13 DAY),
+  (3, (SELECT id FROM users WHERE email = 'sample.reader2@sample.invalid'), 5, NULL, 'approved', NOW() - INTERVAL 18 DAY),
+  (3, (SELECT id FROM users WHERE email = 'sample.reader3@sample.invalid'), 5, NULL, 'approved', NOW() - INTERVAL 23 DAY),
+  (4, (SELECT id FROM users WHERE email = 'sample.reader1@sample.invalid'), 5, NULL, 'approved', NOW() - INTERVAL 16 DAY),
+  (4, (SELECT id FROM users WHERE email = 'sample.reader2@sample.invalid'), 5, NULL, 'approved', NOW() - INTERVAL 21 DAY),
+  (4, (SELECT id FROM users WHERE email = 'sample.reader3@sample.invalid'), 5, NULL, 'approved', NOW() - INTERVAL 26 DAY),
+  (5, (SELECT id FROM users WHERE email = 'sample.reader1@sample.invalid'), 5, NULL, 'approved', NOW() - INTERVAL 19 DAY),
+  (5, (SELECT id FROM users WHERE email = 'sample.reader2@sample.invalid'), 5, NULL, 'approved', NOW() - INTERVAL 24 DAY),
+  (5, (SELECT id FROM users WHERE email = 'sample.reader3@sample.invalid'), 5, NULL, 'approved', NOW() - INTERVAL 29 DAY),
+  (6, (SELECT id FROM users WHERE email = 'sample.reader1@sample.invalid'), 4, NULL, 'approved', NOW() - INTERVAL 22 DAY),
+  (6, (SELECT id FROM users WHERE email = 'sample.reader2@sample.invalid'), 3, NULL, 'approved', NOW() - INTERVAL 27 DAY),
+  (6, (SELECT id FROM users WHERE email = 'sample.reader3@sample.invalid'), 5, NULL, 'approved', NOW() - INTERVAL 32 DAY),
+  (7, (SELECT id FROM users WHERE email = 'sample.reader1@sample.invalid'), 5, NULL, 'approved', NOW() - INTERVAL 25 DAY),
+  (7, (SELECT id FROM users WHERE email = 'sample.reader2@sample.invalid'), 5, NULL, 'approved', NOW() - INTERVAL 30 DAY),
+  (7, (SELECT id FROM users WHERE email = 'sample.reader3@sample.invalid'), 5, NULL, 'approved', NOW() - INTERVAL 35 DAY),
+  (8, (SELECT id FROM users WHERE email = 'sample.reader1@sample.invalid'), 4, NULL, 'approved', NOW() - INTERVAL 28 DAY),
+  (8, (SELECT id FROM users WHERE email = 'sample.reader2@sample.invalid'), 4, NULL, 'approved', NOW() - INTERVAL 33 DAY),
+  (8, (SELECT id FROM users WHERE email = 'sample.reader3@sample.invalid'), 3, NULL, 'approved', NOW() - INTERVAL 38 DAY),
+  (9, (SELECT id FROM users WHERE email = 'sample.reader1@sample.invalid'), 4, NULL, 'approved', NOW() - INTERVAL 31 DAY),
+  (9, (SELECT id FROM users WHERE email = 'sample.reader2@sample.invalid'), 5, NULL, 'approved', NOW() - INTERVAL 36 DAY),
+  (9, (SELECT id FROM users WHERE email = 'sample.reader3@sample.invalid'), 3, NULL, 'approved', NOW() - INTERVAL 41 DAY),
+  (10, (SELECT id FROM users WHERE email = 'sample.reader1@sample.invalid'), 4, NULL, 'approved', NOW() - INTERVAL 34 DAY),
+  (10, (SELECT id FROM users WHERE email = 'sample.reader2@sample.invalid'), 4, NULL, 'approved', NOW() - INTERVAL 39 DAY),
+  (10, (SELECT id FROM users WHERE email = 'sample.reader3@sample.invalid'), 4, NULL, 'approved', NOW() - INTERVAL 44 DAY),
+  (11, (SELECT id FROM users WHERE email = 'sample.reader1@sample.invalid'), 5, NULL, 'approved', NOW() - INTERVAL 4 DAY),
+  (11, (SELECT id FROM users WHERE email = 'sample.reader2@sample.invalid'), 4, NULL, 'approved', NOW() - INTERVAL 9 DAY),
+  (11, (SELECT id FROM users WHERE email = 'sample.reader3@sample.invalid'), 5, NULL, 'approved', NOW() - INTERVAL 14 DAY),
+  (12, (SELECT id FROM users WHERE email = 'sample.reader1@sample.invalid'), 4, NULL, 'approved', NOW() - INTERVAL 7 DAY),
+  (12, (SELECT id FROM users WHERE email = 'sample.reader2@sample.invalid'), 5, NULL, 'approved', NOW() - INTERVAL 12 DAY),
+  (12, (SELECT id FROM users WHERE email = 'sample.reader3@sample.invalid'), 3, NULL, 'approved', NOW() - INTERVAL 17 DAY),
+  (19, (SELECT id FROM users WHERE email = 'sample.reader1@sample.invalid'), 4, NULL, 'approved', NOW() - INTERVAL 28 DAY),
+  (19, (SELECT id FROM users WHERE email = 'sample.reader2@sample.invalid'), 5, NULL, 'approved', NOW() - INTERVAL 33 DAY),
+  (19, (SELECT id FROM users WHERE email = 'sample.reader3@sample.invalid'), 3, NULL, 'approved', NOW() - INTERVAL 38 DAY),
+  (20, (SELECT id FROM users WHERE email = 'sample.reader1@sample.invalid'), 5, NULL, 'approved', NOW() - INTERVAL 31 DAY),
+  (20, (SELECT id FROM users WHERE email = 'sample.reader2@sample.invalid'), 5, NULL, 'approved', NOW() - INTERVAL 36 DAY),
+  (20, (SELECT id FROM users WHERE email = 'sample.reader3@sample.invalid'), 5, NULL, 'approved', NOW() - INTERVAL 41 DAY),
+  (21, (SELECT id FROM users WHERE email = 'sample.reader1@sample.invalid'), 5, NULL, 'approved', NOW() - INTERVAL 34 DAY),
+  (21, (SELECT id FROM users WHERE email = 'sample.reader2@sample.invalid'), 3, NULL, 'approved', NOW() - INTERVAL 39 DAY),
+  (21, (SELECT id FROM users WHERE email = 'sample.reader3@sample.invalid'), 5, NULL, 'approved', NOW() - INTERVAL 44 DAY),
+  (22, (SELECT id FROM users WHERE email = 'sample.reader1@sample.invalid'), 4, NULL, 'approved', NOW() - INTERVAL 4 DAY),
+  (22, (SELECT id FROM users WHERE email = 'sample.reader2@sample.invalid'), 5, NULL, 'approved', NOW() - INTERVAL 9 DAY),
+  (22, (SELECT id FROM users WHERE email = 'sample.reader3@sample.invalid'), 4, NULL, 'approved', NOW() - INTERVAL 14 DAY);
 SET FOREIGN_KEY_CHECKS=1;
