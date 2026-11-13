@@ -116,8 +116,9 @@ $shelf_order = [2, 0, 1];
             <div class="fh-best__row">
                 <?php while ($row = $result_best->fetch_assoc()): ?>
                     <a class="fh-best__book" href="<?php echo BASE_URL; ?>frontend/product.php?id=<?php echo (int) $row['id']; ?>"
-                        aria-label="<?php echo htmlspecialchars($row['title']); ?>, Rs. <?php echo number_format((float) $row['price']); ?>">
+                        aria-label="<?php echo htmlspecialchars($row['title']); ?>, <?php echo k_rating_say((int) $row['id']); ?>, Rs. <?php echo number_format((float) $row['price']); ?>">
                         <?php k_cover($row, 'fh-cover'); ?>
+                        <?php echo k_rating_row((int) $row['id']); ?>
                         <span class="fh-best__price">Rs. <?php echo number_format((float) $row['price']); ?></span>
                     </a>
                 <?php endwhile; ?>

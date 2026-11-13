@@ -24,6 +24,11 @@
 .fh-best__copy .fl-lede { font-size: 17px; }
 .fh-best__row { flex: 3 1 560px; min-width: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 128px)); justify-content: center; align-items: end; gap: 22px; }
 .fh-best__book { display: flex; flex-direction: column; align-items: center; gap: 10px; min-width: 0; }
+.fh-best__book { gap: 12px; }
+.fh-best__book .k-book__rating { display: flex; align-items: center; justify-content: center; gap: 5px; height: 16px; margin: 0; }
+/* the unfilled part of the stars is darker here than on white cards, because this row sits on the grey band */
+.fh-best__book .k-book__rating .k-stars { font-size: 13px; letter-spacing: 1px; background-image: linear-gradient(90deg, var(--k-gold) var(--pct, 0%), color-mix(in srgb, var(--k-muted) 42%, var(--k-band)) var(--pct, 0%)); }
+.fh-best__book .k-book__rating-n { font-size: 12px; line-height: 1; color: var(--k-muted); font-variant-numeric: tabular-nums; }
 .fh-best__book .fh-cover { transition: transform .2s; }
 .fh-best__book:hover .fh-cover { transform: translateY(-4px); }
 .fh-best__price { font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--k-ink); }
