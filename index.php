@@ -7,7 +7,7 @@ $body_class = 'is-gbtn';
 $extra_css = ['assets/css/glass-buttons.css', 'assets/css/flat.css', 'assets/css/home-flat.css'];
 require_once 'includes/header.php';
 
-// Hero: three covers (books that have one) standing on a shelf
+// Hero: three covers (books that have one), fanned out
 $hero_books = $conn->query("SELECT id, title, image FROM books WHERE image IS NOT NULL AND image <> '' ORDER BY id ASC LIMIT 3")->fetch_all(MYSQLI_ASSOC);
 
 // Best Sellers (random)
@@ -29,8 +29,8 @@ foreach ($curated_cats as $cat) {
 
 $genres = ['Fiction', 'Business', 'Tech', 'Science', 'History', 'Biography', 'Self-Help', 'Mystery', 'Romance', 'Fantasy'];
 
-// Which hero cover stands in which spot on the shelf (left, middle and right): index in $hero_books
-$shelf_order = [2, 0, 1];
+// Which hero cover takes which spot in the fan (left, middle and right): index in $hero_books
+$fan_order = [2, 0, 1];
 ?>
 
 <main class="fl">
@@ -39,7 +39,7 @@ $shelf_order = [2, 0, 1];
     <section class="fl-wrap fh-hero">
         <div class="fh-hero__copy">
             <h1 class="fl-h1">Discover Your Next <em>Favorite Book</em></h1>
-            <p class="fl-lede">Fiction, business, history, art and more, brought to your door. Pay when it arrives.</p>
+            <p class="fl-lede">Fiction, business, history, art and more, brought to your door.</p>
             <div class="fh-hero__cta">
                 <a href="<?php echo BASE_URL; ?>frontend/shop.php" class="k-btn k-btn--primary k-btn--lg">Shop Now
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -48,6 +48,15 @@ $shelf_order = [2, 0, 1];
                     </svg>
                 </a>
                 <a href="<?php echo BASE_URL; ?>frontend/register.php" class="k-btn k-btn--outline k-btn--lg">Join KITAB</a>
+            </div>
+            <div class="fh-pay">
+                <span class="fh-pay__icon" aria-hidden="true">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2.5" y="6" width="19" height="12" rx="2.2" /><circle cx="12" cy="12" r="2.8" /><path d="M6 9.5v.01M18 14.5v.01" />
+                    </svg>
+                </span>
+                <p class="fh-pay__text"><strong>Pay when it arrives</strong><span>Cash on delivery on every order. No card needed.</span></p>
             </div>
             <?php $return_days = (int) (require __DIR__ . '/includes/legal_pages.php')['site']['return_days']; // the same promises the Book page makes ?>
             <ul class="fh-trust" aria-label="How buying works">
@@ -61,13 +70,6 @@ $shelf_order = [2, 0, 1];
                 <li>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <rect x="3" y="6" width="18" height="12" rx="2" /><circle cx="12" cy="12" r="2.6" />
-                    </svg>
-                    Pay when it arrives
-                </li>
-                <li>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M4 8h10a5 5 0 0 1 0 10H8" /><path d="M8 4 4 8l4 4" />
                     </svg>
                     Return within <?php echo $return_days; ?> days
@@ -75,8 +77,8 @@ $shelf_order = [2, 0, 1];
             </ul>
         </div>
 
-        <div class="fh-shelf">
-            <?php foreach ($shelf_order as $i): ?>
+        <div class="fh-fan">
+            <?php foreach ($fan_order as $i): ?>
                 <?php if (isset($hero_books[$i])): $b = $hero_books[$i]; ?>
                     <a href="<?php echo BASE_URL; ?>frontend/product.php?id=<?php echo (int) $b['id']; ?>"
                         aria-label="<?php echo htmlspecialchars($b['title']); ?>">

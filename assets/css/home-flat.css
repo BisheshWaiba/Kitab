@@ -1,4 +1,4 @@
-/* The parts of the flat Home page that no other page has: the hero shelf, Best Sellers and the Our picks grid.
+/* The parts of the flat Home page that no other page has: the hero, Best Sellers and the Our picks grid.
    Shared pieces (wrap, headings, sections, book cards) are in flat.css. Everything here starts with .fh- or sits under .fl. */
 
 /* ---------- hero ---------- */
@@ -6,34 +6,44 @@
 .fh-hero__copy { flex: 1 1 480px; min-width: 0; display: flex; flex-direction: column; gap: 26px; }
 .fh-hero__cta { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 6px; }
 
-/* the three promises under the buttons (the same ones the Book page makes) */
-.fh-trust { display: flex; flex-wrap: wrap; gap: 10px 18px; margin: 4px 0 0; padding: 0; list-style: none; font-size: 14px; color: var(--k-ink-2); }
+/* "Pay when it arrives" is the shop's best selling point, so it gets a card of its own under the buttons: a big amber icon, the
+   promise in the display type, and what it means. The other two promises (shipping, returns) stay a quiet line beneath it. */
+.fh-pay { display: flex; align-items: center; gap: 18px; max-width: 480px; padding: 18px 22px 18px 18px; box-sizing: border-box; border-radius: 20px; background: var(--k-white); border: 1px solid var(--k-line); box-shadow: 0 14px 30px -20px rgba(17, 18, 20, .4), 0 1px 2px rgba(17, 18, 20, .06); }
+.fh-pay__icon { flex: none; display: grid; place-items: center; width: 60px; height: 60px; border-radius: 16px; color: #1B130A; background: linear-gradient(180deg, #FBD774, #EFB335); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6), 0 8px 16px -10px rgba(190, 120, 0, .8); }
+.fh-pay__text { display: flex; flex-direction: column; gap: 4px; min-width: 0; margin: 0; }
+.fh-pay__text strong { font: 600 22px/1.15 var(--k-display); letter-spacing: -.01em; color: var(--k-ink); }
+.fh-pay__text span { font-size: 15px; line-height: 1.45; color: var(--k-ink-2); }
+
+.fh-trust { display: flex; flex-wrap: wrap; gap: 10px 22px; margin: 0; padding: 0; list-style: none; font-size: 14px; color: var(--k-ink-2); }
 .fh-trust li { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
 .fh-trust svg { flex: none; color: var(--k-ink); }
 
-/* The hero arrives in order: the words rise a little, then the three covers come up onto the shelf one after the other and lift
-   when pointed at. (People who asked for less motion get none of it.) */
+/* The hero arrives in order: the words rise a little, then the three covers come up one after the other and lift when pointed at.
+   (People who asked for less motion get none of it.) */
 @media (prefers-reduced-motion: no-preference) {
   @keyframes fh-rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
   .fh-hero__copy > * { animation: fh-rise .7s var(--k-ease) backwards; }
   .fh-hero__copy > :nth-child(2) { animation-delay: .08s; }
   .fh-hero__copy > :nth-child(3) { animation-delay: .16s; }
-  .fh-hero__copy > :nth-child(4) { animation-delay: .24s; }
-  .fh-shelf a { animation: fh-rise .8s var(--k-ease) backwards; }
-  .fh-shelf a:nth-child(1) { animation-delay: .2s; }
-  .fh-shelf a:nth-child(2) { animation-delay: .34s; }
-  .fh-shelf a:nth-child(3) { animation-delay: .48s; }
-  .fh-shelf .fh-cover { transition: transform .35s var(--k-ease); }
-  .fh-shelf a:hover .fh-cover { transform: translateY(-10px); }
+  .fh-hero__copy > :nth-child(4) { animation-delay: .26s; }
+  .fh-hero__copy > :nth-child(5) { animation-delay: .34s; }
+  .fh-fan a { animation: fh-rise .8s var(--k-ease) backwards; }
+  .fh-fan a:nth-child(1) { animation-delay: .2s; }
+  .fh-fan a:nth-child(2) { animation-delay: .34s; }
+  .fh-fan a:nth-child(3) { animation-delay: .48s; }
+  .fh-fan .fh-cover { transition: transform .35s var(--k-ease); }
+  .fh-fan a:hover .fh-cover { transform: translateY(-10px); }
 }
 
-/* three covers standing on a dark shelf */
-.fh-shelf { position: relative; flex: 1 1 440px; min-width: 0; display: flex; align-items: flex-end; justify-content: center; gap: 16px; min-height: 420px; padding: 36px 28px 44px; box-sizing: border-box; border-radius: 28px; background: var(--k-band); overflow: hidden; }
-.fh-shelf::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 22px; background: linear-gradient(#3A3D47, #15171C); }
-.fh-shelf a { position: relative; z-index: 1; flex: 0 1 auto; }
-.fh-shelf a:nth-child(1) { width: min(122px, 26%); }
-.fh-shelf a:nth-child(2) { width: min(168px, 36%); }
-.fh-shelf a:nth-child(3) { width: min(136px, 29%); }
+/* three covers fanned out like a hand of cards on a warm, glowing panel, with a soft shadow on the ground (no shelf). The
+   rotation and the centring use the separate rotate / translate properties, so the entrance animation (transform) can still run. */
+.fh-fan { position: relative; flex: 1 1 440px; min-width: 0; max-width: 720px; margin-inline: auto; aspect-ratio: 5 / 4; overflow: hidden; isolation: isolate; border-radius: 28px;
+  background: radial-gradient(circle at 50% 56%, color-mix(in srgb, var(--k-gold) 32%, transparent), transparent 60%), var(--k-band); }
+.fh-fan::after { content: ""; position: absolute; left: 16%; right: 16%; bottom: 7%; height: 7%; z-index: 0; border-radius: 50%; background: radial-gradient(closest-side, rgba(17, 18, 20, .3), transparent); filter: blur(6px); }
+.fh-fan a { position: absolute; bottom: 14%; display: block; }
+.fh-fan a:nth-child(1) { left: 6%; width: 29%; rotate: -7deg; transform-origin: 50% 100%; z-index: 1; }
+.fh-fan a:nth-child(2) { left: 50%; width: 35%; translate: -50% 0; bottom: 16%; z-index: 3; }
+.fh-fan a:nth-child(3) { right: 6%; width: 29%; rotate: 7deg; transform-origin: 50% 100%; z-index: 2; }
 
 /* a standing cover (a picture, or the titled box k_cover() shows when a book has no picture) */
 .fh-cover { display: block; width: 100%; height: auto; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 4px rgba(17, 18, 20, .25), 0 18px 28px -12px rgba(17, 18, 20, .5); }
@@ -65,7 +75,9 @@
 }
 @media (max-width: 600px) {
   .fh-hero { gap: 40px; padding-top: 36px; padding-bottom: 48px; }
-  .fh-shelf { min-height: 300px; padding: 28px 16px 40px; gap: 12px; }
+  .fh-pay { padding: 16px 18px 16px 16px; gap: 16px; }
+  .fh-pay__icon { width: 54px; height: 54px; }
+  .fh-pay__text strong { font-size: 20px; }
   .fh-best { gap: 36px; }
   .fh-best__row { grid-template-columns: repeat(3, minmax(0, 128px)); gap: 28px 14px; }
 }
