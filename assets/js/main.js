@@ -507,6 +507,9 @@ document.querySelectorAll('form[data-add-form]').forEach(function (form) {
             .then(function (data) {
                 bumpCartBadge(data.count);
                 showCartToast(form.dataset.title, form.dataset.cover, data.added);
+                if (data.shipNote) { // the free-shipping line on the Book page, now with this book in the cart
+                    document.querySelectorAll('[data-ship-text]').forEach(function (el) { el.textContent = data.shipNote; });
+                }
                 if (label) {
                     label.textContent = 'Added';
                     button.classList.add('is-added'); // on phones the button has no words: this swaps the cart icon for a tick
@@ -524,6 +527,43 @@ document.querySelectorAll('form[data-add-form]').forEach(function (form) {
             });
     });
 });
+
+// Book page on tablets and phones: a bar with the price and Add to Cart sticks to the bottom while the real buttons are out of view
+// (the bar is hidden by the stylesheet on wide screens, and without this script). It does not add anything itself: it presses the
+// real Add to Cart, so the quantity chosen above is what is added, and it shows that button's words ("Adding...", "Added").
+(function () {
+    var bar = document.querySelector('[data-buybar]');
+    var actions = document.querySelector('.gp-actions');
+    var form = document.querySelector('.gp-buyform');
+    var main = form ? form.querySelector('button[name="add_to_cart"]') : null;
+    var mainLabel = main ? main.querySelector('[data-add-label]') : null;
+    if (!bar || !actions || !main || !mainLabel || !('IntersectionObserver' in window)) {
+        return;
+    }
+    var add = bar.querySelector('[data-buybar-add]');
+    var label = bar.querySelector('[data-buybar-label]');
+
+    // "seen" counts only the part of the screen above the bar, so the bar steps aside exactly when the real button is clear of it
+    new IntersectionObserver(function (entries) {
+        var on = !entries[entries.length - 1].isIntersecting;
+        bar.classList.toggle('is-on', on);
+        document.body.classList.toggle('has-buybar', on);
+    }, { rootMargin: '0px 0px -76px 0px' }).observe(actions);
+
+    add.addEventListener('click', function () {
+        if (form.requestSubmit) {
+            form.requestSubmit(main);
+        } else {
+            main.click();
+        }
+    });
+    function mirror() {
+        label.textContent = mainLabel.textContent;
+        add.disabled = main.disabled;
+    }
+    new MutationObserver(mirror).observe(mainLabel, { childList: true, characterData: true, subtree: true });
+    new MutationObserver(mirror).observe(main, { attributes: true, attributeFilter: ['disabled'] });
+})();
 
 // Product page: quantity stepper
 document.querySelectorAll('[data-qty]').forEach(function (box) {

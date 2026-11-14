@@ -1,6 +1,38 @@
 <?php
 // Shared markup helpers for the redesigned pages. Needs BASE_URL (config/db.php).
 
+// The shop's promise: "Free shipping on orders over Rs. 2,000" (shown as progress in the cart and on the Book page)
+const K_FREE_SHIPPING_AT = 2000;
+
+// What the books in the visitor's cart add up to (the session cart is [book id => quantity])
+function k_cart_total(mysqli $conn): float
+{
+    $cart = $_SESSION['cart'] ?? [];
+    if (!$cart) {
+        return 0.0;
+    }
+    $ids = implode(',', array_map('intval', array_keys($cart)));
+    $total = 0.0;
+    foreach ($conn->query("SELECT id, price FROM books WHERE id IN ($ids)")->fetch_all(MYSQLI_ASSOC) as $row) {
+        $total += (float) $row['price'] * (int) $cart[$row['id']];
+    }
+    return $total;
+}
+
+// The one-line shipping note under Add to Cart on the Book page, from the cart total and this book's price
+function k_ship_note(float $cart_total, float $price): string
+{
+    if ($cart_total >= K_FREE_SHIPPING_AT) {
+        return 'Your cart ships free.';
+    }
+    if ($cart_total > 0) {
+        return 'Rs. ' . number_format(K_FREE_SHIPPING_AT - $cart_total) . ' more in your cart for free shipping.';
+    }
+    return $price >= K_FREE_SHIPPING_AT
+        ? 'This book ships free.'
+        : 'Free shipping on orders over Rs. ' . number_format(K_FREE_SHIPPING_AT) . '.';
+}
+
 // The delivery address of an order. Older orders kept it in shipping_address instead of address.
 function k_order_address(array $order): string
 {

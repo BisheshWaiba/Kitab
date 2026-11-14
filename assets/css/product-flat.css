@@ -33,7 +33,11 @@
 .fl .k-wishrow { margin: 0; }
 .fl .gp-actions .k-wishbtn { width: auto; height: 56px; padding: 0 34px; font-size: 16px; } /* a button for customers, a link to Log In for guests */
 
-.gp-trust { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; }
+/* the free-shipping line under the buttons (the words come from k_ship_note() in includes/helpers.php) */
+.gp-ship { display: flex; align-items: center; gap: 10px; margin: -6px 0 0; font-size: 15px; line-height: 1.4; color: var(--k-ink-2); }
+.gp-ship svg { flex: none; color: var(--k-ink); }
+
+.gp-trust { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; }
 .gp-trust li { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; border-radius: 12px; background: var(--k-band); font-size: 14px; line-height: 1.4; color: var(--k-ink-2); }
 .gp-trust svg { color: var(--k-ink); }
 .gp-trust a { text-decoration: underline; text-underline-offset: 3px; }
@@ -51,14 +55,31 @@
 
 /* (the "Added to your cart" message and the cart-badge pop moved to flat.css: book cards on every page use them now) */
 
+/* ---------- the sticky buy bar (tablets and phones, with scripts on) ----------
+   Price, title and Add to Cart stay at the bottom of the screen while the real buttons are out of view. assets/js/main.js adds
+   .is-on to it (and .has-buybar to <body>); a tap is passed to the real Add to Cart, so the quantity chosen above is what is added. */
+.gp-bar { display: none; }
+
 /* ---------- tablets and phones ---------- */
 @media (max-width: 900px) {
   .gp-product { grid-template-columns: minmax(0, 1fr); gap: 32px; padding-top: 32px; padding-bottom: 40px; }
   .gp-stage { min-height: 460px; }
+
+  .has-js .gp-bar { display: flex; align-items: center; gap: 14px; position: fixed; left: 0; right: 0; bottom: 0; z-index: 90; box-sizing: border-box; padding: 10px 16px max(10px, env(safe-area-inset-bottom)); background: var(--k-white); border-top: 1px solid var(--k-line); box-shadow: 0 -14px 28px -18px rgba(17, 18, 20, .35); transform: translateY(100%); visibility: hidden; transition: transform .28s var(--k-ease), visibility 0s .28s; }
+  .has-js .gp-bar.is-on { transform: none; visibility: visible; transition: transform .28s var(--k-ease); }
+  .gp-bar__info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .gp-bar__price { font: 700 20px/1.1 var(--k-body); font-variant-numeric: tabular-nums; }
+  .gp-bar__title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; color: var(--k-muted); }
+  .gp-bar .k-btn { flex: none; height: 48px; padding: 0 24px; }
+  /* room under the footer so the bar never hides its last line, and the "Added to your cart" message rises above the bar */
+  .has-js body:has([data-buybar]) { padding-bottom: 76px; }
+  .has-buybar .gt-toasts { bottom: calc(72px + 12px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .has-js .gp-bar, .has-js .gp-bar.is-on { transition: none; }
 }
 @media (max-width: 600px) {
   .gp-stage { min-height: 400px; }
-  .gp-trust { grid-template-columns: minmax(0, 1fr); }
   .gp-price { font-size: 34px; }
   .fl .k-reviews { padding-bottom: 48px; }
   .gp-related { padding-bottom: 56px; }

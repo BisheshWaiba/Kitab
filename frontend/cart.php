@@ -54,7 +54,7 @@ if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
 }
 
 // The shop's promise ("Free shipping on orders over Rs. 2,000") shown as progress, and books that would complete it
-$free_at = 2000;
+$free_at = K_FREE_SHIPPING_AT;
 $left = max(0, $free_at - $total_price);
 $ship_pct = min(100, (int) round($total_price / $free_at * 100));
 $item_count = array_sum(array_column($cart_items, 'qty'));

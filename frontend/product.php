@@ -56,6 +56,7 @@ if (isset($_POST['add_to_cart'])) {
             'count' => array_sum($_SESSION['cart']),
             'added' => $quantity,
             'inCart' => $_SESSION['cart'][$book_id],
+            'shipNote' => k_ship_note(k_cart_total($conn), (float) $book['price']), // the line under Add to Cart, up to date
         ]);
         exit();
     }
@@ -188,17 +189,19 @@ $category = trim((string) ($book['category'] ?? ''));
             <?php k_wish_button($book, 'button'); ?>
         </div>
 
+        <?php // where the cart stands against the free-shipping promise (main.js refreshes it after each Add to Cart) ?>
+        <p class="gp-ship" data-ship-note>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3 7h11v9H3z" />
+                <path d="M14 10h4l3 3v3h-7z" />
+                <circle cx="7" cy="18" r="1.6" />
+                <circle cx="17" cy="18" r="1.6" />
+            </svg>
+            <span data-ship-text><?php echo htmlspecialchars(k_ship_note(k_cart_total($conn), (float) $book['price'])); ?></span>
+        </p>
+
         <ul class="gp-trust">
-            <li>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M3 7h11v9H3z" />
-                    <path d="M14 10h4l3 3v3h-7z" />
-                    <circle cx="7" cy="18" r="1.6" />
-                    <circle cx="17" cy="18" r="1.6" />
-                </svg>
-                Free shipping over Rs. 2,000
-            </li>
             <li>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
                     stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -387,6 +390,17 @@ if ($result_related->num_rows > 0):
             </button>
         </div>
     <?php endif; ?>
+</div>
+
+<?php // Phones and tablets: while the real Add to Cart is off screen, this bar sticks to the bottom (main.js shows it; the click is passed to the real button) ?>
+<div class="gp-bar" data-buybar>
+    <div class="gp-bar__info">
+        <strong class="gp-bar__price">Rs. <?php echo htmlspecialchars(number_format($book['price'])); ?></strong>
+        <span class="gp-bar__title"><?php echo htmlspecialchars($book['title']); ?></span>
+    </div>
+    <button type="button" class="k-btn k-btn--primary" data-buybar-add aria-label="Add to Cart: <?php echo htmlspecialchars($book['title']); ?>">
+        <span data-buybar-label>Add to Cart</span>
+    </button>
 </div>
 
 <?php require_once '../includes/footer.php'; ?>
