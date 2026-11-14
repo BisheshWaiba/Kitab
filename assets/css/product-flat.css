@@ -49,12 +49,50 @@
 .gp-trust svg { color: var(--k-ink); }
 .gp-trust a { text-decoration: underline; text-underline-offset: 3px; }
 
-/* ---------- reviews: the legacy flat review styles, with the reviews as cards like the canvas ---------- */
+/* ---------- reviews: a summary card on the left (the average, how the stars are spread, the form) and the reviews as cards on the right ---------- */
 .fl .k-reviews { padding-top: 8px; padding-bottom: 64px; }
-.fl .k-reviewlist { gap: 16px; }
+.fl .k-reviews .k-h2 { display: flex; align-items: center; gap: 14px; }
+.k-reviews__n { display: inline-grid; place-items: center; min-width: 34px; height: 34px; padding: 0 12px; box-sizing: border-box; border-radius: 999px; background: var(--k-band); border: 1px solid var(--k-line); font: 600 15px/1 var(--k-body); color: var(--k-ink-2); font-variant-numeric: tabular-nums; }
+
+/* the summary: the average in the display type, the stars, and one gold bar per star count */
+.fl .k-ratingbox,
+.fl .k-reviewform { border-radius: 20px; }
+.fl .k-ratingbox__num { display: flex; align-items: baseline; gap: 8px; }
+.fl .k-ratingbox__num small { font: 500 18px/1 var(--k-body); letter-spacing: 0; color: var(--k-muted); }
+.fl .k-ratingbox__count { font-size: 14px; }
+.fl .k-bars li { grid-template-columns: 54px minmax(0, 1fr) 24px; }
+.fl .k-bars__track { height: 8px; background: color-mix(in srgb, var(--k-ink) 9%, transparent); }
+.fl .k-bars__fill { background: linear-gradient(90deg, #F7C95B, #EFB335); }
+
+/* one review: a round gold initial, the name (with a green "Verified purchase" when they bought the book), the date on the right,
+   the stars, then what they wrote. A review with no words is one slim row instead of a card with an empty body. */
+.fl .k-reviewlist { gap: 14px; }
 .fl .k-review,
-.fl .k-review:first-child { padding: 24px 28px; border: 1px solid var(--k-line); border-radius: 16px; background: var(--k-white); }
-.fl .k-bars__track { background: var(--k-line); }
+.fl .k-review:first-child { display: flex; align-items: flex-start; gap: 16px; padding: 22px 24px; border: 1px solid var(--k-line); border-radius: 18px; background: var(--k-white); transition: border-color .2s, box-shadow .2s; }
+@media (hover: hover) { .fl .k-review:hover { border-color: color-mix(in srgb, var(--k-ink) 22%, var(--k-line)); box-shadow: 0 14px 28px -22px rgba(17, 18, 20, .45); } }
+.k-review__avatar { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; font: 600 18px/1 var(--k-display); color: #1B130A; background: linear-gradient(180deg, #FBD774, #EFB335); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6); }
+.k-review__body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+.k-review__head { width: 100%; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 14px; }
+.k-review__who-line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; min-width: 0; }
+.fl .k-review__who { font-size: 16px; font-weight: 600; }
+.k-review__verified { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: var(--k-ok); }
+.fl .k-review__date { font-size: 13px; color: var(--k-muted); }
+.fl .k-review .k-stars { font-size: 15px; letter-spacing: 1px; }
+.fl .k-review__text { margin: 4px 0 0; max-width: 62ch; font-size: 16px; line-height: 1.65; color: var(--k-ink-2); }
+
+.fl .k-review--short { align-items: center; padding: 14px 20px; }
+.fl .k-review--short .k-review__avatar { width: 38px; height: 38px; font-size: 16px; }
+.fl .k-review--short .k-review__body { flex-direction: row; align-items: center; justify-content: space-between; gap: 6px 16px; }
+.fl .k-review--short .k-review__head { width: auto; flex-direction: column; align-items: flex-start; gap: 1px; }
+
+/* the form: the word for the rating you have picked shows under the stars (which one shows is CSS: :has) */
+.k-rate__word { margin: 4px 0 0; min-height: 20px; font-size: 14px; font-weight: 600; color: var(--k-ink-2); }
+.k-rate__word span { display: none; }
+.k-rate:has(#rate1:checked) .k-rate__word [data-v="1"],
+.k-rate:has(#rate2:checked) .k-rate__word [data-v="2"],
+.k-rate:has(#rate3:checked) .k-rate__word [data-v="3"],
+.k-rate:has(#rate4:checked) .k-rate__word [data-v="4"],
+.k-rate:has(#rate5:checked) .k-rate__word [data-v="5"] { display: inline; }
 
 /* ---------- You May Also Like ---------- */
 .gp-related { padding-bottom: 80px; }
@@ -86,6 +124,10 @@
   .has-js .gp-bar, .has-js .gp-bar.is-on { transition: none; }
 }
 @media (max-width: 600px) {
+  .fl .k-review, .fl .k-review:first-child { gap: 12px; padding: 18px 16px; }
+  .k-review__avatar { width: 38px; height: 38px; font-size: 16px; }
+  .fl .k-review--short { padding: 12px 14px; }
+  .fl .k-review--short .k-review__body { flex-wrap: wrap; }
   .gp-stage { min-height: 400px; }
   .gp-price { font-size: 34px; }
   .fl .k-reviews { padding-bottom: 48px; }

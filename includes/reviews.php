@@ -70,10 +70,13 @@ function k_review_summary(mysqli $conn, int $book_id): array
 }
 
 // The published reviews, newest first
+// (each review also says whether its writer has bought the book: an order of theirs that was not cancelled contains it)
 function k_review_list(mysqli $conn, int $book_id, int $limit): array
 {
     $stmt = $conn->prepare(
-        "SELECT r.id, r.user_id, r.rating, r.comment, r.created_at, u.name
+        "SELECT r.id, r.user_id, r.rating, r.comment, r.created_at, u.name,
+                EXISTS (SELECT 1 FROM orders o JOIN order_items oi ON oi.order_id = o.id
+                        WHERE o.user_id = r.user_id AND oi.book_id = r.book_id AND o.status <> 'cancelled') AS verified
          FROM reviews r LEFT JOIN users u ON u.id = r.user_id
          WHERE r.book_id = ? AND r.status = 'approved'
          ORDER BY r.created_at DESC, r.id DESC LIMIT ?"

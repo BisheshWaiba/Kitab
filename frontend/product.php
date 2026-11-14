@@ -253,7 +253,7 @@ $max_qty = max(1, k_max_qty($stock)); // the most the quantity box accepts
 
 <!-- Reviews -->
 <section class="k-reviews" id="reviews" aria-labelledby="reviews-title">
-    <h2 class="k-h2" id="reviews-title">Reviews</h2>
+    <h2 class="k-h2" id="reviews-title">Customer reviews<?php if ($review_count > 0): ?><span class="k-reviews__n"><?php echo $review_count; ?></span><?php endif; ?></h2>
 
     <?php if ($review_flash): ?>
         <div class="k-alert k-alert--<?php echo $review_flash['type'] === 'success' ? 'success' : 'error'; ?>"
@@ -266,7 +266,7 @@ $max_qty = max(1, k_max_qty($stock)); // the most the quantity box accepts
             <?php if ($review_count > 0): ?>
                 <div class="k-card k-ratingbox">
                     <div class="k-ratingbox__score">
-                        <span class="k-ratingbox__num"><?php echo number_format($review_avg, 1); ?></span>
+                        <span class="k-ratingbox__num"><?php echo number_format($review_avg, 1); ?><small>/ 5</small></span>
                         <?php echo k_stars($review_avg); ?>
                         <span class="k-ratingbox__count">Based on <?php echo $review_count . ($review_count === 1 ? ' review' : ' reviews'); ?></span>
                     </div>
@@ -316,6 +316,8 @@ $max_qty = max(1, k_max_qty($stock)); // the most the quantity box accepts
                                 <label for="rate<?php echo $v; ?>"><span class="k-sr"><?php echo $v; ?> star<?php echo $v === 1 ? '' : 's'; ?></span><svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7 6.1 20.8l1.2-6.5L2.5 9.7l6.6-.9z" /></svg></label>
                             <?php endfor; ?>
                         </div>
+                        <?php // the word for the stars chosen (or pointed at); which one shows is CSS (:has), see product-flat.css ?>
+                        <p class="k-rate__word" aria-hidden="true"><span data-v="1">Poor</span><span data-v="2">Fair</span><span data-v="3">Good</span><span data-v="4">Very good</span><span data-v="5">Excellent</span></p>
                     </fieldset>
 
                     <div class="k-field">
@@ -342,26 +344,41 @@ $max_qty = max(1, k_max_qty($stock)); // the most the quantity box accepts
                 <ul class="k-reviewlist">
                     <?php foreach ($reviews as $rv): ?>
                         <?php $mine = $viewer_id > 0 && (int) $rv['user_id'] === $viewer_id; ?>
-                        <li class="k-review" id="review-<?php echo (int) $rv['id']; ?>">
-                            <div class="k-review__head">
-                                <span class="k-review__who"><?php echo htmlspecialchars(k_review_name((string) $rv['name'])); ?></span>
-                                <?php if ($mine): ?><span class="k-tag">You</span><?php endif; ?>
+                        <?php
+                        $rv_name = k_review_name((string) $rv['name']);
+                        $rv_text = trim((string) $rv['comment']);
+                        ?>
+                        <li class="k-review<?php echo $rv_text === '' ? ' k-review--short' : ''; ?>" id="review-<?php echo (int) $rv['id']; ?>">
+                            <span class="k-review__avatar" aria-hidden="true"><?php echo htmlspecialchars(mb_strtoupper(mb_substr($rv_name, 0, 1))); ?></span>
+                            <div class="k-review__body">
+                                <div class="k-review__head">
+                                    <div class="k-review__who-line">
+                                        <span class="k-review__who"><?php echo htmlspecialchars($rv_name); ?></span>
+                                        <?php if ($mine): ?><span class="k-tag">You</span><?php endif; ?>
+                                        <?php if (!empty($rv['verified'])): ?>
+                                            <span class="k-review__verified">
+                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5" /></svg>
+                                                Verified purchase
+                                            </span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <time class="k-review__date" datetime="<?php echo htmlspecialchars(date('Y-m-d', strtotime($rv['created_at']))); ?>"><?php echo date('M j, Y', strtotime($rv['created_at'])); ?></time>
+                                </div>
                                 <?php echo k_stars((float) $rv['rating']); ?>
-                                <time class="k-review__date" datetime="<?php echo htmlspecialchars(date('Y-m-d', strtotime($rv['created_at']))); ?>"><?php echo date('F j, Y', strtotime($rv['created_at'])); ?></time>
+                                <?php if ($rv_text !== ''): ?>
+                                    <p class="k-review__text"><?php echo nl2br(htmlspecialchars($rv['comment'])); ?></p>
+                                <?php endif; ?>
+                                <?php if ($viewer_is_admin): ?>
+                                    <form method="POST" action="review.php" class="k-review__admin"
+                                        onsubmit="return confirm('Remove this review from the page?')">
+                                        <input type="hidden" name="csrf" value="<?php echo k_csrf_token(); ?>">
+                                        <input type="hidden" name="book_id" value="<?php echo (int) $book['id']; ?>">
+                                        <input type="hidden" name="review_id" value="<?php echo (int) $rv['id']; ?>">
+                                        <input type="hidden" name="do" value="remove">
+                                        <button type="submit" class="k-linkbtn k-linkbtn--danger">Remove review</button>
+                                    </form>
+                                <?php endif; ?>
                             </div>
-                            <?php if (trim((string) $rv['comment']) !== ''): ?>
-                                <p class="k-review__text"><?php echo nl2br(htmlspecialchars($rv['comment'])); ?></p>
-                            <?php endif; ?>
-                            <?php if ($viewer_is_admin): ?>
-                                <form method="POST" action="review.php" class="k-review__admin"
-                                    onsubmit="return confirm('Remove this review from the page?')">
-                                    <input type="hidden" name="csrf" value="<?php echo k_csrf_token(); ?>">
-                                    <input type="hidden" name="book_id" value="<?php echo (int) $book['id']; ?>">
-                                    <input type="hidden" name="review_id" value="<?php echo (int) $rv['id']; ?>">
-                                    <input type="hidden" name="do" value="remove">
-                                    <button type="submit" class="k-linkbtn k-linkbtn--danger">Remove review</button>
-                                </form>
-                            <?php endif; ?>
                         </li>
                     <?php endforeach; ?>
                 </ul>
