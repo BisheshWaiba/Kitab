@@ -95,3 +95,37 @@ body.is-gbtn .gp-qty:active { transform: none; }
   .fl .gk-steps__dot { width: 24px; height: 24px; font-size: 12px; }
   .fl .gk-steps li:not(:last-child)::after { min-width: 10px; margin: 0 8px; }
 }
+
+/* ---------- "Added to your cart": the message that slides in, and the badge that pops (flat card, glass buttons) ----------
+   Shown after Add to Cart on the Book page and on every book card (assets/js/main.js builds it). */
+.gt-toasts { position: fixed; z-index: 200; top: 136px; right: 24px; display: flex; flex-direction: column; gap: 12px; width: min(420px, calc(100vw - 32px)); pointer-events: none; }
+.gt-toast { pointer-events: auto; display: flex; align-items: center; gap: 14px; padding: 14px; border-radius: 16px; background: var(--k-white); border: 1px solid var(--k-line); box-shadow: 0 18px 40px -18px rgba(17, 18, 20, .35), 0 2px 8px rgba(17, 18, 20, .08); }
+.gt-toast__img { flex: none; width: 44px; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 4px rgba(17, 18, 20, .25), 0 10px 18px -8px rgba(17, 18, 20, .5); }
+.gt-toast__text { flex: 1; min-width: 0; display: flex; flex-direction: column; font-size: 14px; color: var(--k-ink-2); }
+.gt-toast__text strong { font-size: 15px; color: var(--k-ink); }
+.gt-toast__text span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gt-toast .k-btn { flex: none; }
+.gt-toast__close { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; padding: 0; cursor: pointer; }
+.gt-toast.is-out { opacity: 0; transform: translateX(24px); transition: opacity .2s ease-in, transform .2s ease-in; }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes gt-in { from { opacity: 0; transform: translateX(36px); } to { opacity: 1; transform: none; } }
+  @keyframes gt-bump { 0% { transform: scale(.4); } 60% { transform: scale(1.35); } 100% { transform: scale(1); } }
+  .gt-toast { animation: gt-in .55s var(--k-ease) backwards; }
+  .k-cart__badge--bump { animation: gt-bump .5s var(--k-ease); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gt-toast.is-out { transform: none; transition: opacity .2s; }
+}
+@media (max-width: 900px) {
+  /* on a phone the message rises from the bottom, where the thumb is */
+  .gt-toasts { top: auto; bottom: max(16px, env(safe-area-inset-bottom)); left: 16px; right: 16px; width: auto; }
+  .gt-toast.is-out { transform: translateY(24px); }
+}
+@media (max-width: 900px) and (prefers-reduced-motion: no-preference) {
+  @keyframes gt-up { from { opacity: 0; transform: translateY(36px); } to { opacity: 1; transform: none; } }
+  .gt-toast { animation-name: gt-up; }
+}
+
+/* the Add to Cart button on a book card is a small form (so it adds without leaving the page) */
+.fl .k-book__add { margin: 0; }
+.fl .k-book__foot .k-btn { min-width: 122px; justify-content: center; }

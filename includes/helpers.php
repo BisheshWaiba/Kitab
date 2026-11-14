@@ -483,7 +483,18 @@ function k_book_card(array $b, string $cta = 'outline'): void
         </div>
         <div class="k-book__foot">
             <span class="k-book__price">Rs. <?php echo number_format((float) $b['price']); ?></span>
-            <a href="<?php echo $href; ?>" class="k-btn k-btn--<?php echo $cta === 'primary' ? 'primary' : 'outline'; ?>">Add to Cart</a>
+            <?php
+            // Adds one copy to the cart without leaving the page (assets/js/main.js shows the "Added to your cart" message and
+            // updates the cart badge). Without JavaScript the form is sent to the Book page, which adds it and shows the message.
+            $cover_img = trim((string) ($b['image'] ?? ''));
+            $cover_url = $cover_img === '' ? '' : (strpos($cover_img, 'http') === 0 ? $cover_img : BASE_URL . $cover_img);
+            ?>
+            <form method="POST" action="<?php echo $href; ?>" class="k-book__add" data-add-form
+                data-title="<?php echo htmlspecialchars($b['title']); ?>" data-cover="<?php echo htmlspecialchars($cover_url); ?>">
+                <input type="hidden" name="quantity" value="1">
+                <button type="submit" name="add_to_cart" class="k-btn k-btn--<?php echo $cta === 'primary' ? 'primary' : 'outline'; ?>"
+                    aria-label="Add to Cart: <?php echo htmlspecialchars($b['title']); ?>"><span data-add-label>Add to Cart</span></button>
+            </form>
         </div>
     </article>
     <?php
