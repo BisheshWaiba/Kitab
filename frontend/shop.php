@@ -143,22 +143,27 @@ $clear_all = $build(['search' => null, 'author' => null, 'category' => null, 'mi
     <p class="fl-sub">Browse our complete catalog</p>
 </section>
 
-<div class="fl-wrap gs-main">
+<div class="fl-wrap gs-main gs-layout">
+    <?php // The categories stand in a column on the left, as they used to. Below 900px the same list turns into a row of chips (shop-flat.css). ?>
+    <aside class="gs-side">
+    <h2 class="gs-side__title">Categories</h2>
     <nav class="gs-filter" aria-label="Book categories">
-        <ul class="k-cats fl-chips">
+        <ul class="k-cats fl-chips gs-side__list">
             <?php $all_href = $build(['category' => null, 'search' => null, 'author' => null]); ?>
-            <li><a href="<?php echo htmlspecialchars($all_href); ?>" class="k-genre<?php echo $active_category === '' ? ' is-active' : ''; ?>"
-                    <?php echo $active_category === '' ? 'aria-current="page"' : ''; ?>>All</a></li>
+            <li><a href="<?php echo htmlspecialchars($all_href); ?>" class="k-genre gs-side__link<?php echo $active_category === '' ? ' is-active' : ''; ?>"
+                    <?php echo $active_category === '' ? 'aria-current="page"' : ''; ?>><span class="gs-side__all">All Categories</span><span class="gs-side__chip-all">All</span></a></li>
             <?php while ($cat = $cat_result->fetch_assoc()): ?>
                 <?php $is_active = ($active_category === $cat['category']); ?>
                 <li><a href="<?php echo htmlspecialchars($build(['category' => $cat['category'], 'search' => null, 'author' => null])); ?>"
-                        class="k-genre<?php echo $is_active ? ' is-active' : ''; ?>"
+                        class="k-genre gs-side__link<?php echo $is_active ? ' is-active' : ''; ?>"
                         <?php echo $is_active ? 'aria-current="page"' : ''; ?>><?php echo htmlspecialchars($cat['category']); ?></a>
                 </li>
             <?php endwhile; ?>
         </ul>
     </nav>
+    </aside>
 
+    <div class="gs-results">
     <div class="gs-controls">
         <p class="gs-count" aria-live="polite">
             <strong><?php echo $count; ?></strong><?php echo $filters_active ? ' of ' . $total_books : ''; ?>
@@ -259,6 +264,7 @@ $clear_all = $build(['search' => null, 'author' => null, 'category' => null, 'mi
     <?php else: ?>
         <?php k_empty_state('cart', 'No books yet', 'The shelves are being filled. Please check back soon.', 'Back to Home', BASE_URL . 'index.php'); ?>
     <?php endif; ?>
+    </div>
 </div>
 
 </main>

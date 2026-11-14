@@ -100,3 +100,37 @@ body.is-gbtn .fl .gs-rate { height: 48px; padding: 0 20px; gap: 7px; white-space
   .gs-popular { padding-top: 28px; }
   .gs-popular .fl-h2 { font-size: 28px; margin-bottom: 20px; }
 }
+
+/* ---------- the category column ----------
+   From 901px up the categories stand in a column on the left, as they used to (a quiet list, no glass); below that the same links are
+   the row of chips above the books. The two labels for "all" are swapped by the same breakpoint. */
+.gs-side__title,
+.gs-side__all { display: none; }
+
+@media (min-width: 901px) {
+  .gs-layout { display: flex; align-items: flex-start; gap: 40px; }
+  .gs-side { flex: 0 0 232px; position: sticky; top: 100px; display: flex; flex-direction: column; gap: 12px; }
+  .gs-results { flex: 1 1 0; min-width: 0; }
+  .gs-results .fl-grid { grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr)); } /* the column takes room, so no bigger cards here */
+
+  .gs-side__title { display: block; margin: 0; padding: 0 14px; font: 600 12px/1 var(--k-body); letter-spacing: .08em; text-transform: uppercase; color: var(--k-muted); }
+  .fl .gs-side__list { flex-direction: column; flex-wrap: nowrap; gap: 2px; margin: 0; padding: 0; }
+  .gs-side__all { display: inline; }
+  .gs-side__chip-all { display: none; }
+
+  /* the links keep the k-genre class (that is what makes them glass chips on phones), so here the glass is switched off again */
+  body.is-gbtn .gs-side .gs-side__link,
+  body.is-gbtn .gs-side .gs-side__link:hover,
+  body.is-gbtn .gs-side .gs-side__link:active,
+  body.is-gbtn .gs-side .gs-side__link.is-active,
+  body.is-gbtn .gs-side .gs-side__link.is-active:hover {
+    display: flex; align-items: center; justify-content: flex-start; width: 100%; height: 44px; padding: 0 14px; box-sizing: border-box;
+    border: 0; border-radius: 10px; background: none; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; transform: none;
+    font-size: 15px; font-weight: 500; line-height: 1.2; color: var(--k-ink-2); text-align: left; transition: background-color .15s, color .15s;
+  }
+  body.is-gbtn .gs-side .gs-side__link::before { display: none; }
+  body.is-gbtn .gs-side .gs-side__link:hover { background: var(--k-band); color: var(--k-ink); }
+  body.is-gbtn .gs-side .gs-side__link.is-active,
+  body.is-gbtn .gs-side .gs-side__link.is-active:hover { background: var(--k-accent-tint); color: var(--k-ink); font-weight: 600; }
+  body.is-gbtn .gs-side .gs-side__link:focus-visible { outline: 3px solid var(--k-accent); outline-offset: 2px; }
+}
