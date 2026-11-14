@@ -354,6 +354,35 @@ document.querySelectorAll('form[data-shop-tools]').forEach(function (form) {
             }
         });
     }
+    // wide screens: the Price pill opens the price panel under it; a click outside or Escape closes it (the pill only shows on wide
+    // screens, see shop-flat.css, so on a phone this never runs)
+    var priceWrap = form.querySelector('.gs-pricewrap');
+    var priceButton = priceWrap ? priceWrap.querySelector('[data-price-toggle]') : null;
+    if (priceButton) {
+        var setPrice = function (open) {
+            priceWrap.classList.toggle('is-open', open);
+            priceButton.setAttribute('aria-expanded', open ? 'true' : 'false');
+        };
+        priceButton.addEventListener('click', function () {
+            var open = !priceWrap.classList.contains('is-open');
+            setPrice(open);
+            var first = priceWrap.querySelector('input[name="min"]');
+            if (open && first) {
+                first.focus();
+            }
+        });
+        document.addEventListener('click', function (e) {
+            if (priceWrap.classList.contains('is-open') && !priceWrap.contains(e.target)) {
+                setPrice(false);
+            }
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && priceWrap.classList.contains('is-open')) {
+                setPrice(false);
+                priceButton.focus();
+            }
+        });
+    }
     form.addEventListener('submit', function (event) {
         if (event.defaultPrevented) {
             return; // a price box has a message under it: nothing is sent, so nothing is switched off

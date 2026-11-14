@@ -15,7 +15,7 @@
 .gs-controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px; margin: 28px 0; }
 .gs-count { margin: 0; font-size: 16px; color: var(--k-muted); }
 .gs-count strong { font-size: 18px; color: var(--k-ink); font-variant-numeric: tabular-nums; }
-.gs-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin: 0; }
+.gs-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 0; }
 
 /* the sort control is a glass pill (the glass is in glass-buttons.css). The real <select> lies invisibly over the whole pill,
    so a click or a key press anywhere on it opens the list, and the pill shows the choice that is currently applied */
@@ -24,12 +24,23 @@
 .gs-select { position: absolute; inset: -1px; z-index: 1; width: calc(100% + 2px); height: calc(100% + 2px); margin: 0; padding: 0; border: 0; opacity: 0; cursor: pointer; font-size: 16px; }
 .gs-sort:has(.gs-select:focus-visible) { outline: 3px solid var(--k-accent); outline-offset: 2px; }
 
-.gs-price { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; font-size: 14px; color: var(--k-ink-2); }
-.gs-price__label { font-weight: 600; }
-.fl .gs-num { width: 108px; height: 48px; padding: 0 16px; border-radius: 10px; font-size: 15px; font-variant-numeric: tabular-nums; -moz-appearance: textfield; }
+/* the price range: a label, three quick ranges, the two boxes and Apply. On wide screens (with scripts) it is a panel that opens under a
+   Price pill, like the Sort and 4 & up pills beside it (see the end of this file); otherwise it simply stays in the page */
+.gs-pricewrap { display: contents; }
+.gs-pricebtn { display: none; }
+.gs-price { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 14px; font-size: 14px; color: var(--k-ink-2); }
+.gs-price__label { flex: 1 1 100%; font-weight: 600; color: var(--k-ink); }
+.gs-presets { flex: 1 1 100%; display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.gs-preset { display: inline-flex; align-items: center; min-height: 38px; padding: 0 14px; box-sizing: border-box; border-radius: 999px; border: 1px solid var(--k-line); background: var(--k-band); font-size: 14px; font-weight: 600; color: var(--k-ink); transition: background-color .15s, border-color .15s; }
+.gs-preset:hover { background: var(--k-white); border-color: var(--k-ink); }
+.gs-preset.is-on { background: rgba(242, 177, 52, .22); border-color: var(--k-gold); }
+.gs-preset:focus-visible { outline: 3px solid var(--k-accent); outline-offset: 2px; }
+.gs-price__row { flex: 1 1 100%; min-width: 0; display: flex; align-items: center; gap: 10px; }
+.fl .gs-num { flex: 1 1 0; min-width: 0; width: 0; height: 48px; padding: 0 16px; border-radius: 10px; font-size: 15px; font-variant-numeric: tabular-nums; -moz-appearance: textfield; }
 .gs-num::-webkit-inner-spin-button,
 .gs-num::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 .gs-price .k-field__error { flex: 1 1 100%; }
+.gs-price__actions { flex: 1 1 100%; display: flex; align-items: center; gap: 18px; }
 .gs-clear { display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
 .gs-clear:hover { text-decoration-thickness: 2px; }
 
@@ -39,7 +50,7 @@
 .gs-rate-group { display: flex; align-items: center; font-size: 14px; color: var(--k-ink-2); }
 .gs-rate-group__label { display: none; }
 .gs-rate-group > * { flex: none; }
-body.is-gbtn .fl .gs-rate { height: 48px; padding: 0 20px; gap: 7px; white-space: nowrap; }
+body.is-gbtn .fl .gs-rate { height: 48px; padding: 0 20px; gap: 7px; font: 600 15px/1 var(--k-body); white-space: nowrap; }
 .gs-rate__star { color: var(--k-gold); font-size: 17px; line-height: 1; }
 .gs-rate.is-active .gs-rate__star { color: currentColor; } /* on the amber chip the gold star would vanish */
 
@@ -64,7 +75,6 @@ body.is-gbtn .fl .gs-rate { height: 48px; padding: 0 20px; gap: 7px; white-space
   .gs-rate-group__label { display: block; }
   .gs-price__label { flex: 1 1 100%; }
   .gs-rate-group .gs-price__label { flex: none; } /* (in the stacked group the label must not stretch like the price label does) */
-  .gs-price .gs-num { flex: 1 1 120px; min-width: 0; width: auto; }
 }
 
 /* the "Filters" button and the short "Sort:" label are for phones only (below) */
@@ -133,4 +143,20 @@ body.is-gbtn .fl .gs-rate { height: 48px; padding: 0 20px; gap: 7px; white-space
   body.is-gbtn .gs-side .gs-side__link.is-active,
   body.is-gbtn .gs-side .gs-side__link.is-active:hover { background: var(--k-accent-tint); color: var(--k-ink); font-weight: 600; }
   body.is-gbtn .gs-side .gs-side__link:focus-visible { outline: 3px solid var(--k-accent); outline-offset: 2px; }
+}
+
+/* ---------- wide screens: the three pills in a row (Sort, 4 & up, Price), the price range opens as a panel ----------
+   The Price button is a glass pill like the other two (amber, with the range in it, while a range is set). */
+@media (min-width: 901px) {
+  .has-js .gs-pricewrap { display: block; position: relative; }
+  .has-js .gs-pricebtn { display: inline-flex; }
+  body.is-gbtn .fl .gs-pricebtn { height: 48px; padding: 0 18px 0 22px; gap: 9px; font: 600 15px/1 var(--k-body); white-space: nowrap; }
+  .gs-pricebtn svg { flex: none; display: block; transition: transform .2s; }
+  .gs-pricebtn[aria-expanded="true"] svg { transform: rotate(180deg); }
+  .has-js .gs-price { display: none; position: absolute; top: calc(100% + 12px); right: 0; z-index: 30; width: 380px; max-width: calc(100vw - 48px); box-sizing: border-box; padding: 20px; border-radius: 20px; background: var(--k-white); border: 1px solid var(--k-line); box-shadow: 0 30px 60px -24px rgba(17, 18, 20, .5), 0 2px 8px rgba(17, 18, 20, .08); }
+  .has-js .gs-pricewrap.is-open .gs-price { display: flex; animation: k-panel-in .18s ease-out; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .has-js .gs-pricewrap.is-open .gs-price { animation: none; }
+  .gs-pricebtn svg { transition: none; }
 }

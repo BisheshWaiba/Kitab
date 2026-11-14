@@ -134,6 +134,35 @@ if ($rating_on) {
     $tags[] = ['4 stars and up', $build(['rating' => null])];
 }
 $clear_all = $build(['search' => null, 'author' => null, 'category' => null, 'min' => null, 'max' => null, 'rating' => null]);
+
+// The Price button: "Price" until a range is set, then the range itself
+$fmt = fn(float $n): string => number_format($n, $n == floor($n) ? 0 : 2);
+if ($min_price !== null && $max_price !== null) {
+    $price_pill = 'Rs. ' . $fmt($min_price) . ' – ' . $fmt($max_price);
+} elseif ($min_price !== null) {
+    $price_pill = 'Rs. ' . $fmt($min_price) . ' and up';
+} elseif ($max_price !== null) {
+    $price_pill = 'Up to Rs. ' . $fmt($max_price);
+} else {
+    $price_pill = 'Price';
+}
+
+// Three quick ranges that split the catalogue's prices into thirds, rounded to 500: [words, lowest or null, highest or null].
+// Left out when the prices are too close together for the split to mean anything.
+$presets = [];
+$lo = (int) $price_lo;
+$hi = (int) $price_hi;
+if ($hi - $lo >= 1500) {
+    $t1 = (int) (round(($lo + ($hi - $lo) / 3) / 500) * 500);
+    $t2 = (int) (round(($lo + 2 * ($hi - $lo) / 3) / 500) * 500);
+    if ($t1 > 0 && $t2 > $t1) {
+        $presets = [
+            ['Under Rs. ' . number_format($t1), null, $t1],
+            ['Rs. ' . number_format($t1) . ' – ' . number_format($t2), $t1, $t2],
+            ['Over Rs. ' . number_format($t2), $t2, null],
+        ];
+    }
+}
 ?>
 
 <main class="fl">
@@ -208,19 +237,44 @@ $clear_all = $build(['search' => null, 'author' => null, 'category' => null, 'mi
                     </a>
                 </div>
 
-                <div class="gs-price" role="group" aria-labelledby="gs-price-label">
-                    <span id="gs-price-label" class="gs-price__label">Price (Rs.)</span>
-                    <input type="number" name="min" class="k-input gs-num" min="0" step="any" inputmode="numeric"
-                        placeholder="<?php echo (int) $price_lo; ?>" aria-label="Lowest price" data-msg-invalid="Enter a lowest price of 0 or more."
-                        value="<?php echo $min_price !== null ? $plain($min_price) : ''; ?>">
-                    <span aria-hidden="true">to</span>
-                    <input type="number" name="max" class="k-input gs-num" min="0" step="any" inputmode="numeric"
-                        placeholder="<?php echo (int) $price_hi; ?>" aria-label="Highest price" data-msg-invalid="Enter a highest price of 0 or more."
-                        value="<?php echo $max_price !== null ? $plain($max_price) : ''; ?>">
-                    <button type="submit" class="k-btn k-btn--outline k-btn--sm">Apply</button>
-                    <?php if ($price_active): ?>
-                        <a href="<?php echo htmlspecialchars($build(['min' => null, 'max' => null])); ?>" class="gs-clear">Clear price</a>
-                    <?php endif; ?>
+                <?php // On wide screens the price boxes open from a Price button, like the other two pills (main.js); below that, and without scripts, they stay in the page. ?>
+                <div class="gs-pricewrap">
+                    <button type="button" class="k-genre gs-pricebtn<?php echo $price_active ? ' is-active' : ''; ?>" data-price-toggle aria-expanded="false" aria-controls="gs-price-panel">
+                        <span><?php echo htmlspecialchars($price_pill); ?></span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+                    </button>
+
+                    <div class="gs-price" id="gs-price-panel" role="group" aria-labelledby="gs-price-label">
+                        <span id="gs-price-label" class="gs-price__label">Price range (Rs.)</span>
+                        <?php if ($presets): ?>
+                            <ul class="gs-presets" aria-label="Quick ranges">
+                                <?php foreach ($presets as [$words, $from, $to]): ?>
+                                    <?php
+                                    $on = ($from === null ? $min_price === null : ($min_price !== null && abs($min_price - $from) < 0.001))
+                                        && ($to === null ? $max_price === null : ($max_price !== null && abs($max_price - $to) < 0.001));
+                                    ?>
+                                    <li><a href="<?php echo htmlspecialchars($build(['min' => $from === null ? null : (string) $from, 'max' => $to === null ? null : (string) $to])); ?>"
+                                            class="gs-preset<?php echo $on ? ' is-on' : ''; ?>"<?php echo $on ? ' aria-current="true"' : ''; ?>><?php echo htmlspecialchars($words); ?></a></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php endif; ?>
+                        <div class="gs-price__row">
+                            <input type="number" name="min" class="k-input gs-num" min="0" step="any" inputmode="numeric"
+                                placeholder="<?php echo (int) $price_lo; ?>" aria-label="Lowest price" data-msg-invalid="Enter a lowest price of 0 or more."
+                                value="<?php echo $min_price !== null ? $plain($min_price) : ''; ?>">
+                            <span aria-hidden="true">to</span>
+                            <input type="number" name="max" class="k-input gs-num" min="0" step="any" inputmode="numeric"
+                                placeholder="<?php echo (int) $price_hi; ?>" aria-label="Highest price" data-msg-invalid="Enter a highest price of 0 or more."
+                                value="<?php echo $max_price !== null ? $plain($max_price) : ''; ?>">
+                        </div>
+                        <div class="gs-price__actions">
+                            <button type="submit" class="k-btn k-btn--primary k-btn--sm">Apply</button>
+                            <?php if ($price_active): ?>
+                                <a href="<?php echo htmlspecialchars($build(['min' => null, 'max' => null])); ?>" class="gs-clear">Clear price</a>
+                            <?php endif; ?>
+                        </div>
+                    </div>
                 </div>
             </div>
         </form>
