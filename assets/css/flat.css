@@ -23,24 +23,27 @@
 
 /* ---------- book cards (the shared .k-book card from k_book_card(), styled for these pages only) ---------- */
 /* A product-shot card, like a shop's product tile: no border, a soft shadow, a tall pale stage with the picture large on it,
-   then (on white) the stars, the name in plain type and a bold price. Nothing else shows at rest. */
-.fl .k-book { gap: 0; background: var(--k-white); border: 0; border-radius: 18px; overflow: hidden; box-shadow: 0 2px 6px rgba(17, 18, 20, .12), 0 12px 26px -12px rgba(17, 18, 20, .3); transition: box-shadow .25s; }
+   then (on white) the stars, the name in plain type and a bold price. Nothing else shows at rest.
+   Everything inside is sized in cqw (a hundredth of the card's own width), measured off the reference tile (390 wide: stage 530 tall,
+   name 23px, price 24px bold, stars 90px wide), so the card keeps the same proportions at any width: 4 across, 2 across, one on a phone. */
+.fl .k-book { container-type: inline-size; gap: 0; background: var(--k-white); border: 0; border-radius: 18px; overflow: hidden; box-shadow: 0 2px 6px rgba(17, 18, 20, .12), 0 12px 26px -12px rgba(17, 18, 20, .3); transition: box-shadow .25s; }
 .fl .k-book:hover,
 .fl .k-book:focus-within { box-shadow: 0 2px 6px rgba(17, 18, 20, .12), 0 22px 40px -16px rgba(17, 18, 20, .4); }
 
-/* the stage: always 17 wide to 25 tall (about three quarters of the card), a very light grey that fades a little towards the bottom.
-   The bottom padding leaves room for the Add to Cart button, which sits below the cover. */
-.fl .k-book__cover { box-sizing: border-box; aspect-ratio: 17 / 25; border-radius: 0; padding: 34px 0 64px; background: linear-gradient(180deg, var(--k-band), color-mix(in srgb, var(--k-band) 40%, var(--k-white))); }
-.fl .k-book__cover .k-cover { width: 75%; max-width: 100%; box-shadow: 0 2px 4px rgba(20, 22, 28, .14), 0 20px 30px -14px rgba(20, 22, 28, .42); transition: transform .25s; }
+/* the stage: 390 wide to 530 tall like the reference (just over three quarters of the card), a very light grey that fades a little
+   towards the bottom. The cover is centred in it, a little above the middle (the bottom padding leaves room for Add to Cart). */
+.fl .k-book__cover { box-sizing: border-box; aspect-ratio: 39 / 53; border-radius: 0; padding: 0 0 8cqw; background: linear-gradient(180deg, var(--k-band), color-mix(in srgb, var(--k-band) 40%, var(--k-white))); }
+.fl .k-book__cover .k-cover { width: 70%; max-width: 100%; box-shadow: 0 2px 4px rgba(20, 22, 28, .14), 0 20px 30px -14px rgba(20, 22, 28, .42); transition: transform .25s; }
 .fl .k-book:hover .k-cover { transform: translateY(-6px); }
 
-/* under the stage: stars, name, price. The price sits at the bottom so every card in a row lines up */
-.fl .k-book__info { flex: 1; display: flex; flex-direction: column; gap: 0; padding: 18px 20px 22px; }
-.fl .k-book__rating { display: flex; align-items: center; height: 20px; margin-bottom: 10px; }
-.fl .k-book__rating .k-stars { font-size: 18px; letter-spacing: 2px; background-image: linear-gradient(90deg, #ffd60a var(--pct, 0%), color-mix(in srgb, var(--k-ink) 14%, var(--k-white)) var(--pct, 0%)); }
+/* under the stage (38.5% of the card's width tall): stars, name, price. The price sits at the bottom so every card in a row lines up.
+   The sizes have floors so the words stay readable on a very narrow card, and the name keeps to two lines. */
+.fl .k-book__info { flex: 1; display: flex; flex-direction: column; gap: 0; padding: 2cqw 5cqw 7cqw; }
+.fl .k-book__rating { display: flex; align-items: center; height: 6cqw; margin-bottom: 4cqw; }
+.fl .k-book__rating .k-stars { font-size: clamp(14px, 5cqw, 22px); letter-spacing: .5cqw; background-image: linear-gradient(90deg, #ffd60a var(--pct, 0%), color-mix(in srgb, var(--k-ink) 14%, var(--k-white)) var(--pct, 0%)); }
 .fl .k-book__rating-n { display: none; }
-.fl .k-book__title { font-family: var(--k-body); font-size: 20px; font-weight: 400; line-height: 1.3; letter-spacing: .03em; }
-.fl .k-book__price { margin-top: auto; padding-top: 14px; font: 700 22px/1.2 var(--k-body); letter-spacing: 0; font-variant-numeric: tabular-nums; }
+.fl .k-book__title { font-family: var(--k-body); font-size: clamp(15px, 5.9cqw, 24px); font-weight: 400; line-height: 1.3; letter-spacing: .03em; }
+.fl .k-book__price { margin-top: auto; padding-top: 4cqw; font: 700 clamp(16px, 6.15cqw, 26px)/1.2 var(--k-body); letter-spacing: 0; font-variant-numeric: tabular-nums; }
 
 /* the heart and Add to Cart sit on the stage. They fade in on hover or keyboard focus; on a touch screen (no hover) they are always there. */
 .fl .k-wish { top: 14px; right: 14px; transition: opacity .2s; }
