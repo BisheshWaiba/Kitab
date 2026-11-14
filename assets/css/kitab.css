@@ -313,6 +313,70 @@ body {
 
 .k-auth { display: flex; align-items: center; gap: 12px; }
 
+/* ---------- Phone header ----------
+   On phones (640px and narrower) the header is one 60px bar: the logo, then search, cart and menu buttons. Search and the links
+   open as panels under the bar (assets/js/main.js puts .is-open-search / .is-open-menu on .k-nav). It needs scripts: the .has-js
+   class on <html> comes from includes/header.php, so without them the header stays as it is on tablets (logo, links, search).
+   On wider screens the phone-only parts below are hidden and the search panel is invisible to the layout (display: contents). */
+.k-navbar { display: none; }
+.k-search-panel { display: contents; }
+.k-theme--row,
+.k-links__label { display: none; }
+.k-navbtn { padding: 0; border: 0; background: transparent; font: inherit; cursor: pointer; }
+.k-navbtn .k-navbtn__close,
+.k-navbtn[aria-expanded="true"] .k-navbtn__open { display: none; }
+.k-navbtn[aria-expanded="true"] .k-navbtn__close { display: block; }
+
+@keyframes k-panel-in { from { opacity: 0; transform: translateY(-6px); } }
+
+@media (max-width: 640px) {
+  .has-js .k-nav__inner { height: 60px; flex-wrap: nowrap; padding: 0 12px 0 16px; gap: 8px; }
+  .has-js .k-logo { font-size: 28px; }
+  .has-js .k-navbar { display: flex; align-items: center; gap: 6px; }
+  .has-js .k-navbar .k-cart,
+  .has-js .k-navbar .k-navbtn { width: 44px; height: 44px; }
+  /* the three bar buttons are glass without the drop shadow, which the bar's edge would cut off flat */
+  .has-js .k-navbar .k-cart,
+  .has-js .k-navbar .k-cart:hover { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9), 0 0 0 1px rgba(17, 18, 20, .07); }
+  .has-js .k-theme:not(.k-theme--row),
+  .has-js .k-links > .k-cart:not(.k-cart--wish) { display: none; } /* the switch moves into the menu, and the bar has its own cart */
+
+  /* the two panels: full width, right under the bar, over a dimmed page */
+  .has-js .k-search-panel,
+  .has-js .k-links { display: none; position: absolute; top: 100%; left: 0; right: 0; z-index: 2; box-sizing: border-box; margin: 0; background: var(--k-white); border-bottom: 1px solid var(--k-line); box-shadow: 0 22px 32px -20px rgba(17, 18, 20, .4); }
+  .has-js .k-nav.is-open-search::after,
+  .has-js .k-nav.is-open-menu::after { content: ""; position: absolute; top: 100%; left: 0; right: 0; height: 100vh; z-index: 1; background: rgba(10, 11, 14, .38); }
+  .has-js .k-nav.is-open-search .k-search-panel { display: block; padding: 10px 16px 16px; animation: k-panel-in .18s ease-out; }
+  .has-js .k-search { width: 100%; max-width: none; height: 48px; order: 0; }
+  .has-js .k-search input { font-size: 16px; } /* 16px keeps iPhones from zooming into the box */
+  .has-js .k-nav.is-open-menu .k-links { display: flex; flex-direction: column; align-items: stretch; gap: 0; padding: 4px 16px 18px; animation: k-panel-in .18s ease-out; }
+
+  /* the menu rows: Home, Shop, Wishlist, the dark mode switch, then Log In / Sign Up (or My account) */
+  .has-js .k-links .k-link { order: 1; width: 100%; height: 54px; box-sizing: border-box; border-bottom: 1px solid var(--k-line); box-shadow: none; font-size: 17px; color: var(--k-ink); }
+  .has-js .k-links .k-link.is-active { font-weight: 600; box-shadow: none; }
+  .has-js .k-links .k-link.is-active::after { content: ""; margin-left: auto; width: 8px; height: 8px; border-radius: 50%; background: var(--k-gold); }
+  .has-js .k-links .k-cart--wish { order: 2; }
+  .has-js .k-links .k-theme--row { order: 3; }
+  .has-js .k-links .k-auth,
+  .has-js .k-links .k-avatar { order: 4; }
+  .has-js .k-links .k-cart--wish,
+  .has-js .k-links .k-theme--row,
+  .has-js .k-links .k-cart--wish:hover,
+  .has-js .k-links .k-theme--row:hover { display: flex; position: relative; top: auto; right: auto; align-items: center; justify-content: flex-start; gap: 12px; width: 100%; height: 54px; padding: 0; box-sizing: border-box; border: 0; border-bottom: 1px solid var(--k-line); border-radius: 0; background: none; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; transform: none; font: 500 17px/1 var(--k-body); color: var(--k-ink); text-align: left; }
+  .has-js .k-links .k-cart--wish::before,
+  .has-js .k-links .k-theme--row::before { display: none; }
+  .has-js .k-links .k-cart--wish .k-cart__badge { position: static; margin-left: auto; box-shadow: none; }
+  .has-js .k-links .k-links__label { display: inline; }
+  .has-js .k-links .k-theme__to-light { display: none; }
+  .has-js[data-theme="dark"] .k-links .k-theme__to-dark { display: none; }
+  .has-js[data-theme="dark"] .k-links .k-theme__to-light { display: inline; }
+
+  .has-js .k-links .k-auth { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+  .has-js .k-links .k-auth .k-btn { height: 48px; padding: 0 12px; }
+  .has-js .k-links .k-avatar { width: 100%; height: 48px; margin-top: 16px; border-radius: 999px; gap: 10px; font: 600 16px/1 var(--k-body); }
+  .has-js .k-links .k-avatar__initial { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: rgba(255, 255, 255, .55); font-family: var(--k-display); font-size: 16px; }
+}
+
 /* ---------- Footer ---------- */
 .k-footer { background: var(--k-white); color: var(--k-ink-2); font-family: var(--k-body); border-top: 1px solid var(--k-line); }
 
@@ -1884,6 +1948,7 @@ select.k-input { appearance: auto; }
 
 @media (prefers-reduced-motion: reduce) {
   .k-btn, .k-genre, .k-chip, .k-cover, .k-search, .k-bookshelf__book, .k-bookshelf__img { transition: none; }
+  .k-search-panel, .k-links { animation: none !important; }
   .k-bookshelf__book { animation: none; }
   .k-book__cover:hover .k-cover, .k-pick:hover .k-cover { transform: none; }
   .k-bookshelf__book:hover { translate: none; }

@@ -38,12 +38,12 @@
 
 /* under the stage (38.5% of the card's width tall): stars, name, price. The price sits at the bottom so every card in a row lines up.
    The sizes have floors so the words stay readable on a very narrow card, and the name keeps to two lines. */
-.fl .k-book__info { flex: 1; display: flex; flex-direction: column; gap: 0; padding: 2cqw 5cqw 7cqw; }
-.fl .k-book__rating { display: flex; align-items: center; height: 6cqw; margin-bottom: 4cqw; }
+.fl .k-book__info { flex: 1; display: flex; flex-direction: column; gap: 0; padding: max(2cqw, 6px) max(5cqw, 12px) max(7cqw, 14px); }
+.fl .k-book__rating { display: flex; align-items: center; height: max(6cqw, 16px); margin-bottom: max(4cqw, 8px); }
 .fl .k-book__rating .k-stars { font-size: clamp(14px, 5cqw, 22px); letter-spacing: .5cqw; background-image: linear-gradient(90deg, #ffd60a var(--pct, 0%), color-mix(in srgb, var(--k-ink) 14%, var(--k-white)) var(--pct, 0%)); }
 .fl .k-book__rating-n { display: none; }
 .fl .k-book__title { font-family: var(--k-body); font-size: clamp(15px, 5.9cqw, 24px); font-weight: 400; line-height: 1.3; letter-spacing: .03em; }
-.fl .k-book__price { margin-top: auto; padding-top: 4cqw; font: 700 clamp(16px, 6.15cqw, 26px)/1.2 var(--k-body); letter-spacing: 0; font-variant-numeric: tabular-nums; }
+.fl .k-book__price { margin-top: auto; padding-top: max(4cqw, 8px); font: 700 clamp(16px, 6.15cqw, 26px)/1.2 var(--k-body); letter-spacing: 0; font-variant-numeric: tabular-nums; }
 
 /* the heart and Add to Cart sit on the stage. They fade in on hover or keyboard focus; on a touch screen (no hover) they are always there. */
 .fl .k-wish { top: 14px; right: 14px; transition: opacity .2s; }
@@ -65,6 +65,26 @@
   .fl .k-book, .fl .k-book__cover .k-cover, .fl .k-wish, .fl .k-book__add { transition: none; }
   .fl .k-book:hover .k-cover { transform: none; }
   .fl .k-book__add { transform: translate(-50%, 0); }
+}
+
+/* ---------- phones: two cards across, and Add to Cart becomes a small round button in the corner of the stage ----------
+   (the cards size their insides from their own width, see above, so they stay in proportion; the type has floors so it stays readable) */
+.k-book__add-icon { display: none; }
+@media (max-width: 640px) {
+  .fl-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .fl .k-book { border-radius: 14px; }
+  .fl .k-book__cover { padding-bottom: 12cqw; }
+  .fl .k-book__cover .k-cover { width: 62%; }
+  .fl .k-wish { top: 8px; right: 8px; }
+  .fl .k-wish__btn { width: 36px; height: 36px; }
+  .fl .k-book .k-book__add,
+  .fl .k-book:hover .k-book__add,
+  .fl .k-book:focus-within .k-book__add { left: auto; right: 8px; bottom: 8px; transform: none; }
+  .fl .k-book__add .k-btn { width: 40px; height: 40px; padding: 0; }
+  .fl .k-book__add [data-add-label] { display: none; }
+  .fl .k-book__add .k-book__add-icon--cart { display: block; }
+  .fl .k-book__add .is-added .k-book__add-icon--cart { display: none; }
+  .fl .k-book__add .is-added .k-book__add-icon--done { display: block; }
 }
 
 @media (max-width: 600px) {

@@ -485,7 +485,18 @@ function k_book_card(array $b, string $cta = 'outline'): void
                 data-title="<?php echo htmlspecialchars($b['title']); ?>" data-cover="<?php echo htmlspecialchars($cover_url); ?>">
                 <input type="hidden" name="quantity" value="1">
                 <button type="submit" name="add_to_cart" class="k-btn k-btn--primary"
-                    aria-label="Add to Cart: <?php echo htmlspecialchars($b['title']); ?>"><span data-add-label>Add to Cart</span></button>
+                    aria-label="Add to Cart: <?php echo htmlspecialchars($b['title']); ?>">
+                    <?php // the two icons only show on phones, where the button is a small round one instead of the "Add to Cart" pill (flat.css) ?>
+                    <svg class="k-book__add-icon k-book__add-icon--cart" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 4h2.2l2.1 10.2a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1L20.5 8H6.2" />
+                        <circle cx="9.5" cy="19.5" r="1.4" />
+                        <circle cx="17" cy="19.5" r="1.4" />
+                    </svg>
+                    <svg class="k-book__add-icon k-book__add-icon--done" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5" /></svg>
+                    <span data-add-label>Add to Cart</span>
+                </button>
             </form>
         </div>
         <div class="k-book__info">

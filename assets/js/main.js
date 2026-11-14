@@ -276,6 +276,60 @@ document.querySelectorAll('[data-theme-toggle]').forEach(function (button) {
     window.addEventListener('storage', show);
 });
 
+// Phone header: the search and the menu open as panels under the bar, one at a time. The buttons only show on phones
+// (assets/css/kitab.css, "Phone header"); without this script the header stays as it is on tablets.
+(function () {
+    var nav = document.querySelector('.k-nav');
+    var buttons = nav ? nav.querySelectorAll('[data-nav-toggle]') : [];
+    if (!buttons.length) {
+        return;
+    }
+    function opened() {
+        return nav.classList.contains('is-open-search') ? 'search' : (nav.classList.contains('is-open-menu') ? 'menu' : '');
+    }
+    function set(which, focusInput) {
+        nav.classList.toggle('is-open-search', which === 'search');
+        nav.classList.toggle('is-open-menu', which === 'menu');
+        buttons.forEach(function (b) {
+            b.setAttribute('aria-expanded', b.getAttribute('data-nav-toggle') === which ? 'true' : 'false');
+        });
+        var input = nav.querySelector('.k-search input');
+        if (which === 'search' && focusInput && input) {
+            input.focus();
+        }
+    }
+    buttons.forEach(function (b) {
+        b.addEventListener('click', function () {
+            var which = b.getAttribute('data-nav-toggle');
+            set(opened() === which ? '' : which, true);
+        });
+    });
+    // a tap on the dimmed page (outside the bar and its panels) closes the panel, and so does Escape
+    document.addEventListener('click', function (e) {
+        if (opened() && !e.target.closest('.k-nav__inner')) {
+            set('');
+        }
+    });
+    document.addEventListener('keydown', function (e) {
+        var which = opened();
+        if (e.key === 'Escape' && which) {
+            set('');
+            var back = nav.querySelector('[data-nav-toggle="' + which + '"]');
+            if (back) {
+                back.focus();
+            }
+        }
+    });
+    // turning the phone sideways (or widening the window) leaves the phone layout: close whatever is open
+    if (window.matchMedia) {
+        var wide = window.matchMedia('(min-width: 641px)');
+        var closeWhenWide = function (e) { if (e.matches) { set(''); } };
+        if (wide.addEventListener) { wide.addEventListener('change', closeWhenWide); }
+    }
+    // coming back with the browser's Back button must not find a panel still open
+    window.addEventListener('pageshow', function () { set(''); });
+})();
+
 // Shop controls: the sort applies at once, and empty price boxes (and the default sort) stay out of the address
 document.querySelectorAll('form[data-shop-tools]').forEach(function (form) {
     var skipped = [];
@@ -288,6 +342,18 @@ document.querySelectorAll('form[data-shop-tools]').forEach(function (form) {
             }
         });
     });
+    // phones: the "Price" button shows or hides the price boxes (the button itself only shows on phones, see shop-flat.css)
+    var filterButton = form.querySelector('[data-filter-toggle]');
+    if (filterButton) {
+        filterButton.addEventListener('click', function () {
+            var open = form.classList.toggle('is-filters-open');
+            filterButton.setAttribute('aria-expanded', open ? 'true' : 'false');
+            var first = form.querySelector('.gs-price input');
+            if (open && first) {
+                first.focus();
+            }
+        });
+    }
     form.addEventListener('submit', function (event) {
         if (event.defaultPrevented) {
             return; // a price box has a message under it: nothing is sent, so nothing is switched off
@@ -314,23 +380,22 @@ document.querySelectorAll('form[data-shop-tools]').forEach(function (form) {
 // Add to cart without leaving the page: the book goes in, the cart badge pops and a message slides in with "View cart".
 // Without JavaScript the form posts normally and comes back to the book, which shows the same message once.
 function bumpCartBadge(count) {
-    var link = document.querySelector('.k-links a.k-cart:not(.k-cart--wish)');
-    if (!link) {
-        return;
-    }
-    var badge = link.querySelector('.k-cart__badge');
-    if (!badge) {
-        badge = document.createElement('span');
-        badge.className = 'k-cart__badge';
-        link.appendChild(badge);
-    }
-    if (typeof count === 'number') {
-        badge.textContent = count;
-        link.setAttribute('aria-label', 'Cart, ' + count + (count === 1 ? ' item' : ' items'));
-    }
-    badge.classList.remove('k-cart__badge--bump');
-    void badge.offsetWidth; // lets the animation start again when a book is added twice in a row
-    badge.classList.add('k-cart__badge--bump');
+    // two cart links in the header: the one beside the menu links (wide screens) and the one in the phone bar; only one shows at a time
+    document.querySelectorAll('.k-nav a.k-cart:not(.k-cart--wish)').forEach(function (link) {
+        var badge = link.querySelector('.k-cart__badge');
+        if (!badge) {
+            badge = document.createElement('span');
+            badge.className = 'k-cart__badge';
+            link.appendChild(badge);
+        }
+        if (typeof count === 'number') {
+            badge.textContent = count;
+            link.setAttribute('aria-label', 'Cart, ' + count + (count === 1 ? ' item' : ' items'));
+        }
+        badge.classList.remove('k-cart__badge--bump');
+        void badge.offsetWidth; // lets the animation start again when a book is added twice in a row
+        badge.classList.add('k-cart__badge--bump');
+    });
 }
 
 // Sets up a message that is already in the page (shown by the server or built just now): close button, auto-dismiss
@@ -444,7 +509,8 @@ document.querySelectorAll('form[data-add-form]').forEach(function (form) {
                 showCartToast(form.dataset.title, form.dataset.cover, data.added);
                 if (label) {
                     label.textContent = 'Added';
-                    setTimeout(function () { label.textContent = normal; }, 1800);
+                    button.classList.add('is-added'); // on phones the button has no words: this swaps the cart icon for a tick
+                    setTimeout(function () { label.textContent = normal; button.classList.remove('is-added'); }, 1800);
                 }
                 button.disabled = false;
             })

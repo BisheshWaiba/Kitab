@@ -41,11 +41,33 @@
   .gs-price .gs-num { flex: 1 1 120px; min-width: 0; width: auto; }
 }
 
-/* on phones the chips scroll sideways in one row; the padding leaves room for the glass shadows */
+/* the "Price" button and the short "Sort:" label are for phones only (below) */
+.gs-filterbtn,
+.gs-sort__short { display: none; }
+.gs-filterbtn { gap: 8px; }
+.gs-filterbtn__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--k-red); }
+
+/* on phones the chips scroll sideways in one row (the padding leaves room for the glass shadows), the heading is smaller, and the
+   controls take two short rows: "18 books", then Sort and Price side by side. The price boxes open under them (the Price button
+   needs scripts; without them the boxes simply stay in view). */
 @media (max-width: 640px) {
-  .gs-head { padding-top: 36px; }
+  .gs-head { padding-top: 24px; padding-bottom: 16px; }
+  .gs-head .fl-h1 { font-size: 34px; }
+  .gs-head .fl-sub { margin-top: 4px; font-size: 15px; }
   .fl .k-cats { flex-wrap: nowrap; overflow-x: auto; margin: -6px -20px -8px; padding: 6px 20px 18px; scrollbar-width: none; }
   .fl .k-cats::-webkit-scrollbar { display: none; }
   .fl .k-cats li { flex: 0 0 auto; }
   .gs-main { padding-bottom: 48px; }
+
+  .gs-controls { margin: 12px 0 18px; gap: 10px; }
+  .gs-count { font-size: 14px; }
+  .gs-count strong { font-size: 15px; }
+  .gs-sort__lead { display: none; }
+  .gs-sort__short { display: inline; }
+  .gs-sort__text { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .has-js .gs-tools { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: stretch; }
+  .has-js .gs-sort { height: 44px; padding: 0 14px 0 18px; min-width: 0; }
+  .has-js .gs-filterbtn { display: inline-flex; height: 44px; padding: 0 16px; }
+  .has-js .gs-price { grid-column: 1 / -1; }
+  .has-js .gs-tools:not(.is-filters-open) .gs-price { display: none; }
 }

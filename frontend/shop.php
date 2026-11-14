@@ -153,7 +153,9 @@ if ($min_price !== null && $max_price !== null) {
             <?php if ($notes): ?><span>&middot; <?php echo htmlspecialchars(implode(' · ', $notes)); ?></span><?php endif; ?>
         </p>
 
-        <form method="GET" action="shop.php" class="gs-tools" data-shop-tools data-validate>
+        <?php $price_active = $min_price !== null || $max_price !== null; ?>
+        <?php // On phones the price boxes sit behind a "Price" button (shown only with scripts on); they are open from the start while a price range is applied. ?>
+        <form method="GET" action="shop.php" class="gs-tools<?php echo $price_active ? ' is-filters-open' : ''; ?>" data-shop-tools data-validate>
             <?php foreach (['search' => $search_text, 'author' => $author_filter, 'category' => $active_category] as $name => $value): ?>
                 <?php if ($value !== ''): ?>
                     <input type="hidden" name="<?php echo $name; ?>" value="<?php echo htmlspecialchars($value); ?>">
@@ -161,7 +163,7 @@ if ($min_price !== null && $max_price !== null) {
             <?php endforeach; ?>
 
             <label class="gs-sort">
-                <span aria-hidden="true">Sort by: <?php echo htmlspecialchars(str_replace(': ', ', ', $sorts[$sort][0])); ?></span>
+                <span class="gs-sort__text" aria-hidden="true"><span class="gs-sort__lead">Sort by: </span><span class="gs-sort__short">Sort: </span><?php echo htmlspecialchars(str_replace(': ', ', ', $sorts[$sort][0])); ?></span>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                     stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
                 <select name="sort" class="gs-select" aria-label="Sort by" data-autosubmit>
@@ -171,7 +173,14 @@ if ($min_price !== null && $max_price !== null) {
                 </select>
             </label>
 
-            <div class="gs-price" role="group" aria-labelledby="gs-price-label">
+            <button type="button" class="k-btn k-btn--outline gs-filterbtn" data-filter-toggle aria-expanded="<?php echo $price_active ? 'true' : 'false'; ?>" aria-controls="gs-price-panel">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10" /><circle cx="16" cy="7" r="2" /><circle cx="8" cy="17" r="2" /></svg>
+                <span>Price</span>
+                <?php if ($price_active): ?><span class="gs-filterbtn__dot" aria-hidden="true"></span><span class="k-sr">(range applied)</span><?php endif; ?>
+            </button>
+
+            <div class="gs-price" id="gs-price-panel" role="group" aria-labelledby="gs-price-label">
                 <span id="gs-price-label" class="gs-price__label">Price (Rs.)</span>
                 <input type="number" name="min" class="k-input gs-num" min="0" step="any" inputmode="numeric"
                     placeholder="<?php echo (int) $price_lo; ?>" aria-label="Lowest price" data-msg-invalid="Enter a lowest price of 0 or more."
@@ -181,7 +190,7 @@ if ($min_price !== null && $max_price !== null) {
                     placeholder="<?php echo (int) $price_hi; ?>" aria-label="Highest price" data-msg-invalid="Enter a highest price of 0 or more."
                     value="<?php echo $max_price !== null ? $plain($max_price) : ''; ?>">
                 <button type="submit" class="k-btn k-btn--outline k-btn--sm">Apply</button>
-                <?php if ($min_price !== null || $max_price !== null): ?>
+                <?php if ($price_active): ?>
                     <a href="<?php echo htmlspecialchars($build(['min' => null, 'max' => null])); ?>" class="gs-clear">Clear price</a>
                 <?php endif; ?>
             </div>

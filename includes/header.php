@@ -27,6 +27,7 @@ $user_initial = isset($_SESSION['user_name']) ? strtoupper(mb_substr($_SESSION['
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <?php require __DIR__ . '/theme.php'; ?>
+    <script>document.documentElement.classList.add('has-js');</script>
     <title><?php echo isset($page_title) ? htmlspecialchars($page_title) . ' - KITAB' : 'KITAB - Premium Book Store'; ?></title>
 <?php require __DIR__ . '/favicon.php'; ?>
 <?php require __DIR__ . '/share_meta.php'; ?>
@@ -52,19 +53,52 @@ $user_initial = isset($_SESSION['user_name']) ? strtoupper(mb_substr($_SESSION['
         <div class="k-nav__inner">
             <a href="<?php echo BASE_URL; ?>index.php" class="k-logo">KITAB<span>.</span></a>
 
-            <form action="<?php echo BASE_URL; ?>frontend/shop.php" method="GET" class="k-search" role="search">
-                <button type="submit" class="k-search__btn" aria-label="Search">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            <?php $cart_say = 'Cart' . ($cart_count > 0 ? ', ' . $cart_count . ' items' : ''); ?>
+            <?php // Phones only (assets/css/kitab.css, "Phone header"): the bar holds search, cart and a menu button; search and the links open as panels under it. ?>
+            <div class="k-navbar">
+                <button type="button" class="k-cart k-navbtn" data-nav-toggle="search" aria-expanded="false" aria-controls="k-search-panel" aria-label="Search">
+                    <svg class="k-navbtn__open" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <circle cx="11" cy="11" r="7" />
                         <path d="m20 20-3.5-3.5" />
                     </svg>
+                    <svg class="k-navbtn__close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
                 </button>
-                <input type="text" name="search" placeholder="Search books..." aria-label="Search books"
-                    value="<?php echo is_string($_GET['search'] ?? null) ? htmlspecialchars($_GET['search']) : ''; ?>">
-            </form>
+                <a href="<?php echo BASE_URL; ?>frontend/cart.php" class="k-cart k-cart--bar" aria-label="<?php echo $cart_say; ?>">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 4h2.2l2.1 10.2a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1L20.5 8H6.2" />
+                        <circle cx="9.5" cy="19.5" r="1.4" />
+                        <circle cx="17" cy="19.5" r="1.4" />
+                    </svg>
+                    <?php if ($cart_count > 0): ?>
+                        <span class="k-cart__badge"><?php echo $cart_count; ?></span>
+                    <?php endif; ?>
+                </a>
+                <button type="button" class="k-cart k-navbtn" data-nav-toggle="menu" aria-expanded="false" aria-controls="k-links" aria-label="Menu">
+                    <svg class="k-navbtn__open" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+                    <svg class="k-navbtn__close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+                </button>
+            </div>
 
-            <nav class="k-links" aria-label="Main">
+            <div class="k-search-panel" id="k-search-panel">
+                <form action="<?php echo BASE_URL; ?>frontend/shop.php" method="GET" class="k-search" role="search">
+                    <button type="submit" class="k-search__btn" aria-label="Search">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="11" cy="11" r="7" />
+                            <path d="m20 20-3.5-3.5" />
+                        </svg>
+                    </button>
+                    <input type="text" name="search" placeholder="Search books..." aria-label="Search books"
+                        value="<?php echo is_string($_GET['search'] ?? null) ? htmlspecialchars($_GET['search']) : ''; ?>">
+                </form>
+            </div>
+
+            <nav class="k-links" id="k-links" aria-label="Main">
                 <a href="<?php echo BASE_URL; ?>index.php"
                     class="k-link<?php echo $nav_home ? ' is-active' : ''; ?>">Home</a>
                 <a href="<?php echo BASE_URL; ?>frontend/shop.php"
@@ -77,11 +111,12 @@ $user_initial = isset($_SESSION['user_name']) ? strtoupper(mb_substr($_SESSION['
                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21.2l7.8-7.7 1-1.1a5.5 5.5 0 0 0 0-7.8z" />
                     </svg>
+                    <span class="k-links__label">Wishlist</span>
                     <?php if ($wish_count > 0): ?>
                         <span class="k-cart__badge"><?php echo $wish_count; ?></span>
                     <?php endif; ?>
                 </a>
-                <a href="<?php echo BASE_URL; ?>frontend/cart.php" class="k-cart" aria-label="Cart<?php echo $cart_count > 0 ? ', ' . $cart_count . ' items' : ''; ?>">
+                <a href="<?php echo BASE_URL; ?>frontend/cart.php" class="k-cart" aria-label="<?php echo $cart_say; ?>">
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M3 4h2.2l2.1 10.2a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1L20.5 8H6.2" />
@@ -94,7 +129,8 @@ $user_initial = isset($_SESSION['user_name']) ? strtoupper(mb_substr($_SESSION['
                 </a>
                 <?php if (isset($_SESSION['user_id'])): ?>
                     <a href="<?php echo BASE_URL; ?>frontend/profile.php" class="k-avatar" aria-label="My account">
-                        <?php echo htmlspecialchars($user_initial); ?>
+                        <span class="k-avatar__initial"><?php echo htmlspecialchars($user_initial); ?></span>
+                        <span class="k-links__label">My account</span>
                     </a>
                 <?php else: ?>
                     <div class="k-auth">
@@ -102,6 +138,20 @@ $user_initial = isset($_SESSION['user_name']) ? strtoupper(mb_substr($_SESSION['
                         <a href="<?php echo BASE_URL; ?>frontend/register.php" class="k-btn k-btn--primary k-btn--sm">Sign Up</a>
                     </div>
                 <?php endif; ?>
+                <?php // the same switch again, as a row of the phone menu (the one beside the links is hidden on phones) ?>
+                <button type="button" class="k-theme k-theme--row" data-theme-toggle aria-pressed="false" aria-label="Dark mode">
+                    <svg class="k-theme__moon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M20 14.6A8.4 8.4 0 0 1 9.4 4a8.4 8.4 0 1 0 10.6 10.6Z" />
+                    </svg>
+                    <svg class="k-theme__sun" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="4" />
+                        <path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4" />
+                    </svg>
+                    <span class="k-links__label k-theme__to-dark">Dark mode</span>
+                    <span class="k-links__label k-theme__to-light">Light mode</span>
+                </button>
             </nav>
             <button type="button" class="k-theme" data-theme-toggle aria-pressed="false" aria-label="Dark mode" title="Switch between light and dark">
                 <svg class="k-theme__moon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
