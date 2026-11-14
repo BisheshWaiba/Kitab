@@ -694,3 +694,87 @@ document.querySelectorAll('.k-chip[data-target]').forEach(function (chip) {
         stage.style.setProperty('--py', '0px');
     });
 })();
+
+// Book page reviews. Choosing in the Sort or Filter list reloads the reviews at once (no Apply button; without scripts the form shows
+// one). A choice that means "no change" is left out of the address so it stays short.
+document.querySelectorAll('form[data-review-tools]').forEach(function (form) {
+    var skipped = [];
+    form.querySelectorAll('select[data-autosubmit]').forEach(function (select) {
+        select.addEventListener('change', function () {
+            form.querySelectorAll('select[data-autosubmit]').forEach(function (s) {
+                if (s.value === '' || s.value === 'default') {
+                    s.disabled = true;
+                    skipped.push(s);
+                }
+            });
+            form.submit();
+        });
+    });
+    // coming back with the browser's Back button must not find them still switched off
+    window.addEventListener('pageshow', function () {
+        skipped.forEach(function (s) { s.disabled = false; });
+        skipped = [];
+    });
+});
+
+// The thumbs-up under a review: the vote is sent in the background and the number changes in place. If anything about that fails
+// (or you are not logged in) the form is simply sent the ordinary way, so it always works.
+document.querySelectorAll('form[data-helpful]').forEach(function (form) {
+    var busy = false;
+    form.addEventListener('submit', function (event) {
+        if (!window.fetch) {
+            return; // an old browser just sends the form
+        }
+        event.preventDefault();
+        if (busy) {
+            return;
+        }
+        busy = true;
+        var button = form.querySelector('.gr-helpful');
+        fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            credentials: 'same-origin',
+            headers: { 'Accept': 'application/json' }
+        }).then(function (response) {
+            return response.json();
+        }).then(function (data) {
+            if (!data || !data.ok) {
+                throw new Error('not counted');
+            }
+            button.classList.toggle('is-on', !!data.on);
+            button.setAttribute('aria-pressed', data.on ? 'true' : 'false');
+            button.setAttribute('aria-label', 'Mark this review as helpful (' + data.count + ' so far)');
+            button.querySelector('.gr-helpful__n').textContent = data.count;
+            busy = false;
+        }).catch(function () {
+            HTMLFormElement.prototype.submit.call(form);
+        });
+    });
+});
+
+// A review's ⋮ menu closes when you click anywhere else, press Escape, or pick "Edit review"
+(function () {
+    var menus = document.querySelectorAll('details.gr-menu');
+    if (!menus.length) {
+        return;
+    }
+    document.addEventListener('click', function (e) {
+        menus.forEach(function (menu) {
+            if (menu.open && (!menu.contains(e.target) || e.target.closest('a.gr-menu__item'))) {
+                menu.open = false;
+            }
+        });
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') {
+            return;
+        }
+        menus.forEach(function (menu) {
+            if (menu.open) {
+                menu.open = false;
+                menu.querySelector('summary').focus();
+            }
+        });
+    });
+})();

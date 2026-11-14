@@ -6,6 +6,7 @@
 
 const REVIEW_MAX_COMMENT = 1000;
 const REVIEW_PAGE_SIZE = 20;   // reviews shown before "Show all"
+const REVIEW_SORTS = ['default' => 'Default', 'newest' => 'Newest', 'high' => 'Highest rating', 'low' => 'Lowest rating'];
 
 // "Bishesh Waiba" -> "Bishesh W.": reviews are public, so only the first name and last initial are shown
 function k_review_name(string $full): string
@@ -42,6 +43,20 @@ function k_reviews_ready(mysqli $conn): void
         return;
     }
     $done = true;
+    // "Helpful" votes (the thumbs-up under a review): one per person per review, gone when the review or the person is
+    $helpful = "CREATE TABLE IF NOT EXISTS review_helpful (
+        review_id INT NOT NULL, user_id INT NOT NULL, created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (review_id, user_id), KEY user_id (user_id)%s
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+    try {
+        $conn->query(sprintf($helpful, ", CONSTRAINT fk_helpful_review FOREIGN KEY (review_id) REFERENCES reviews (id) ON DELETE CASCADE, CONSTRAINT fk_helpful_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE"));
+    } catch (Throwable $e) {
+        try {
+            $conn->query(sprintf($helpful, '')); // a database that refuses the links still gets the table
+        } catch (Throwable $e2) {
+            error_log('KITAB: could not create review_helpful: ' . $e2->getMessage());
+        }
+    }
     $has = $conn->query("SHOW INDEX FROM reviews WHERE Key_name = 'user_book'");
     if ($has && $has->num_rows === 0) {
         try {
@@ -69,21 +84,41 @@ function k_review_summary(mysqli $conn, int $book_id): array
     return [$count, $count > 0 ? $sum / $count : 0.0, $by_rating];
 }
 
-// The published reviews, newest first
-// (each review also says whether its writer has bought the book: an order of theirs that was not cancelled contains it)
-function k_review_list(mysqli $conn, int $book_id, int $limit): array
+// The published reviews. $sort is one of REVIEW_SORTS (the default puts the most helpful first), $stars keeps only that rating
+// (0 = all), $viewer_id lets each review say whether this visitor already marked it helpful. Each review also says whether its
+// writer has bought the book (an order of theirs that was not cancelled contains it) and how many people found it helpful.
+function k_review_list(mysqli $conn, int $book_id, int $limit, string $sort = 'default', int $stars = 0, int $viewer_id = 0): array
 {
+    k_reviews_ready($conn);
+    $order = [
+        'newest' => 'r.created_at DESC, r.id DESC',
+        'high' => 'r.rating DESC, r.created_at DESC, r.id DESC',
+        'low' => 'r.rating ASC, r.created_at DESC, r.id DESC',
+    ][$sort] ?? 'helpful DESC, r.created_at DESC, r.id DESC';
+    $only = ($stars >= 1 && $stars <= 5) ? ' AND r.rating = ' . $stars : '';
     $stmt = $conn->prepare(
         "SELECT r.id, r.user_id, r.rating, r.comment, r.created_at, u.name,
                 EXISTS (SELECT 1 FROM orders o JOIN order_items oi ON oi.order_id = o.id
-                        WHERE o.user_id = r.user_id AND oi.book_id = r.book_id AND o.status <> 'cancelled') AS verified
+                        WHERE o.user_id = r.user_id AND oi.book_id = r.book_id AND o.status <> 'cancelled') AS verified,
+                (SELECT COUNT(*) FROM review_helpful h WHERE h.review_id = r.id) AS helpful,
+                EXISTS (SELECT 1 FROM review_helpful h WHERE h.review_id = r.id AND h.user_id = ?) AS voted
          FROM reviews r LEFT JOIN users u ON u.id = r.user_id
-         WHERE r.book_id = ? AND r.status = 'approved'
-         ORDER BY r.created_at DESC, r.id DESC LIMIT ?"
+         WHERE r.book_id = ? AND r.status = 'approved'$only
+         ORDER BY $order LIMIT ?"
     );
-    $stmt->bind_param("ii", $book_id, $limit);
+    $stmt->bind_param("iii", $viewer_id, $book_id, $limit);
     $stmt->execute();
     return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
+
+// How many published reviews there are, all of them or only those with $stars stars (for "Show all N reviews")
+function k_review_count(mysqli $conn, int $book_id, int $stars = 0): int
+{
+    $only = ($stars >= 1 && $stars <= 5) ? ' AND rating = ' . $stars : '';
+    $stmt = $conn->prepare("SELECT COUNT(*) FROM reviews WHERE book_id = ? AND status = 'approved'$only");
+    $stmt->bind_param("i", $book_id);
+    $stmt->execute();
+    return (int) $stmt->get_result()->fetch_row()[0];
 }
 
 // This person's own review of the book (in any state), or null

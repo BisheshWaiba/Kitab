@@ -49,41 +49,79 @@
 .gp-trust svg { color: var(--k-ink); }
 .gp-trust a { text-decoration: underline; text-underline-offset: 3px; }
 
-/* ---------- reviews: a summary card on the left (the average, how the stars are spread, the form) and the reviews as cards on the right ---------- */
-.fl .k-reviews { padding-top: 8px; padding-bottom: 64px; }
-.fl .k-reviews .k-h2 { display: flex; align-items: center; gap: 14px; }
-.k-reviews__n { display: inline-grid; place-items: center; min-width: 34px; height: 34px; padding: 0 12px; box-sizing: border-box; border-radius: 999px; background: var(--k-band); border: 1px solid var(--k-line); font: 600 15px/1 var(--k-body); color: var(--k-ink-2); font-variant-numeric: tabular-nums; }
+/* ---------- reviews: laid out like a marketplace review page. The score and one bar per star count on top, a bar with Sort and Filter,
+   then the reviews as plain rows (stars, who, what they wrote, a thumbs-up and a menu). No cards, just hairlines. ---------- */
+.fl .gr { --gr-gold: #FFC93C; --gr-empty: color-mix(in srgb, var(--k-ink) 12%, transparent); --gr-track: color-mix(in srgb, var(--k-ink) 7%, var(--k-white)); gap: 0; padding-top: 0; padding-bottom: 72px; }
+.gr .k-stars { background: linear-gradient(90deg, var(--gr-gold) var(--pct, 0%), var(--gr-empty) var(--pct, 0%)); -webkit-background-clip: text; background-clip: text; }
 
-/* the summary: the average in the display type, the stars, and one gold bar per star count */
-.fl .k-ratingbox,
-.fl .k-reviewform { border-radius: 20px; }
-.fl .k-ratingbox__num { display: flex; align-items: baseline; gap: 8px; }
-.fl .k-ratingbox__num small { font: 500 18px/1 var(--k-body); letter-spacing: 0; color: var(--k-muted); }
-.fl .k-ratingbox__count { font-size: 14px; }
-.fl .k-bars li { grid-template-columns: 54px minmax(0, 1fr) 24px; }
-.fl .k-bars__track { height: 8px; background: color-mix(in srgb, var(--k-ink) 9%, transparent); }
-.fl .k-bars__fill { background: linear-gradient(90deg, #F7C95B, #EFB335); }
+/* the score: 4.2/5, big stars, "20 Ratings", and next to it the bars (each row is a link that filters the reviews to that rating) */
+.gr-summary { display: grid; grid-template-columns: 300px 380px; gap: 28px 56px; align-items: start; padding: 40px 0 36px; }
+.gr-score { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.gr-score__num { margin: 0; font: 400 64px/1 var(--k-body); letter-spacing: -.02em; color: var(--k-ink); }
+.gr-score__num small { font-size: 34px; letter-spacing: 0; color: var(--k-muted); }
+.gr-score .k-stars { margin-top: 6px; font-size: 42px; letter-spacing: 2px; }
+.gr-score__n { margin: 4px 0 0; font-size: 14px; color: var(--k-muted); }
+.gr-score__none { margin: 0; font: 400 26px/1.2 var(--k-body); color: var(--k-ink-2); }
+.gr-score__link { margin-top: 10px; font-size: 14px; font-weight: 600; color: var(--k-ink); text-decoration: underline; text-underline-offset: 3px; }
+.gr-bars { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.gr-bars__row { display: grid; grid-template-columns: auto minmax(0, 1fr) 40px; align-items: center; gap: 22px; color: var(--k-ink); }
+.gr-bars .k-stars { font-size: 19px; letter-spacing: 1px; }
+.gr-track { height: 14px; border-radius: 2px; background: var(--gr-track); overflow: hidden; }
+.gr-fill { display: block; height: 100%; background: var(--gr-gold); }
+.gr-n { font-size: 14px; font-variant-numeric: tabular-nums; }
+.gr-bars__row:hover .gr-n { text-decoration: underline; }
+.gr-bars__row:focus-visible, .gr-score__link:focus-visible { outline: 3px solid var(--k-accent); outline-offset: 3px; border-radius: 2px; }
 
-/* one review: a round gold initial, the name (with a green "Verified purchase" when they bought the book), the date on the right,
-   the stars, then what they wrote. A review with no words is one slim row instead of a card with an empty body. */
-.fl .k-reviewlist { gap: 14px; }
-.fl .k-review,
-.fl .k-review:first-child { display: flex; align-items: flex-start; gap: 16px; padding: 22px 24px; border: 1px solid var(--k-line); border-radius: 18px; background: var(--k-white); transition: border-color .2s, box-shadow .2s; }
-@media (hover: hover) { .fl .k-review:hover { border-color: color-mix(in srgb, var(--k-ink) 22%, var(--k-line)); box-shadow: 0 14px 28px -22px rgba(17, 18, 20, .45); } }
-.k-review__avatar { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; font: 600 18px/1 var(--k-display); color: #1B130A; background: linear-gradient(180deg, #FBD774, #EFB335); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6); }
-.k-review__body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
-.k-review__head { width: 100%; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 14px; }
-.k-review__who-line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; min-width: 0; }
-.fl .k-review__who { font-size: 16px; font-weight: 600; }
-.k-review__verified { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: var(--k-ok); }
-.fl .k-review__date { font-size: 13px; color: var(--k-muted); }
-.fl .k-review .k-stars { font-size: 15px; letter-spacing: 1px; }
-.fl .k-review__text { margin: 4px 0 0; max-width: 62ch; font-size: 16px; line-height: 1.65; color: var(--k-ink-2); }
+/* the bar between: "Product Reviews" on the left, Sort and Filter on the right (each is a cell with a real list lying invisibly over it) */
+.gr-bar { display: flex; align-items: stretch; justify-content: space-between; border-top: 1px solid var(--k-line); border-bottom: 1px solid var(--k-line); }
+.gr-bar__title { margin: 0; display: flex; align-items: center; min-height: 56px; font: 400 17px/1 var(--k-body); color: var(--k-ink); }
+.gr-tools { display: flex; margin: 0; }
+.gr-tool { position: relative; display: flex; align-items: center; gap: 9px; min-height: 56px; padding: 0 24px; box-sizing: border-box; border-left: 1px solid var(--k-line); font-size: 15px; color: var(--k-muted); white-space: nowrap; cursor: pointer; transition: background-color .15s; }
+.gr-tool strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; font-weight: 400; color: var(--k-ink); }
+.gr-tool svg { flex: none; color: var(--k-muted); }
+.gr-tool:hover { background: var(--k-band); }
+.gr-select { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0; border: 0; opacity: 0; cursor: pointer; font-size: 16px; }
+.gr-tool:has(.gr-select:focus-visible) { outline: 3px solid var(--k-accent); outline-offset: -3px; }
 
-.fl .k-review--short { align-items: center; padding: 14px 20px; }
-.fl .k-review--short .k-review__avatar { width: 38px; height: 38px; font-size: 16px; }
-.fl .k-review--short .k-review__body { flex-direction: row; align-items: center; justify-content: space-between; gap: 6px 16px; }
-.fl .k-review--short .k-review__head { width: auto; flex-direction: column; align-items: flex-start; gap: 1px; }
+/* a review: stars (and the date), who wrote it, what they said, then the thumbs-up and, for their own reviews (and an admin), a menu */
+.gr-list { margin: 0; padding: 0; list-style: none; }
+.gr-item { padding: 22px 0 12px; border-bottom: 1px solid var(--k-line); }
+.gr-item__top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.gr-item .k-stars { font-size: 22px; letter-spacing: 1px; }
+.gr-item__date { font-size: 13px; color: var(--k-muted); }
+.gr-item__who { margin: 4px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 14px; color: var(--k-muted); }
+.gr-item__you { padding: 1px 9px; border-radius: 999px; border: 1px solid var(--k-line); background: var(--k-band); font-size: 12px; font-weight: 600; color: var(--k-ink-2); }
+.gr-item__verified { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: var(--k-ok); }
+.gr-item__text { margin: 14px 0 0; max-width: 78ch; font-size: 16px; line-height: 1.55; color: var(--k-ink); overflow-wrap: anywhere; }
+.gr-item__foot { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; min-height: 36px; }
+.gr-helpful-form { margin: 0; }
+.gr-helpful { display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 10px 0 0; border: 0; background: none; font: 400 14px/1 var(--k-body); color: var(--k-muted); cursor: pointer; transition: color .15s; }
+.gr-helpful:hover { color: var(--k-ink); }
+.gr-helpful.is-on { color: #D69A0C; }
+.gr-helpful:focus-visible { outline: 3px solid var(--k-accent); outline-offset: 2px; border-radius: 6px; }
+.gr-helpful--static { cursor: default; }
+.gr-helpful--static:hover { color: var(--k-muted); }
+.gr-menu { position: relative; margin-left: auto; }
+.gr-menu summary { list-style: none; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; color: var(--k-muted); cursor: pointer; }
+.gr-menu summary::-webkit-details-marker { display: none; }
+.gr-menu summary:hover, .gr-menu[open] summary { background: var(--k-band); color: var(--k-ink); }
+.gr-menu summary:focus-visible { outline: 3px solid var(--k-accent); outline-offset: 2px; }
+.gr-menu__panel { position: absolute; right: 0; bottom: calc(100% + 6px); z-index: 20; min-width: 190px; padding: 6px; border-radius: 12px; background: var(--k-white); border: 1px solid var(--k-line); box-shadow: 0 18px 36px -16px rgba(17, 18, 20, .45); }
+.gr-menu__panel form { margin: 0; }
+.gr-menu__item { display: block; width: 100%; box-sizing: border-box; padding: 10px 12px; border: 0; border-radius: 8px; background: none; text-align: left; font: 500 14px/1.2 var(--k-body); color: var(--k-ink); cursor: pointer; }
+.gr-menu__item:hover { background: var(--k-band); }
+.gr-menu__item--danger, .gr-menu__item--danger:hover { color: var(--k-red); }
+.gr-more { margin-top: 24px; }
+.gr-empty { margin: 0; padding: 36px 0; border-bottom: 1px solid var(--k-line); font-size: 16px; color: var(--k-muted); }
+.gr-empty a { color: var(--k-ink); text-decoration: underline; text-underline-offset: 3px; }
+
+/* writing one: a plain bordered box under the list */
+.gr-write { margin-top: 40px; max-width: 620px; padding: 28px; box-sizing: border-box; border: 1px solid var(--k-line); border-radius: 12px; }
+.gr-write__title { margin: 0 0 16px; font: 600 22px/1.2 var(--k-display); letter-spacing: -.01em; }
+.gr-write__form .gr-write__title { margin-bottom: 0; }
+.gr-write__note { margin: 0 0 18px; font-size: 16px; line-height: 1.6; color: var(--k-ink-2); }
+.gr-write__form { display: flex; flex-direction: column; gap: 20px; }
+.gr-write__actions { display: flex; gap: 12px; }
 
 /* the form: the word for the rating you have picked shows under the stars (which one shows is CSS: :has) */
 .k-rate__word { margin: 4px 0 0; min-height: 20px; font-size: 14px; font-weight: 600; color: var(--k-ink-2); }
@@ -93,6 +131,28 @@
 .k-rate:has(#rate3:checked) .k-rate__word [data-v="3"],
 .k-rate:has(#rate4:checked) .k-rate__word [data-v="4"],
 .k-rate:has(#rate5:checked) .k-rate__word [data-v="5"] { display: inline; }
+
+/* tablets and phones: the score above the bars; Sort and Filter share a row of their own */
+@media (max-width: 900px) {
+  .gr-summary { grid-template-columns: minmax(0, 1fr); gap: 28px; padding: 28px 0; }
+  .gr-bars { max-width: 460px; }
+  .gr-bar { flex-wrap: wrap; }
+  .gr-bar__title { width: 100%; min-height: 52px; }
+  .gr-tools { width: 100%; border-top: 1px solid var(--k-line); }
+  .gr-tool { flex: 1 1 auto; min-width: 0; min-height: 52px; padding: 0 16px; }
+  .gr-tool:first-of-type { border-left: 0; }
+}
+@media (max-width: 600px) {
+  .gr-score__num { font-size: 56px; }
+  .gr-score .k-stars { font-size: 38px; }
+  .gr-bars__row { gap: 14px; }
+  .gr-write { padding: 22px 18px; }
+}
+/* narrow phones: Sort and Filter show only the icon and the choice ("Highest rating", "5 star"), so even the longest fits side by side */
+@media (max-width: 480px) {
+  .gr-tool { gap: 8px; padding: 0 14px; }
+  .gr-tool__k { display: none; }
+}
 
 /* ---------- You May Also Like ---------- */
 .gp-related { padding-bottom: 80px; }
@@ -124,13 +184,9 @@
   .has-js .gp-bar, .has-js .gp-bar.is-on { transition: none; }
 }
 @media (max-width: 600px) {
-  .fl .k-review, .fl .k-review:first-child { gap: 12px; padding: 18px 16px; }
-  .k-review__avatar { width: 38px; height: 38px; font-size: 16px; }
-  .fl .k-review--short { padding: 12px 14px; }
-  .fl .k-review--short .k-review__body { flex-wrap: wrap; }
   .gp-stage { min-height: 400px; }
   .gp-price { font-size: 34px; }
-  .fl .k-reviews { padding-bottom: 48px; }
+  .fl .gr { padding-bottom: 48px; }
   .gp-related { padding-bottom: 56px; }
 }
 @media (max-width: 380px) {

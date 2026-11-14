@@ -91,8 +91,22 @@ if ($cart_toast && (int) $cart_toast['book'] !== (int) $book['id']) {
 // Reviews
 [$review_count, $review_avg, $review_dist] = k_review_summary($conn, (int) $book['id']);
 $show_all_reviews = ($_GET['reviews'] ?? '') === 'all';
-$reviews = k_review_list($conn, (int) $book['id'], $show_all_reviews ? 100000 : REVIEW_PAGE_SIZE);
 $viewer_id = (int) ($_SESSION['user_id'] ?? 0);
+// How the reviews are shown: sorted (rsort) and/or only one rating (rstars), both from the bar above the list
+$rsort = (is_string($_GET['rsort'] ?? null) && isset(REVIEW_SORTS[$_GET['rsort']])) ? $_GET['rsort'] : 'default';
+$rstars = in_array($_GET['rstars'] ?? '', ['1', '2', '3', '4', '5'], true) ? (int) $_GET['rstars'] : 0;
+$reviews = k_review_list($conn, (int) $book['id'], $show_all_reviews ? 100000 : REVIEW_PAGE_SIZE, $rsort, $rstars, $viewer_id);
+$review_shown_total = k_review_count($conn, (int) $book['id'], $rstars);
+// The address of this page with some of those choices changed ('' removes one), back at the reviews
+$rlink = function (array $change = []) use ($book, $rsort, $rstars, $show_all_reviews): string {
+    $q = array_merge([
+        'id' => (int) $book['id'],
+        'rsort' => $rsort !== 'default' ? $rsort : '',
+        'rstars' => $rstars > 0 ? (string) $rstars : '',
+        'reviews' => $show_all_reviews ? 'all' : '',
+    ], $change);
+    return 'product.php?' . htmlspecialchars(http_build_query(array_filter($q, fn($v) => $v !== '' && $v !== null)), ENT_QUOTES) . '#reviews';
+};
 $viewer_is_admin = ($_SESSION['user_role'] ?? '') === 'admin';
 $my_review = $viewer_id > 0 ? k_review_of($conn, (int) $book['id'], $viewer_id) : null;
 $viewer_is_seller = $viewer_id > 0 && (int) $book['seller_id'] === $viewer_id;
@@ -251,146 +265,200 @@ $max_qty = max(1, k_max_qty($stock)); // the most the quantity box accepts
     </div>
 </section>
 
-<!-- Reviews -->
-<section class="k-reviews" id="reviews" aria-labelledby="reviews-title">
-    <h2 class="k-h2" id="reviews-title">Customer reviews<?php if ($review_count > 0): ?><span class="k-reviews__n"><?php echo $review_count; ?></span><?php endif; ?></h2>
-
+<!-- Reviews: the summary (the average, how many gave each rating), a bar to sort and filter, then the reviews as plain rows -->
+<section class="k-reviews gr" id="reviews" aria-labelledby="reviews-title">
     <?php if ($review_flash): ?>
         <div class="k-alert k-alert--<?php echo $review_flash['type'] === 'success' ? 'success' : 'error'; ?>"
             role="<?php echo $review_flash['type'] === 'success' ? 'status' : 'alert'; ?>">
             <?php echo htmlspecialchars($review_flash['message']); ?></div>
     <?php endif; ?>
 
-    <div class="k-reviews__grid">
-        <div class="k-reviews__side">
+    <div class="gr-summary">
+        <div class="gr-score">
             <?php if ($review_count > 0): ?>
-                <div class="k-card k-ratingbox">
-                    <div class="k-ratingbox__score">
-                        <span class="k-ratingbox__num"><?php echo number_format($review_avg, 1); ?><small>/ 5</small></span>
-                        <?php echo k_stars($review_avg); ?>
-                        <span class="k-ratingbox__count">Based on <?php echo $review_count . ($review_count === 1 ? ' review' : ' reviews'); ?></span>
-                    </div>
-                    <ul class="k-bars">
-                        <?php foreach ($review_dist as $stars => $n): ?>
-                            <li>
-                                <span><?php echo $stars; ?> star<?php echo $stars === 1 ? '' : 's'; ?></span>
-                                <span class="k-bars__track" aria-hidden="true"><span class="k-bars__fill"
-                                        style="width: <?php echo round($n / $review_count * 100); ?>%"></span></span>
-                                <span class="k-bars__n"><?php echo $n; ?></span>
-                            </li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-            <?php endif; ?>
-
-            <?php if ($viewer_id === 0): ?>
-                <div class="k-card k-reviewform">
-                    <h3 class="k-h3">Write a review</h3>
-                    <p class="k-reviewform__note">Log in to share what you thought of this book.</p>
-                    <a href="login.php" class="k-btn k-btn--outline">Log In</a>
-                </div>
-            <?php elseif ($viewer_is_seller): ?>
-                <div class="k-card k-reviewform">
-                    <h3 class="k-h3">Write a review</h3>
-                    <p class="k-reviewform__note">You listed this book, so you can't review it.</p>
-                </div>
-            <?php elseif ($my_review && $my_review['status'] === 'rejected'): ?>
-                <div class="k-card k-reviewform">
-                    <h3 class="k-h3">Your review</h3>
-                    <p class="k-reviewform__note">Your review was removed by our team and can't be changed.</p>
-                </div>
+                <p class="gr-score__num"><?php echo number_format($review_avg, 1); ?><small>/5</small></p>
+                <?php echo k_stars($review_avg); ?>
+                <p class="gr-score__n"><?php echo $review_count . ($review_count === 1 ? ' Rating' : ' Ratings'); ?></p>
             <?php else: ?>
-                <form method="POST" action="review.php" class="k-card k-reviewform" data-validate>
-                    <input type="hidden" name="csrf" value="<?php echo k_csrf_token(); ?>">
-                    <input type="hidden" name="book_id" value="<?php echo (int) $book['id']; ?>">
-                    <input type="hidden" name="do" value="save">
-                    <h3 class="k-h3"><?php echo $my_review ? 'Edit your review' : 'Write a review'; ?></h3>
-
-                    <fieldset class="k-rate">
-                        <legend class="k-field__label">Your rating</legend>
-                        <div class="k-rate__stars">
-                            <?php for ($v = 5; $v >= 1; $v--): ?>
-                                <input type="radio" name="rating" id="rate<?php echo $v; ?>" value="<?php echo $v; ?>" required
-                                    data-msg-missing="Choose a rating from 1 to 5 stars."
-                                    <?php echo $form_rating === $v ? 'checked' : ''; ?>>
-                                <label for="rate<?php echo $v; ?>"><span class="k-sr"><?php echo $v; ?> star<?php echo $v === 1 ? '' : 's'; ?></span><svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7 6.1 20.8l1.2-6.5L2.5 9.7l6.6-.9z" /></svg></label>
-                            <?php endfor; ?>
-                        </div>
-                        <?php // the word for the stars chosen (or pointed at); which one shows is CSS (:has), see product-flat.css ?>
-                        <p class="k-rate__word" aria-hidden="true"><span data-v="1">Poor</span><span data-v="2">Fair</span><span data-v="3">Good</span><span data-v="4">Very good</span><span data-v="5">Excellent</span></p>
-                    </fieldset>
-
-                    <div class="k-field">
-                        <label for="comment">Your review <span class="k-field__hint">(optional)</span></label>
-                        <textarea id="comment" name="comment" rows="4" maxlength="<?php echo REVIEW_MAX_COMMENT; ?>"
-                            class="k-input k-textarea" placeholder="What did you think of it?"><?php echo htmlspecialchars($form_comment); ?></textarea>
-                    </div>
-                    <button type="submit" class="k-btn k-btn--primary"><?php echo $my_review ? 'Update Review' : 'Post Review'; ?></button>
-                </form>
-                <?php if ($my_review): ?>
-                    <form method="POST" action="review.php" class="k-reviewdelete"
-                        onsubmit="return confirm('Delete your review of this book?')">
-                        <input type="hidden" name="csrf" value="<?php echo k_csrf_token(); ?>">
-                        <input type="hidden" name="book_id" value="<?php echo (int) $book['id']; ?>">
-                        <input type="hidden" name="do" value="delete">
-                        <button type="submit" class="k-linkbtn">Delete my review</button>
-                    </form>
-                <?php endif; ?>
+                <p class="gr-score__none">No ratings yet</p>
             <?php endif; ?>
+            <a href="#write-review" class="gr-score__link"><?php echo $my_review ? 'Edit your review' : 'Write a review'; ?></a>
         </div>
+        <?php if ($review_count > 0): ?>
+            <ul class="gr-bars" aria-label="Ratings by number of stars">
+                <?php foreach ($review_dist as $stars => $n): ?>
+                    <li>
+                        <a href="<?php echo $rlink(['rstars' => $stars, 'reviews' => '']); ?>" class="gr-bars__row"
+                            aria-label="<?php echo $n . ($n === 1 ? ' rating' : ' ratings') . ' of ' . $stars . ($stars === 1 ? ' star' : ' stars'); ?>: show them">
+                            <?php echo k_stars((float) $stars); ?>
+                            <span class="gr-track" aria-hidden="true"><span class="gr-fill" style="width: <?php echo round($n / $review_count * 100, 1); ?>%"></span></span>
+                            <span class="gr-n"><?php echo $n; ?></span>
+                        </a>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+    </div>
 
-        <div class="k-reviews__list">
-            <?php if ($reviews): ?>
-                <ul class="k-reviewlist">
-                    <?php foreach ($reviews as $rv): ?>
-                        <?php $mine = $viewer_id > 0 && (int) $rv['user_id'] === $viewer_id; ?>
-                        <?php
-                        $rv_name = k_review_name((string) $rv['name']);
-                        $rv_text = trim((string) $rv['comment']);
-                        ?>
-                        <li class="k-review<?php echo $rv_text === '' ? ' k-review--short' : ''; ?>" id="review-<?php echo (int) $rv['id']; ?>">
-                            <span class="k-review__avatar" aria-hidden="true"><?php echo htmlspecialchars(mb_strtoupper(mb_substr($rv_name, 0, 1))); ?></span>
-                            <div class="k-review__body">
-                                <div class="k-review__head">
-                                    <div class="k-review__who-line">
-                                        <span class="k-review__who"><?php echo htmlspecialchars($rv_name); ?></span>
-                                        <?php if ($mine): ?><span class="k-tag">You</span><?php endif; ?>
-                                        <?php if (!empty($rv['verified'])): ?>
-                                            <span class="k-review__verified">
-                                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5" /></svg>
-                                                Verified purchase
-                                            </span>
-                                        <?php endif; ?>
-                                    </div>
-                                    <time class="k-review__date" datetime="<?php echo htmlspecialchars(date('Y-m-d', strtotime($rv['created_at']))); ?>"><?php echo date('M j, Y', strtotime($rv['created_at'])); ?></time>
-                                </div>
-                                <?php echo k_stars((float) $rv['rating']); ?>
-                                <?php if ($rv_text !== ''): ?>
-                                    <p class="k-review__text"><?php echo nl2br(htmlspecialchars($rv['comment'])); ?></p>
-                                <?php endif; ?>
-                                <?php if ($viewer_is_admin): ?>
-                                    <form method="POST" action="review.php" class="k-review__admin"
-                                        onsubmit="return confirm('Remove this review from the page?')">
-                                        <input type="hidden" name="csrf" value="<?php echo k_csrf_token(); ?>">
-                                        <input type="hidden" name="book_id" value="<?php echo (int) $book['id']; ?>">
-                                        <input type="hidden" name="review_id" value="<?php echo (int) $rv['id']; ?>">
-                                        <input type="hidden" name="do" value="remove">
-                                        <button type="submit" class="k-linkbtn k-linkbtn--danger">Remove review</button>
-                                    </form>
-                                <?php endif; ?>
-                            </div>
-                        </li>
+    <div class="gr-bar">
+        <h2 class="gr-bar__title" id="reviews-title">Product Reviews</h2>
+        <form method="GET" action="product.php#reviews" class="gr-tools" data-review-tools>
+            <input type="hidden" name="id" value="<?php echo (int) $book['id']; ?>">
+            <?php if ($show_all_reviews): ?><input type="hidden" name="reviews" value="all"><?php endif; ?>
+            <label class="gr-tool">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 20V5M4 9l4-4 4 4M16 4v15M12 15l4 4 4-4" /></svg>
+                <span class="gr-tool__k">Sort:</span> <strong><?php echo REVIEW_SORTS[$rsort]; ?></strong>
+                <select name="rsort" class="gr-select" aria-label="Sort the reviews" data-autosubmit>
+                    <?php foreach (REVIEW_SORTS as $key => $label): ?>
+                        <option value="<?php echo $key; ?>" <?php echo $rsort === $key ? 'selected' : ''; ?>><?php echo $label; ?></option>
                     <?php endforeach; ?>
-                </ul>
-                <?php if ($review_count > count($reviews)): ?>
-                    <a href="product.php?id=<?php echo (int) $book['id']; ?>&amp;reviews=all#reviews" class="k-btn k-btn--outline">Show all <?php echo $review_count; ?> reviews</a>
-                <?php endif; ?>
-            <?php else: ?>
-                <div class="k-empty">
-                    <p>No reviews yet. Be the first to say what you thought.</p>
+                </select>
+            </label>
+            <label class="gr-tool">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18l-7 8.5V20l-4-2v-4.5L3 5z" /></svg>
+                <span class="gr-tool__k">Filter:</span> <strong><?php echo $rstars > 0 ? $rstars . ' star' : 'All star'; ?></strong>
+                <select name="rstars" class="gr-select" aria-label="Show only reviews with this many stars" data-autosubmit>
+                    <option value="">All star</option>
+                    <?php for ($v = 5; $v >= 1; $v--): ?>
+                        <option value="<?php echo $v; ?>" <?php echo $rstars === $v ? 'selected' : ''; ?>><?php echo $v; ?> star</option>
+                    <?php endfor; ?>
+                </select>
+            </label>
+            <noscript><button type="submit" class="k-btn k-btn--outline k-btn--sm">Apply</button></noscript>
+        </form>
+    </div>
+
+    <?php if ($reviews): ?>
+        <ul class="gr-list">
+            <?php foreach ($reviews as $rv): ?>
+                <?php
+                $mine = $viewer_id > 0 && (int) $rv['user_id'] === $viewer_id;
+                $rv_name = k_review_name((string) $rv['name']);
+                $rv_text = trim((string) $rv['comment']);
+                $helpful_n = (int) $rv['helpful'];
+                ?>
+                <li class="gr-item" id="review-<?php echo (int) $rv['id']; ?>">
+                    <div class="gr-item__top">
+                        <?php echo k_stars((float) $rv['rating']); ?>
+                        <time class="gr-item__date" datetime="<?php echo htmlspecialchars(date('Y-m-d', strtotime($rv['created_at']))); ?>"><?php echo date('j M Y', strtotime($rv['created_at'])); ?></time>
+                    </div>
+                    <p class="gr-item__who">
+                        <span><?php echo htmlspecialchars($rv_name); ?></span>
+                        <?php if ($mine): ?><span class="gr-item__you">You</span><?php endif; ?>
+                        <?php if (!empty($rv['verified'])): ?>
+                            <span class="gr-item__verified">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5" /></svg>
+                                Verified purchase
+                            </span>
+                        <?php endif; ?>
+                    </p>
+                    <?php if ($rv_text !== ''): ?>
+                        <p class="gr-item__text"><?php echo nl2br(htmlspecialchars($rv['comment'])); ?></p>
+                    <?php endif; ?>
+                    <div class="gr-item__foot">
+                        <?php if ($mine): ?>
+                            <span class="gr-helpful gr-helpful--static" title="People who found your review helpful">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2 10.5h4V21H2zM22 11.2c0-1-.8-1.9-1.9-1.9h-5.5l.8-3.9v-.3c0-.4-.2-.8-.4-1.1L14 3 7.6 9.4c-.4.4-.6.9-.6 1.4V19c0 1.1.9 2 2 2h8.2c.8 0 1.5-.5 1.8-1.2l2.9-6.7c.1-.3.1-.6.1-.8v-1.1z" /></svg>
+                                <span class="gr-helpful__n"><?php echo $helpful_n; ?></span>
+                                <span class="k-sr">people found your review helpful</span>
+                            </span>
+                        <?php else: ?>
+                            <form method="POST" action="review.php" class="gr-helpful-form" data-helpful>
+                                <input type="hidden" name="csrf" value="<?php echo k_csrf_token(); ?>">
+                                <input type="hidden" name="book_id" value="<?php echo (int) $book['id']; ?>">
+                                <input type="hidden" name="review_id" value="<?php echo (int) $rv['id']; ?>">
+                                <input type="hidden" name="do" value="helpful">
+                                <button type="submit" class="gr-helpful<?php echo !empty($rv['voted']) ? ' is-on' : ''; ?>" aria-pressed="<?php echo !empty($rv['voted']) ? 'true' : 'false'; ?>"
+                                    aria-label="Mark this review as helpful (<?php echo $helpful_n; ?> so far)">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2 10.5h4V21H2zM22 11.2c0-1-.8-1.9-1.9-1.9h-5.5l.8-3.9v-.3c0-.4-.2-.8-.4-1.1L14 3 7.6 9.4c-.4.4-.6.9-.6 1.4V19c0 1.1.9 2 2 2h8.2c.8 0 1.5-.5 1.8-1.2l2.9-6.7c.1-.3.1-.6.1-.8v-1.1z" /></svg>
+                                    <span class="gr-helpful__n"><?php echo $helpful_n; ?></span>
+                                </button>
+                            </form>
+                        <?php endif; ?>
+
+                        <?php if ($mine || $viewer_is_admin): ?>
+                            <details class="gr-menu">
+                                <summary aria-label="Options for this review">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="1.8" /><circle cx="12" cy="12" r="1.8" /><circle cx="12" cy="19" r="1.8" /></svg>
+                                </summary>
+                                <div class="gr-menu__panel">
+                                    <?php if ($mine): ?>
+                                        <a href="#write-review" class="gr-menu__item">Edit review</a>
+                                        <form method="POST" action="review.php" onsubmit="return confirm('Delete your review of this book?')">
+                                            <input type="hidden" name="csrf" value="<?php echo k_csrf_token(); ?>">
+                                            <input type="hidden" name="book_id" value="<?php echo (int) $book['id']; ?>">
+                                            <input type="hidden" name="do" value="delete">
+                                            <button type="submit" class="gr-menu__item gr-menu__item--danger">Delete review</button>
+                                        </form>
+                                    <?php endif; ?>
+                                    <?php if ($viewer_is_admin && !$mine): ?>
+                                        <form method="POST" action="review.php" onsubmit="return confirm('Remove this review from the page?')">
+                                            <input type="hidden" name="csrf" value="<?php echo k_csrf_token(); ?>">
+                                            <input type="hidden" name="book_id" value="<?php echo (int) $book['id']; ?>">
+                                            <input type="hidden" name="review_id" value="<?php echo (int) $rv['id']; ?>">
+                                            <input type="hidden" name="do" value="remove">
+                                            <button type="submit" class="gr-menu__item gr-menu__item--danger">Remove review</button>
+                                        </form>
+                                    <?php endif; ?>
+                                </div>
+                            </details>
+                        <?php endif; ?>
+                    </div>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+        <?php if ($review_shown_total > count($reviews)): ?>
+            <a href="<?php echo $rlink(['reviews' => 'all']); ?>" class="k-btn k-btn--outline gr-more">Show all <?php echo $review_shown_total; ?> reviews</a>
+        <?php endif; ?>
+    <?php elseif ($rstars > 0): ?>
+        <p class="gr-empty">No <?php echo $rstars; ?>-star reviews yet. <a href="<?php echo $rlink(['rstars' => '', 'reviews' => '']); ?>">Show all reviews</a></p>
+    <?php else: ?>
+        <p class="gr-empty">No reviews yet. Be the first to say what you thought.</p>
+    <?php endif; ?>
+
+    <?php // Writing a review: the same form as before, under the list ?>
+    <div class="gr-write" id="write-review">
+        <?php if ($viewer_id === 0): ?>
+            <h3 class="gr-write__title">Write a review</h3>
+            <p class="gr-write__note">Log in to share what you thought of this book.</p>
+            <a href="login.php" class="k-btn k-btn--outline">Log In</a>
+        <?php elseif ($viewer_is_seller): ?>
+            <h3 class="gr-write__title">Write a review</h3>
+            <p class="gr-write__note">You listed this book, so you can't review it.</p>
+        <?php elseif ($my_review && $my_review['status'] === 'rejected'): ?>
+            <h3 class="gr-write__title">Your review</h3>
+            <p class="gr-write__note">Your review was removed by our team and can't be changed.</p>
+        <?php else: ?>
+            <form method="POST" action="review.php" class="gr-write__form" data-validate>
+                <input type="hidden" name="csrf" value="<?php echo k_csrf_token(); ?>">
+                <input type="hidden" name="book_id" value="<?php echo (int) $book['id']; ?>">
+                <input type="hidden" name="do" value="save">
+                <h3 class="gr-write__title"><?php echo $my_review ? 'Edit your review' : 'Write a review'; ?></h3>
+
+                <fieldset class="k-rate">
+                    <legend class="k-field__label">Your rating</legend>
+                    <div class="k-rate__stars">
+                        <?php for ($v = 5; $v >= 1; $v--): ?>
+                            <input type="radio" name="rating" id="rate<?php echo $v; ?>" value="<?php echo $v; ?>" required
+                                data-msg-missing="Choose a rating from 1 to 5 stars."
+                                <?php echo $form_rating === $v ? 'checked' : ''; ?>>
+                            <label for="rate<?php echo $v; ?>"><span class="k-sr"><?php echo $v; ?> star<?php echo $v === 1 ? '' : 's'; ?></span><svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.8l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.7 6.1 20.8l1.2-6.5L2.5 9.7l6.6-.9z" /></svg></label>
+                        <?php endfor; ?>
+                    </div>
+                    <?php // the word for the stars chosen; which one shows is CSS (:has), see product-flat.css ?>
+                    <p class="k-rate__word" aria-hidden="true"><span data-v="1">Poor</span><span data-v="2">Fair</span><span data-v="3">Good</span><span data-v="4">Very good</span><span data-v="5">Excellent</span></p>
+                </fieldset>
+
+                <div class="k-field">
+                    <label for="comment">Your review <span class="k-field__hint">(optional)</span></label>
+                    <textarea id="comment" name="comment" rows="4" maxlength="<?php echo REVIEW_MAX_COMMENT; ?>"
+                        class="k-input k-textarea" placeholder="What did you think of it?"><?php echo htmlspecialchars($form_comment); ?></textarea>
                 </div>
-            <?php endif; ?>
-        </div>
+                <div class="gr-write__actions">
+                    <button type="submit" class="k-btn k-btn--primary"><?php echo $my_review ? 'Update Review' : 'Post Review'; ?></button>
+                </div>
+            </form>
+        <?php endif; ?>
     </div>
 </section>
 

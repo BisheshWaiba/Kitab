@@ -103,4 +103,36 @@ if ($action === 'remove' && $is_admin) {
     k_review_done($book_id, 'success', 'The review was removed.');
 }
 
+// "Helpful": the thumbs-up under a review. Pressing it again takes the vote back; nobody can vote on their own review.
+if ($action === 'helpful') {
+    $review_id = (int) ($_POST['review_id'] ?? 0);
+    $stmt = $conn->prepare("SELECT user_id FROM reviews WHERE id = ? AND book_id = ? AND status = 'approved'");
+    $stmt->bind_param("ii", $review_id, $book_id);
+    $stmt->execute();
+    $target = $stmt->get_result()->fetch_assoc();
+    $on = false;
+    if ($target && (int) $target['user_id'] !== $user_id) {
+        $stmt = $conn->prepare("DELETE FROM review_helpful WHERE review_id = ? AND user_id = ?");
+        $stmt->bind_param("ii", $review_id, $user_id);
+        $stmt->execute();
+        if ($stmt->affected_rows === 0) {
+            $stmt = $conn->prepare("INSERT IGNORE INTO review_helpful (review_id, user_id) VALUES (?, ?)");
+            $stmt->bind_param("ii", $review_id, $user_id);
+            $stmt->execute();
+            $on = true;
+        }
+    }
+    $stmt = $conn->prepare("SELECT COUNT(*) FROM review_helpful WHERE review_id = ?");
+    $stmt->bind_param("i", $review_id);
+    $stmt->execute();
+    $count = (int) $stmt->get_result()->fetch_row()[0];
+    if (strpos($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false) {
+        header('Content-Type: application/json');
+        echo json_encode(['ok' => (bool) $target, 'count' => $count, 'on' => $on]);
+        exit();
+    }
+    header("Location: product.php?id=" . $book_id . "#review-" . $review_id);
+    exit();
+}
+
 k_review_done($book_id, 'error', 'That did not work. Please try again.');
