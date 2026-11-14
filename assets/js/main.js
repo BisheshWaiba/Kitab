@@ -637,3 +637,31 @@ document.querySelectorAll('.k-chip[data-target]').forEach(function (chip) {
         }
     });
 });
+
+// Home hero: the covers (and the golden disc behind them) follow the pointer a little, each by a different amount, which gives the
+// stage some depth. Only for a mouse, and not for people who asked for less motion. The movement itself is CSS (--px and --py).
+(function () {
+    var stage = document.querySelector('[data-hero-stage]');
+    if (!stage || !window.matchMedia) {
+        return;
+    }
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !window.matchMedia('(hover: hover)').matches) {
+        return;
+    }
+    var frame = 0;
+    stage.addEventListener('pointermove', function (e) {
+        var box = stage.getBoundingClientRect();
+        var x = (e.clientX - box.left) / box.width - 0.5;
+        var y = (e.clientY - box.top) / box.height - 0.5;
+        cancelAnimationFrame(frame);
+        frame = requestAnimationFrame(function () {
+            stage.style.setProperty('--px', (x * 26).toFixed(1) + 'px');
+            stage.style.setProperty('--py', (y * 18).toFixed(1) + 'px');
+        });
+    });
+    stage.addEventListener('pointerleave', function () {
+        cancelAnimationFrame(frame);
+        stage.style.setProperty('--px', '0px');
+        stage.style.setProperty('--py', '0px');
+    });
+})();

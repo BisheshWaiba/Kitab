@@ -2,13 +2,23 @@
    Shared pieces (wrap, headings, sections, book cards) are in flat.css. Everything here starts with .fh- or sits under .fl. */
 
 /* ---------- hero ---------- */
-.fh-hero { display: flex; flex-wrap: wrap; align-items: center; gap: 56px; padding-top: 72px; padding-bottom: 72px; }
-.fh-hero__copy { flex: 1 1 480px; min-width: 0; display: flex; flex-direction: column; gap: 26px; }
-.fh-hero__cta { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 6px; }
+/* a warm wash across the full width (two soft glows of the brand gold), so the first screen is not a flat white sheet */
+.fh-top { position: relative; overflow: clip; background:
+  radial-gradient(55% 90% at 92% 12%, color-mix(in srgb, var(--k-gold) 24%, transparent), transparent 70%),
+  radial-gradient(45% 70% at -4% 100%, color-mix(in srgb, var(--k-gold) 13%, transparent), transparent 70%); }
+.fh-hero { display: flex; flex-wrap: wrap; align-items: center; gap: 56px; padding-top: 64px; padding-bottom: 72px; }
+.fh-hero__copy { flex: 1 1 480px; min-width: 0; display: flex; flex-direction: column; gap: 24px; }
+.fh-hero__cta { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 2px; }
+
+/* the small pill over the headline: real numbers from the catalogue */
+.fh-eyebrow { align-self: flex-start; display: inline-flex; align-items: center; gap: 10px; margin: 0; padding: 7px 14px 7px 12px; border-radius: 999px; border: 1px solid var(--k-line); background: color-mix(in srgb, var(--k-white) 78%, transparent); font-size: 13px; font-weight: 600; letter-spacing: .02em; color: var(--k-ink-2); }
+.fh-eyebrow__dot { width: 8px; height: 8px; border-radius: 50%; background: var(--k-gold); box-shadow: 0 0 0 4px rgba(242, 177, 52, .25); }
 
 /* "Pay when it arrives" is the shop's best selling point, so it gets a card of its own under the buttons: a big amber icon, the
    promise in the display type, and what it means. The other two promises (shipping, returns) stay a quiet line beneath it. */
-.fh-pay { display: flex; align-items: center; gap: 18px; max-width: 480px; padding: 18px 22px 18px 18px; box-sizing: border-box; border-radius: 20px; background: var(--k-white); border: 1px solid var(--k-line); box-shadow: 0 14px 30px -20px rgba(17, 18, 20, .4), 0 1px 2px rgba(17, 18, 20, .06); }
+.fh-pay { display: flex; align-items: center; gap: 18px; max-width: 480px; padding: 18px 22px 18px 18px; box-sizing: border-box; border-radius: 20px; border: 1px solid color-mix(in srgb, var(--k-gold) 40%, var(--k-line));
+  background: linear-gradient(135deg, var(--k-white), color-mix(in srgb, var(--k-gold) 11%, var(--k-white)));
+  box-shadow: 0 16px 34px -20px rgba(190, 120, 0, .55), 0 1px 2px rgba(17, 18, 20, .06); }
 .fh-pay__icon { flex: none; display: grid; place-items: center; width: 60px; height: 60px; border-radius: 16px; color: #1B130A; background: linear-gradient(180deg, #FBD774, #EFB335); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6), 0 8px 16px -10px rgba(190, 120, 0, .8); }
 .fh-pay__text { display: flex; flex-direction: column; gap: 4px; min-width: 0; margin: 0; }
 .fh-pay__text strong { font: 600 22px/1.15 var(--k-display); letter-spacing: -.01em; color: var(--k-ink); }
@@ -18,32 +28,62 @@
 .fh-trust li { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
 .fh-trust svg { flex: none; color: var(--k-ink); }
 
-/* The hero arrives in order: the words rise a little, then the three covers come up one after the other and lift when pointed at.
+/* The hero arrives in order: the words rise a little, then the covers come up one after the other and the glass cards settle in.
    (People who asked for less motion get none of it.) */
 @media (prefers-reduced-motion: no-preference) {
   @keyframes fh-rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+  @keyframes fh-bob { 50% { translate: 0 -7px; } }
+  @keyframes fh-spin { to { rotate: 360deg; } }
   .fh-hero__copy > * { animation: fh-rise .7s var(--k-ease) backwards; }
-  .fh-hero__copy > :nth-child(2) { animation-delay: .08s; }
-  .fh-hero__copy > :nth-child(3) { animation-delay: .16s; }
-  .fh-hero__copy > :nth-child(4) { animation-delay: .26s; }
-  .fh-hero__copy > :nth-child(5) { animation-delay: .34s; }
+  .fh-hero__copy > :nth-child(2) { animation-delay: .06s; }
+  .fh-hero__copy > :nth-child(3) { animation-delay: .12s; }
+  .fh-hero__copy > :nth-child(4) { animation-delay: .2s; }
+  .fh-hero__copy > :nth-child(5) { animation-delay: .28s; }
+  .fh-hero__copy > :nth-child(6) { animation-delay: .36s; }
   .fh-fan a { animation: fh-rise .8s var(--k-ease) backwards; }
-  .fh-fan a:nth-child(1) { animation-delay: .2s; }
-  .fh-fan a:nth-child(2) { animation-delay: .34s; }
-  .fh-fan a:nth-child(3) { animation-delay: .48s; }
+  .fh-fan a:nth-child(1) { animation-delay: .22s; }
+  .fh-fan a:nth-child(2) { animation-delay: .36s; }
+  .fh-fan a:nth-child(3) { animation-delay: .5s; }
   .fh-fan .fh-cover { transition: transform .35s var(--k-ease); }
   .fh-fan a:hover .fh-cover { transform: translateY(-10px); }
+  .fh-chip { animation: fh-rise .8s var(--k-ease) .7s backwards, fh-bob 6s ease-in-out 1.5s infinite; }
+  .fh-chip--book { animation-delay: .8s, 2.2s; }
+  .fh-stage::after { animation: fh-spin 90s linear infinite; }
 }
 
-/* three covers fanned out like a hand of cards on a warm, glowing panel, with a soft shadow on the ground (no shelf). The
-   rotation and the centring use the separate rotate / translate properties, so the entrance animation (transform) can still run. */
-.fh-fan { position: relative; flex: 1 1 440px; min-width: 0; max-width: 720px; margin-inline: auto; aspect-ratio: 5 / 4; overflow: hidden; isolation: isolate; border-radius: 28px;
-  background: radial-gradient(circle at 50% 56%, color-mix(in srgb, var(--k-gold) 32%, transparent), transparent 60%), var(--k-band); }
-.fh-fan::after { content: ""; position: absolute; left: 16%; right: 16%; bottom: 7%; height: 7%; z-index: 0; border-radius: 50%; background: radial-gradient(closest-side, rgba(17, 18, 20, .3), transparent); filter: blur(6px); }
-.fh-fan a { position: absolute; bottom: 14%; display: block; }
-.fh-fan a:nth-child(1) { left: 6%; width: 29%; rotate: -7deg; transform-origin: 50% 100%; z-index: 1; }
-.fh-fan a:nth-child(2) { left: 50%; width: 35%; translate: -50% 0; bottom: 16%; z-index: 3; }
-.fh-fan a:nth-child(3) { right: 6%; width: 29%; rotate: 7deg; transform-origin: 50% 100%; z-index: 2; }
+/* the stage: a golden disc (the sun behind the books) with a thin dashed ring turning slowly around it, the covers fanned in front
+   like a hand of cards, and a soft shadow on the ground. The covers follow the pointer a little (assets/js/main.js sets --px and --py).
+   The rotation and the centring use the separate rotate / translate properties, so the entrance animation (transform) can still run. */
+.fh-stage { --disc: radial-gradient(circle at 50% 32%, #FFF0C2, #F8CF6A 52%, #EDAE30); position: relative; flex: 1 1 440px; min-width: 0; max-width: 720px; margin-inline: auto; aspect-ratio: 5 / 4.3; isolation: isolate; }
+:root[data-theme="dark"] .fh-stage { --disc: radial-gradient(circle at 50% 32%, #7A5A1C, #4E3910 55%, #2E2209); }
+.fh-stage::before { content: ""; position: absolute; left: 50%; top: 45%; z-index: -1; width: 78%; aspect-ratio: 1; border-radius: 50%; background: var(--disc); box-shadow: inset 0 -26px 60px rgba(160, 95, 0, .28), 0 30px 70px -30px rgba(190, 120, 0, .55); translate: calc(-50% + var(--px, 0px) * -.5) calc(-50% + var(--py, 0px) * -.5); transition: translate .35s ease-out; }
+.fh-stage::after { content: ""; position: absolute; left: 50%; top: 46%; z-index: -1; width: 92%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; border: 1.5px dashed color-mix(in srgb, var(--k-ink) 22%, transparent); pointer-events: none; }
+.fh-fan { position: absolute; inset: 0; }
+.fh-fan::after { content: ""; position: absolute; left: 18%; right: 18%; bottom: 13%; height: 6%; z-index: 0; border-radius: 50%; background: radial-gradient(closest-side, rgba(17, 18, 20, .34), transparent); filter: blur(7px); }
+.fh-fan a { position: absolute; bottom: 20%; display: block; transition: translate .3s ease-out; }
+.fh-fan a:nth-child(1) { left: 7%; width: 29%; rotate: -8deg; transform-origin: 50% 100%; z-index: 1; translate: calc(var(--px, 0px) * -1.4) calc(var(--py, 0px) * -.6); }
+.fh-fan a:nth-child(2) { left: 50%; width: 36%; bottom: 22%; z-index: 3; translate: calc(-50% + var(--px, 0px) * .8) calc(var(--py, 0px) * .5); }
+.fh-fan a:nth-child(3) { right: 7%; width: 29%; rotate: 8deg; transform-origin: 50% 100%; z-index: 2; translate: calc(var(--px, 0px) * 1.4) calc(var(--py, 0px) * -.6); }
+
+/* two glass cards that float over the stage */
+.fh-chip { position: absolute; z-index: 4; display: flex; align-items: center; gap: 12px; padding: 10px 16px 10px 14px; border-radius: 18px; color: var(--k-ink); text-decoration: none;
+  background: color-mix(in srgb, var(--k-white) 74%, transparent); border: 1px solid color-mix(in srgb, var(--k-white) 60%, var(--k-line));
+  -webkit-backdrop-filter: blur(14px) saturate(170%); backdrop-filter: blur(14px) saturate(170%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6), 0 18px 34px -16px rgba(17, 18, 20, .45); }
+.fh-chip--rating { top: 5%; left: clamp(-24px, -5%, 0px); }
+.fh-chip--rating .k-stars { font-size: 15px; letter-spacing: 1px; background: linear-gradient(90deg, #F2B134 var(--pct, 0%), color-mix(in srgb, var(--k-ink) 16%, transparent) var(--pct, 0%)); -webkit-background-clip: text; background-clip: text; }
+.fh-chip--rating .fh-chip__line { font-size: 15px; font-weight: 500; color: var(--k-ink-2); }
+.fh-chip--rating .fh-chip__line strong { font: 600 18px/1 var(--k-display); color: var(--k-ink); }
+.fh-chip--rating .fh-chip__text small { font-size: 12px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--k-muted); }
+.fh-chip--book { left: 0; right: 0; bottom: 1%; margin-inline: auto; width: max-content; max-width: 80%; padding: 10px 10px 10px 18px; }
+.fh-chip--book:hover { background: color-mix(in srgb, var(--k-white) 90%, transparent); }
+.fh-chip--book:focus-visible { outline: 3px solid var(--k-accent); outline-offset: 3px; }
+.fh-chip__text { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.fh-chip__text small { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--k-muted); }
+.fh-chip__text strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 600 16px/1.25 var(--k-display); }
+.fh-chip__text span { font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--k-ink-2); }
+.fh-chip__go { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; color: #1B130A; background: linear-gradient(180deg, #FBD774, #EFB335); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6); transition: transform .25s var(--k-ease); }
+.fh-chip--book:hover .fh-chip__go { transform: translateX(3px); }
 
 /* a standing cover (a picture, or the titled box k_cover() shows when a book has no picture) */
 .fh-cover { display: block; width: 100%; height: auto; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 4px rgba(17, 18, 20, .25), 0 18px 28px -12px rgba(17, 18, 20, .5); }
@@ -74,7 +114,22 @@
   .fl .k-picks__panel { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; } /* two cards across, like the other grids (flat.css) */
 }
 @media (max-width: 600px) {
-  .fh-hero { gap: 40px; padding-top: 36px; padding-bottom: 48px; }
+  .fh-hero { gap: 36px; padding-top: 28px; padding-bottom: 48px; }
+  .fh-chip { padding: 8px 12px 8px 10px; border-radius: 14px; }
+  .fh-chip--rating { top: 1%; left: 0; }
+  /* a taller stage on phones, so the covers stand clear above the glass cards instead of sitting behind them */
+  .fh-stage { aspect-ratio: 1 / 1; }
+  .fh-fan a { bottom: 27%; }
+  .fh-fan a:nth-child(1), .fh-fan a:nth-child(3) { width: 30%; }
+  .fh-fan a:nth-child(2) { width: 38%; bottom: 29%; }
+  .fh-stage::before { top: 44%; width: 86%; }
+  .fh-stage::after { top: 46%; width: 98%; }
+  .fh-chip--rating .fh-chip__line { font-size: 13px; }
+  .fh-chip--rating .fh-chip__line strong { font-size: 16px; }
+  .fh-chip--rating .k-stars { display: none; }
+  .fh-chip--book { padding: 8px 8px 8px 14px; }
+  .fh-chip__text strong { font-size: 14px; }
+  .fh-chip__go { width: 34px; height: 34px; }
   .fh-pay { padding: 16px 18px 16px 16px; gap: 16px; }
   .fh-pay__icon { width: 54px; height: 54px; }
   .fh-pay__text strong { font-size: 20px; }
