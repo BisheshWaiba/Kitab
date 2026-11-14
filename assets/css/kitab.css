@@ -384,6 +384,14 @@ body {
   .has-js .k-links .k-avatar__initial { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: rgba(255, 255, 255, .55); font-family: var(--k-display); font-size: 16px; }
 }
 
+/* Without scripts there is no phone menu, so the header keeps its tablet layout (logo, links, search). Even then nothing may stick
+   out: below 480px the links wrap and Log In / Sign Up share a row of their own (this was the 28px overflow at 320px). */
+@media (max-width: 480px) {
+  :root:not(.has-js) .k-links { flex-wrap: wrap; row-gap: 10px; }
+  :root:not(.has-js) .k-auth { flex: 1 1 100%; }
+  :root:not(.has-js) .k-auth .k-btn { flex: 1 1 0; }
+}
+
 /* ---------- Footer ---------- */
 .k-footer { background: var(--k-white); color: var(--k-ink-2); font-family: var(--k-body); border-top: 1px solid var(--k-line); }
 
