@@ -10,7 +10,7 @@ $users = $conn->query("SELECT * FROM users ORDER BY id DESC");
     </div>
 
     <div class="k-tablecard">
-        <table class="k-table k-table--xwide">
+        <table class="k-table k-table--xwide k-table--stack">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -26,17 +26,17 @@ $users = $conn->query("SELECT * FROM users ORDER BY id DESC");
                     <?php $is_admin = ($user['role'] ?? '') === 'admin'; ?>
                     <tr>
                         <td class="k-num k-muted">#<?php echo (int) $user['id']; ?></td>
-                        <td class="k-num--strong"><?php echo htmlspecialchars((string) $user['name']); ?></td>
-                        <td class="k-muted k-nowrap"><?php echo htmlspecialchars((string) $user['email']); ?></td>
-                        <td class="k-num k-muted"><?php echo htmlspecialchars((string) $user['phone'] !== '' ? (string) $user['phone'] : '—'); ?></td>
-                        <td>
+                        <td class="k-num--strong" data-label="Name"><?php echo htmlspecialchars((string) $user['name']); ?></td>
+                        <td class="k-muted k-nowrap" data-label="Email"><?php echo htmlspecialchars((string) $user['email']); ?></td>
+                        <td class="k-num k-muted" data-label="Phone"><?php echo htmlspecialchars((string) $user['phone'] !== '' ? (string) $user['phone'] : '—'); ?></td>
+                        <td data-label="Role">
                             <?php if ($is_admin): ?>
                                 <span class="k-pill k-pill--admin">Admin</span>
                             <?php else: ?>
                                 <span class="k-pill k-pill--user">User</span>
                             <?php endif; ?>
                         </td>
-                        <td class="k-num k-muted"><?php echo date('M d, Y', strtotime($user['created_at'])); ?></td>
+                        <td class="k-num k-muted" data-label="Registered"><?php echo date('M d, Y', strtotime($user['created_at'])); ?></td>
                     </tr>
                 <?php endwhile; ?>
                 <?php if ($users->num_rows == 0): ?>

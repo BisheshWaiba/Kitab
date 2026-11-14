@@ -191,7 +191,7 @@ $cover_url = $cover === '' ? '' : (strpos($cover, 'http') === 0 ? $cover : BASE_
     <?php endif; ?>
 </main>
 
-<script src="<?php echo BASE_URL; ?>assets/js/main.js"></script>
+
 </body>
 
 </html>

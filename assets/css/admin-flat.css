@@ -1,0 +1,114 @@
+/* The Admin area, restyled to match the shop: flat surfaces, the amber glass buttons (glass-buttons.css), dark mode (the tokens in
+   kitab.css), icons in the sidebar, and a sidebar that turns into a menu on phones. Loaded after kitab.css and glass-buttons.css by
+   Admin/includes/header.php; every rule sits under .k-adminbody or has a k- admin name, so the shop never picks it up. */
+
+/* The old admin-style.css only still mattered for this: no browser margins or padding, and the page is a row (sidebar, then content) */
+body.k-adminbody { margin: 0; display: flex; min-height: 100vh; background: var(--k-white); color: var(--k-ink); }
+:where(.k-adminbody) * { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ---------- the sidebar ---------- */
+.k-adminside { background: var(--k-band); }
+.k-adminside__link { gap: 12px; }
+.k-adminside__link svg { flex: none; color: var(--k-muted); transition: color .15s; }
+.k-adminside__link:hover svg,
+.k-adminside__link.is-active svg { color: var(--k-ink); }
+.k-adminside__link:hover { background: color-mix(in srgb, var(--k-ink) 6%, transparent); }
+.k-adminside__link.is-active { background: var(--k-white); box-shadow: inset 3px 0 0 var(--k-gold), 0 0 0 1px var(--k-line), 0 6px 12px -8px rgba(17, 18, 20, .25); }
+.k-adminside__link--danger svg { color: currentColor; }
+.k-adminside__badge { margin-left: auto; background: var(--k-gold); color: #1B130A; }
+button.k-adminside__theme { width: 100%; border: 0; background: transparent; font-family: var(--k-body); text-align: left; cursor: pointer; }
+.k-adminside__sun,
+.k-adminside__to-light { display: none; }
+:root[data-theme="dark"] .k-adminside__sun { display: block; }
+:root[data-theme="dark"] .k-adminside__moon,
+:root[data-theme="dark"] .k-adminside__to-dark { display: none; }
+:root[data-theme="dark"] .k-adminside__to-light { display: inline; }
+
+/* the bar for small screens is not there on wide ones, or without scripts (the sidebar just sits above the page then) */
+.k-adminbar { display: none; }
+
+/* ---------- the page ---------- */
+.k-admin__main { max-width: 1400px; padding: 44px 48px 72px; }
+.k-admin__bar { align-items: center; }
+
+/* numbers at the top of the dashboard: an amber icon, the figure (never wraps) and what it counts */
+.k-stat { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "icon label" "value value" "hint hint"; align-items: center; gap: 4px 12px; }
+.k-stat__icon { grid-area: icon; display: grid; place-items: center; width: 36px; height: 36px; margin-bottom: 8px; border-radius: 11px; background: rgba(242, 177, 52, .2); color: var(--k-ink); }
+.k-stat__label { grid-area: label; margin-bottom: 8px; }
+.k-stat__value { grid-area: value; font-size: clamp(28px, 2.6vw, 38px); white-space: nowrap; }
+.k-stat__hint { grid-area: hint; font-size: 13px; color: var(--k-muted); }
+
+/* "needs a look": what is waiting for the admin, each one a link to the page that deals with it */
+.k-todo { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr)); gap: 16px; }
+.k-todo__item { display: flex; align-items: center; gap: 14px; padding: 16px 20px; border-radius: 16px; border: 1px solid var(--k-line); background: var(--k-band); color: var(--k-ink); transition: border-color .15s, background-color .15s, transform .25s var(--k-ease); }
+.k-todo__item:hover { border-color: var(--k-ink); background: var(--k-white); transform: translateY(-2px); }
+.k-todo__item:focus-visible { outline: 3px solid var(--k-accent); outline-offset: 2px; }
+.k-todo__n { flex: none; display: grid; place-items: center; min-width: 44px; height: 44px; padding: 0 10px; box-sizing: border-box; border-radius: 12px; background: var(--k-white); border: 1px solid var(--k-line); font: 700 18px/1 var(--k-body); font-variant-numeric: tabular-nums; color: var(--k-muted); }
+.k-todo__item.is-hot .k-todo__n { background: var(--k-gold); border-color: var(--k-gold); color: #1B130A; }
+.k-todo__text { min-width: 0; display: flex; flex-direction: column; gap: 2px; font-weight: 600; }
+.k-todo__text small { font-size: 13px; font-weight: 400; color: var(--k-muted); }
+
+/* a row of search and filter chips above a table */
+.k-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
+.k-toolbar .k-search { flex: 1 1 280px; max-width: 420px; }
+.k-chips { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.k-chips__n { margin-left: 8px; font-size: 13px; font-weight: 600; opacity: .6; font-variant-numeric: tabular-nums; }
+.k-admin__count { margin-top: -12px; font-size: 14px; color: var(--k-muted); }
+
+/* the order status control: a small list and Save, under the status pill */
+.k-statusform { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+.k-statusform select { width: auto; min-width: 132px; height: 40px; padding: 0 12px; border-radius: 10px; font-size: 14px; }
+.k-statusform .k-btn { height: 40px; }
+.k-idlink { color: inherit; text-decoration: underline; text-decoration-color: transparent; text-underline-offset: 3px; transition: text-decoration-color .15s; }
+.k-idlink:hover { text-decoration-color: currentColor; }
+
+/* "10 in stock" on phones (the table cell only holds the number) */
+.k-stock--out { color: var(--k-bad); font-weight: 600; }
+
+/* ---------- tablets and phones ---------- */
+@media (max-width: 900px) {
+  body.k-adminbody { flex-direction: column; }
+  .k-admin__main { padding: 28px 20px 56px; }
+
+  .has-js .k-adminbar { display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 60; height: 60px; padding: 0 12px 0 20px; background: var(--k-white); border-bottom: 1px solid var(--k-line); }
+  .k-adminbar__brand { display: inline-flex; align-items: baseline; gap: 8px; font: 600 26px/1 var(--k-display); letter-spacing: -.03em; color: var(--k-ink); }
+  .k-adminbar__brand span { color: var(--k-red); margin-left: -6px; }
+  .k-adminbar__brand small { font: 600 11px/1 var(--k-body); letter-spacing: .1em; text-transform: uppercase; color: var(--k-muted); }
+
+  /* the sidebar is the menu: closed until the button opens it, full width under the bar, over a dimmed page */
+  .has-js .k-adminside { display: none; position: fixed; top: 60px; left: 0; right: 0; width: auto; height: auto; max-height: calc(100vh - 60px); flex-direction: column; flex-wrap: nowrap; align-items: stretch; gap: 0; padding: 12px 16px 20px; overflow-y: auto; border-right: 0; border-bottom: 1px solid var(--k-line); box-shadow: 0 22px 32px -20px rgba(17, 18, 20, .4); z-index: 70; }
+  .has-js .k-adminside.is-open { display: flex; animation: k-panel-in .18s ease-out; }
+  .has-js .k-adminside__brand { display: none; }
+  .has-js .k-adminside__nav { flex-direction: column; flex-wrap: nowrap; }
+  .has-js .k-adminside__foot { flex-direction: column; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--k-line); }
+  .has-js .k-adminside__link { height: 50px; font-size: 16px; }
+  body.has-adminmenu::after { content: ""; position: fixed; inset: 60px 0 0 0; z-index: 65; background: rgba(10, 11, 14, .38); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .has-js .k-adminside.is-open { animation: none; }
+  .k-todo__item, .k-todo__item:hover { transition: none; transform: none; }
+}
+
+/* ---------- small screens: a table row becomes a card (the stacking itself is .k-table--stack in kitab.css) ---------- */
+@media (max-width: 640px) {
+  .k-admincard .k-table--stack { min-width: 0; }
+  .k-admin__bar .k-btn { width: 100%; }
+  .k-toolbar .k-search { max-width: none; }
+  .k-chips { flex-wrap: nowrap; overflow-x: auto; margin: -6px -20px; padding: 6px 20px 14px; scrollbar-width: none; }
+  .k-chips::-webkit-scrollbar { display: none; }
+  .k-chips li { flex: 0 0 auto; }
+  .k-statusform { flex-wrap: wrap; }
+  .k-stock::after { content: " in stock"; font-weight: 400; color: var(--k-muted); }
+  .k-stock--out::after { content: ""; }
+
+  /* the Book list: the cover on the left, then title, author, category, price, stock and the buttons */
+  .k-table--books tr { grid-template-columns: 64px minmax(0, 1fr); gap: 4px 16px; align-items: start; }
+  .k-table--books td { grid-column: 2; min-width: 0; }
+  .k-table--books td[data-label]::before { display: none; }
+  .k-table--books td:nth-child(1) { display: none; }
+  .k-table--books td:nth-child(2) { grid-column: 1; grid-row: 1 / span 5; }
+  .k-table--books td:nth-child(2) .k-thumb { width: 64px; }
+  .k-table--books td:nth-child(8) { grid-column: 1 / -1; margin-top: 12px; }
+  .k-table--books .k-admintitle { max-width: none; }
+  .k-table--books .k-rowactions .k-btn { flex: 1; }
+}

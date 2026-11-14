@@ -35,7 +35,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute();
         $_SESSION['flash'] = ['type' => 'success', 'message' => 'Order #' . $order_id . ' is now ' . $new . ($new === 'cancelled' ? ', and its books are back in stock.' : '.')];
     }
-    header("Location: " . BASE_URL . "admin/orders.php");
+    $back = in_array($_POST['filter'] ?? '', $statuses, true) ? '?status=' . $_POST['filter'] : '';
+    header("Location: " . BASE_URL . "admin/orders.php" . $back);
     exit();
 }
 
@@ -44,8 +45,23 @@ unset($_SESSION['flash']);
 
 include 'includes/header.php';
 
-// Fetch Orders
-$orders = $conn->query("SELECT * FROM orders ORDER BY created_at DESC");
+// Fetch Orders: all of them, or only one status
+$status_filter = in_array($_GET['status'] ?? '', $statuses, true) ? $_GET['status'] : '';
+if ($status_filter !== '') {
+    $stmt = $conn->prepare("SELECT * FROM orders WHERE status = ? ORDER BY created_at DESC");
+    $stmt->bind_param("s", $status_filter);
+    $stmt->execute();
+    $orders = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+} else {
+    $orders = $conn->query("SELECT * FROM orders ORDER BY created_at DESC")->fetch_all(MYSQLI_ASSOC);
+}
+$counts = array_fill_keys($statuses, 0);
+foreach ($conn->query("SELECT status, COUNT(*) FROM orders GROUP BY status")->fetch_all() as [$st, $n]) {
+    if (isset($counts[strtolower((string) $st)])) {
+        $counts[strtolower((string) $st)] += (int) $n;
+    }
+}
+$count_all = array_sum($counts);
 ?>
 
 <main class="k-admin__main">
@@ -58,8 +74,15 @@ $orders = $conn->query("SELECT * FROM orders ORDER BY created_at DESC");
             role="<?php echo $flash['type'] === 'success' ? 'status' : 'alert'; ?>"><?php echo htmlspecialchars($flash['message']); ?></div>
     <?php endif; ?>
 
+    <ul class="k-chips" aria-label="Filter by status">
+        <li><a href="orders.php" class="k-genre<?php echo $status_filter === '' ? ' is-active' : ''; ?>"<?php echo $status_filter === '' ? ' aria-current="true"' : ''; ?>>All<span class="k-chips__n"><?php echo $count_all; ?></span></a></li>
+        <?php foreach ($statuses as $s): ?>
+            <li><a href="orders.php?status=<?php echo $s; ?>" class="k-genre<?php echo $status_filter === $s ? ' is-active' : ''; ?>"<?php echo $status_filter === $s ? ' aria-current="true"' : ''; ?>><?php echo ucfirst($s); ?><span class="k-chips__n"><?php echo $counts[$s]; ?></span></a></li>
+        <?php endforeach; ?>
+    </ul>
+
     <div class="k-tablecard">
-        <table class="k-table k-table--xwide">
+        <table class="k-table k-table--xwide k-table--stack">
             <thead>
                 <tr>
                     <th>Order ID</th>
@@ -72,7 +95,7 @@ $orders = $conn->query("SELECT * FROM orders ORDER BY created_at DESC");
                 </tr>
             </thead>
             <tbody>
-                <?php while ($order = $orders->fetch_assoc()): ?>
+                <?php foreach ($orders as $order): ?>
                     <?php
                     $status = strtolower((string) $order['status']);
                     if (!in_array($status, ['pending', 'processing', 'shipped', 'delivered', 'cancelled'], true)) {
@@ -85,15 +108,16 @@ $orders = $conn->query("SELECT * FROM orders ORDER BY created_at DESC");
                         : ucwords(str_replace('_', ' ', $payment));
                     ?>
                     <tr>
-                        <td class="k-num k-num--strong">#<?php echo (int) $order['id']; ?></td>
-                        <td><?php echo htmlspecialchars((string) $order['name'] !== '' ? (string) $order['name'] : '—'); ?></td>
-                        <td class="k-muted k-nowrap"><?php echo htmlspecialchars((string) $order['email'] !== '' ? (string) $order['email'] : '—'); ?></td>
-                        <td class="k-num k-num--strong">Rs. <?php echo number_format($order['total']); ?></td>
-                        <td class="k-muted"><?php echo htmlspecialchars($payment_label); ?></td>
-                        <td>
+                        <td class="k-num k-num--strong"><a class="k-idlink" href="<?php echo BASE_URL; ?>frontend/order.php?id=<?php echo (int) $order['id']; ?>">#<?php echo (int) $order['id']; ?></a></td>
+                        <td data-label="Customer"><?php echo htmlspecialchars((string) $order['name'] !== '' ? (string) $order['name'] : '—'); ?></td>
+                        <td class="k-muted k-nowrap" data-label="Email"><?php echo htmlspecialchars((string) $order['email'] !== '' ? (string) $order['email'] : '—'); ?></td>
+                        <td class="k-num k-num--strong" data-label="Total">Rs. <?php echo number_format($order['total']); ?></td>
+                        <td class="k-muted" data-label="Payment"><?php echo htmlspecialchars($payment_label); ?></td>
+                        <td data-label="Status">
                             <span class="k-pill k-pill--<?php echo $status; ?>"><?php echo ucfirst($status); ?></span>
                             <?php if ($status !== 'cancelled'): ?>
-                                <form method="POST" class="k-rowactions">
+                                <form method="POST" class="k-statusform">
+                                    <input type="hidden" name="filter" value="<?php echo $status_filter; ?>">
                                     <input type="hidden" name="csrf" value="<?php echo k_csrf_token(); ?>">
                                     <input type="hidden" name="order_id" value="<?php echo (int) $order['id']; ?>">
                                     <select name="status" class="k-input" aria-label="Status of order #<?php echo (int) $order['id']; ?>">
@@ -105,12 +129,12 @@ $orders = $conn->query("SELECT * FROM orders ORDER BY created_at DESC");
                                 </form>
                             <?php endif; ?>
                         </td>
-                        <td class="k-num k-muted"><?php echo date('M d, Y H:i', strtotime($order['created_at'])); ?></td>
+                        <td class="k-num k-muted" data-label="Placed"><?php echo date('M d, Y H:i', strtotime($order['created_at'])); ?></td>
                     </tr>
-                <?php endwhile; ?>
-                <?php if ($orders->num_rows == 0): ?>
+                <?php endforeach; ?>
+                <?php if (!$orders): ?>
                     <tr>
-                        <td colspan="7" class="k-table__empty">No orders found.</td>
+                        <td colspan="7" class="k-table__empty"><?php echo $status_filter !== '' ? 'No ' . $status_filter . ' orders. <a href="orders.php">Show every order</a>.' : 'No orders found.'; ?></td>
                     </tr>
                 <?php endif; ?>
             </tbody>

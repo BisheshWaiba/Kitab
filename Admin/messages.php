@@ -45,7 +45,7 @@ include 'includes/header.php';
     <?php endif; ?>
 
     <div class="k-tablecard">
-        <table class="k-table k-table--xwide">
+        <table class="k-table k-table--xwide k-table--stack">
             <thead>
                 <tr>
                     <th>From</th>
@@ -63,9 +63,9 @@ include 'includes/header.php';
                                 <?php if (!$m['is_read']): ?><span class="k-tag">New</span><?php endif; ?></div>
                             <div class="k-muted"><?php echo htmlspecialchars($m['email']); ?></div>
                         </td>
-                        <td><span class="k-tag"><?php echo htmlspecialchars(CONTACT_TOPICS[$m['topic']] ?? $m['topic']); ?></span></td>
-                        <td class="k-msgtext"><?php echo htmlspecialchars($m['message']); ?></td>
-                        <td class="k-muted k-nowrap"><?php echo date('M j, Y g:i A', strtotime($m['created_at'])); ?></td>
+                        <td data-label="About"><span class="k-tag"><?php echo htmlspecialchars(CONTACT_TOPICS[$m['topic']] ?? $m['topic']); ?></span></td>
+                        <td class="k-msgtext" data-label="Message"><?php echo htmlspecialchars($m['message']); ?></td>
+                        <td class="k-muted k-nowrap" data-label="Received"><?php echo date('M j, Y g:i A', strtotime($m['created_at'])); ?></td>
                         <td>
                             <div class="k-rowactions">
                                 <a href="mailto:<?php echo htmlspecialchars($m['email']); ?>?subject=<?php echo rawurlencode('Re: your message to ' . 'KITAB'); ?>"
@@ -73,7 +73,7 @@ include 'includes/header.php';
                                 <form method="POST" onsubmit="return confirm('Delete this message?')">
                                     <input type="hidden" name="csrf" value="<?php echo k_csrf_token(); ?>">
                                     <input type="hidden" name="id" value="<?php echo (int) $m['id']; ?>">
-                                    <button type="submit" class="k-btn k-btn--danger k-btn--xs"
+                                    <button type="submit" class="k-btn k-btn--danger-light k-btn--xs"
                                         aria-label="Delete the message from <?php echo htmlspecialchars($m['name']); ?>">Delete</button>
                                 </form>
                             </div>
