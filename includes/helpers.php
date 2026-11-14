@@ -464,10 +464,16 @@ function k_rating_row(int $book_id): string
         . '</span>';
 }
 
-// $cta is the look of the Add to Cart button: 'outline' (Shop and Wishlist) or 'primary' (the Home page)
+// A book card: a tall pale stage with the cover on it, then the star rating, the title and the price. The heart (wishlist)
+// and Add to Cart sit on the stage and appear on hover or keyboard focus (always shown on touch screens, see flat.css).
+// Add to Cart adds one copy without leaving the page (assets/js/main.js shows the "Added to your cart" message and updates
+// the cart badge); without JavaScript the form is sent to the Book page, which adds it and shows the message.
+// ($cta is kept for old callers; the button on the stage is always the amber one.)
 function k_book_card(array $b, string $cta = 'outline'): void
 {
     $href = BASE_URL . 'frontend/product.php?id=' . (int) $b['id'];
+    $cover_img = trim((string) ($b['image'] ?? ''));
+    $cover_url = $cover_img === '' ? '' : (strpos($cover_img, 'http') === 0 ? $cover_img : BASE_URL . $cover_img);
     ?>
     <article class="k-book">
         <div class="k-book__media">
@@ -475,26 +481,17 @@ function k_book_card(array $b, string $cta = 'outline'): void
                 <?php k_cover($b); ?>
             </a>
             <?php k_wish_button($b); ?>
-        </div>
-        <div class="k-book__info">
-            <?php echo k_rating_row((int) $b['id']); ?>
-            <a class="k-book__title" href="<?php echo $href; ?>"><?php echo htmlspecialchars($b['title']); ?></a>
-            <span class="k-book__author">by <?php echo htmlspecialchars($b['author']); ?></span>
-        </div>
-        <div class="k-book__foot">
-            <span class="k-book__price">Rs. <?php echo number_format((float) $b['price']); ?></span>
-            <?php
-            // Adds one copy to the cart without leaving the page (assets/js/main.js shows the "Added to your cart" message and
-            // updates the cart badge). Without JavaScript the form is sent to the Book page, which adds it and shows the message.
-            $cover_img = trim((string) ($b['image'] ?? ''));
-            $cover_url = $cover_img === '' ? '' : (strpos($cover_img, 'http') === 0 ? $cover_img : BASE_URL . $cover_img);
-            ?>
             <form method="POST" action="<?php echo $href; ?>" class="k-book__add" data-add-form
                 data-title="<?php echo htmlspecialchars($b['title']); ?>" data-cover="<?php echo htmlspecialchars($cover_url); ?>">
                 <input type="hidden" name="quantity" value="1">
-                <button type="submit" name="add_to_cart" class="k-btn k-btn--<?php echo $cta === 'primary' ? 'primary' : 'outline'; ?>"
+                <button type="submit" name="add_to_cart" class="k-btn k-btn--primary"
                     aria-label="Add to Cart: <?php echo htmlspecialchars($b['title']); ?>"><span data-add-label>Add to Cart</span></button>
             </form>
+        </div>
+        <div class="k-book__info">
+            <?php echo k_rating_row((int) $b['id']); ?>
+            <a class="k-book__title" href="<?php echo $href; ?>"><?php echo htmlspecialchars($b['title']); ?><span class="k-sr"> by <?php echo htmlspecialchars($b['author']); ?></span></a>
+            <span class="k-book__price">Rs. <?php echo number_format((float) $b['price']); ?></span>
         </div>
     </article>
     <?php
