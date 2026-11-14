@@ -28,7 +28,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <?php require __DIR__ . '/../../includes/theme.php'; // dark mode, the same switch as the shop ?>
     <script>document.documentElement.classList.add('has-js');</script>
-    <title>Admin Dashboard - KITAB</title>
+    <title><?php echo htmlspecialchars(($admin_nav[$current_page][0] ?? ['add_book.php' => 'Add Book', 'edit_book.php' => 'Edit Book'][$current_page] ?? 'Admin') . ' - Admin - KITAB'); ?></title>
 <?php require __DIR__ . '/../../includes/favicon.php'; ?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">

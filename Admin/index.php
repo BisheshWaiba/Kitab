@@ -1,4 +1,5 @@
 <?php include 'includes/header.php';
+require_once dirname(__DIR__) . '/includes/helpers.php'; // for k_cover()
 
 // Fetch Stats
 $total_books = $conn->query("SELECT COUNT(*) as count FROM books")->fetch_assoc()['count'];
@@ -10,6 +11,25 @@ $total_revenue = $conn->query("SELECT SUM(total) as sum FROM orders WHERE status
 // What is waiting for the admin
 $pending_orders = (int) $conn->query("SELECT COUNT(*) FROM orders WHERE status = 'pending'")->fetch_row()[0];
 $soldout_books = (int) $conn->query("SELECT COUNT(*) FROM books WHERE stock <= 0")->fetch_row()[0];
+$low_books = (int) $conn->query("SELECT COUNT(*) FROM books WHERE stock BETWEEN 1 AND 5")->fetch_row()[0];
+
+// Orders per day for the last 7 days (today last), cancelled ones left out; days with no orders count as 0
+$per_day = [];
+foreach ($conn->query("SELECT DATE(created_at) AS d, COUNT(*) AS n, SUM(total) AS s FROM orders WHERE status <> 'cancelled' AND created_at >= CURDATE() - INTERVAL 6 DAY GROUP BY d")->fetch_all(MYSQLI_ASSOC) as $row) {
+    $per_day[$row['d']] = [(int) $row['n'], (float) $row['s']];
+}
+$days = [];
+for ($i = 6; $i >= 0; $i--) {
+    $key = date('Y-m-d', strtotime("-$i days"));
+    [$n, $sum] = $per_day[$key] ?? [0, 0.0];
+    $days[] = ['key' => $key, 'label' => $i === 0 ? 'Today' : date('D', strtotime($key)), 'n' => $n, 'sum' => $sum, 'today' => $i === 0];
+}
+$max_day = max(1, max(array_column($days, 'n')));
+$week_orders = array_sum(array_column($days, 'n'));
+$week_revenue = array_sum(array_column($days, 'sum'));
+
+// The books that sold most (copies in orders that were not cancelled)
+$best = $conn->query("SELECT b.id, b.title, b.image, SUM(oi.quantity) AS sold FROM order_items oi JOIN orders o ON o.id = oi.order_id AND o.status <> 'cancelled' JOIN books b ON b.id = oi.book_id GROUP BY b.id ORDER BY sold DESC, b.id DESC LIMIT 5")->fetch_all(MYSQLI_ASSOC);
 
 // Fetch Recent Orders
 $recent_orders = $conn->query("SELECT * FROM orders ORDER BY created_at DESC LIMIT 5");
@@ -26,6 +46,7 @@ $stats = [
 $todo = [
     'Pending orders' => [$pending_orders, 'to get moving', 'orders.php?status=pending'],
     'Sold-out books' => [$soldout_books, 'to restock', 'books.php?stock=out'],
+    'Running low' => [$low_books, '5 copies or fewer left', 'books.php?stock=low'],
     'Unread messages' => [$unread_messages, 'from the Contact page', 'messages.php'],
 ];
 ?>
@@ -60,6 +81,46 @@ $todo = [
             <?php endforeach; ?>
         </div>
     </section>
+
+    <div class="k-dash2">
+        <section class="k-card k-dashcard" aria-labelledby="k-week-title">
+            <div class="k-dashcard__head">
+                <h2 class="k-h3" id="k-week-title">Last 7 days</h2>
+                <span class="k-dashcard__sub"><?php echo $week_orders . ($week_orders === 1 ? ' order' : ' orders'); ?> &middot; Rs. <?php echo number_format($week_revenue); ?></span>
+            </div>
+            <div class="k-chart" role="img" aria-label="Orders per day: <?php echo htmlspecialchars(implode(', ', array_map(fn($d) => $d['label'] . ' ' . $d['n'], $days))); ?>">
+                <?php foreach ($days as $d): ?>
+                    <div class="k-chart__day<?php echo $d['n'] > 0 ? ' has-orders' : ''; ?><?php echo $d['today'] ? ' is-today' : ''; ?>"
+                        title="<?php echo date('M j', strtotime($d['key'])) . ': ' . $d['n'] . ($d['n'] === 1 ? ' order' : ' orders') . ', Rs. ' . number_format($d['sum']); ?>">
+                        <span class="k-chart__n"><?php echo $d['n']; ?></span>
+                        <span class="k-chart__bar" style="--h: <?php echo round($d['n'] / $max_day * 78); ?>%"></span>
+                        <span class="k-chart__label"><?php echo $d['label']; ?></span>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </section>
+
+        <section class="k-card k-dashcard" aria-labelledby="k-best-title">
+            <div class="k-dashcard__head">
+                <h2 class="k-h3" id="k-best-title">Best sellers</h2>
+                <span class="k-dashcard__sub">copies sold</span>
+            </div>
+            <?php if ($best): ?>
+                <ol class="k-top">
+                    <?php foreach ($best as $i => $b): ?>
+                        <li>
+                            <span class="k-top__rank"><?php echo $i + 1; ?></span>
+                            <?php k_cover($b, 'k-thumb', false); ?>
+                            <span class="k-top__title"><?php echo htmlspecialchars($b['title']); ?></span>
+                            <span class="k-top__n"><?php echo (int) $b['sold']; ?></span>
+                        </li>
+                    <?php endforeach; ?>
+                </ol>
+            <?php else: ?>
+                <p class="k-dashcard__empty">Nothing has sold yet. The top five will show here.</p>
+            <?php endif; ?>
+        </section>
+    </div>
 
     <section class="k-card k-admincard">
         <div class="k-admincard__head">

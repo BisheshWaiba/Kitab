@@ -39,7 +39,7 @@ button.k-adminside__theme { width: 100%; border: 0; background: transparent; fon
 .k-stat__hint { grid-area: hint; font-size: 13px; color: var(--k-muted); }
 
 /* "needs a look": what is waiting for the admin, each one a link to the page that deals with it */
-.k-todo { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr)); gap: 16px; }
+.k-todo { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(205px, 100%), 1fr)); gap: 16px; }
 .k-todo__item { display: flex; align-items: center; gap: 14px; padding: 16px 20px; border-radius: 16px; border: 1px solid var(--k-line); background: var(--k-band); color: var(--k-ink); transition: border-color .15s, background-color .15s, transform .25s var(--k-ease); }
 .k-todo__item:hover { border-color: var(--k-ink); background: var(--k-white); transform: translateY(-2px); }
 .k-todo__item:focus-visible { outline: 3px solid var(--k-accent); outline-offset: 2px; }
@@ -111,4 +111,74 @@ button.k-adminside__theme { width: 100%; border: 0; background: transparent; fon
   .k-table--books td:nth-child(8) { grid-column: 1 / -1; margin-top: 12px; }
   .k-table--books .k-admintitle { max-width: none; }
   .k-table--books .k-rowactions .k-btn { flex: 1; }
+}
+
+/* ---------- the second pass: dialogs, table rows, the dashboard charts ---------- */
+
+/* a row you point at lights up a little (mouse only: on a phone there is no pointing) */
+@media (hover: hover) {
+  .k-adminbody .k-table tbody tr:hover td { background: color-mix(in srgb, var(--k-ink) 3.5%, transparent); }
+}
+
+/* the Messages table: the two buttons stand one above the other, and the message text is a little narrower, so the whole row fits the card */
+.k-table--messages .k-msgtext { min-width: 220px; max-width: 360px; }
+.k-table--messages .k-rowactions { flex-direction: column; align-items: stretch; gap: 8px; }
+.k-table--messages .k-rowactions .k-btn { width: 100%; }
+.k-table--messages .k-tag { white-space: normal; }
+
+/* "Are you sure?": replaces the browser's plain confirm() box (assets/js/admin.js builds it when a form has data-confirm) */
+.k-dialog { margin: auto; width: min(440px, calc(100vw - 32px)); padding: 28px; border: 1px solid var(--k-line); border-radius: 20px; background: var(--k-white); color: var(--k-ink); box-shadow: 0 30px 70px -20px rgba(17, 18, 20, .55); }
+.k-dialog::backdrop { background: rgba(10, 11, 14, .5); }
+.k-dialog__title { font: 600 24px/1.2 var(--k-display); letter-spacing: -.01em; }
+.k-dialog__text { margin-top: 10px; font-size: 16px; line-height: 1.55; color: var(--k-ink-2); overflow-wrap: anywhere; }
+.k-dialog__actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 12px; margin-top: 24px; }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes k-dialog-in { from { opacity: 0; transform: translateY(12px) scale(.98); } }
+  .k-dialog[open] { animation: k-dialog-in .22s var(--k-ease); }
+}
+
+/* the dashboard: orders per day for the last week, and the books that sold most */
+.k-dash2 { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 20px; }
+.k-dashcard { padding: 24px 28px; display: flex; flex-direction: column; gap: 20px; }
+.k-dashcard__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 16px; }
+.k-dashcard__sub { font-size: 14px; color: var(--k-muted); }
+
+.k-chart { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 12px; align-items: end; height: 250px; margin-top: auto; }
+.k-chart__day { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 8px; height: 100%; min-width: 0; }
+.k-chart__n { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--k-ink-2); }
+.k-chart__bar { width: 100%; max-width: 44px; min-height: 6px; height: var(--h, 0%); border-radius: 10px 10px 4px 4px; background: color-mix(in srgb, var(--k-ink) 12%, transparent); }
+.k-chart__day.has-orders .k-chart__bar { background: linear-gradient(180deg, #FBD774, #EFB335); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55), 0 8px 14px -10px rgba(190, 120, 0, .8); }
+.k-chart__day.is-today .k-chart__label { font-weight: 700; color: var(--k-ink); }
+.k-chart__label { font-size: 12px; color: var(--k-muted); }
+
+.k-top { display: flex; flex-direction: column; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.k-top li { display: flex; align-items: center; gap: 14px; padding: 7px 0; border-top: 1px solid var(--k-line); }
+.k-top li:first-child { border-top: 0; }
+.k-top__rank { flex: none; width: 22px; font: 700 14px/1 var(--k-body); color: var(--k-muted); font-variant-numeric: tabular-nums; }
+.k-top .k-thumb { flex: none; width: 34px; }
+.k-top .k-cover--empty { padding: 2px; overflow: hidden; font-size: 5px; }
+.k-top__title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 600 15px/1.3 var(--k-display); }
+.k-top__n { flex: none; font-size: 14px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--k-ink-2); }
+.k-dashcard__empty { font-size: 15px; color: var(--k-muted); }
+
+@media (max-width: 1100px) { .k-dash2 { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- phones: nothing in a stacked row may be cut off ---------- */
+@media (max-width: 640px) {
+  .k-table--stack td { min-width: 0; white-space: normal; overflow-wrap: anywhere; }
+  .k-table--stack td[data-label="Email"],
+  .k-table--stack td[data-label="Message"],
+  .k-table--stack td[data-label="Status"] { grid-column: 1 / -1; }
+  .k-table--messages td:last-child { grid-column: 1 / -1; }
+  .k-table--messages .k-rowactions { flex-direction: row; }
+  .k-table--messages .k-rowactions .k-btn { flex: 1; }
+  .k-table--messages .k-msgtext { min-width: 0; max-width: none; }
+  .k-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .k-stat { padding: 16px; gap: 2px 10px; }
+  .k-stat__value { font-size: clamp(20px, 6.2vw, 28px); }
+  .k-stat__hint { font-size: 12px; }
+  .k-todo { gap: 10px; }
+  .k-dashcard { padding: 20px; }
+  .k-chart { gap: 6px; height: 160px; }
+  .k-dialog__actions .k-btn { flex: 1; }
 }

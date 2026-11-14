@@ -116,8 +116,8 @@ unset($_SESSION['flash']);
                                     class="k-btn k-btn--outline k-btn--xs"
                                     aria-label="Edit <?php echo htmlspecialchars($book['title']); ?>">Edit</a>
                                 <form method="POST" action="<?php echo BASE_URL; ?>admin/delete_book.php"
-                                    onsubmit="return confirm(this.dataset.confirm)"
-                                    data-confirm="<?php echo htmlspecialchars('Delete "' . $book['title'] . '"? Its reviews are removed too, and this can\'t be undone.'); ?>">
+                                    data-confirm-title="Delete this book?" data-confirm-button="Delete book"
+                                    data-confirm="<?php echo htmlspecialchars('"' . $book['title'] . '" and its reviews will be removed. This can\'t be undone.'); ?>">
                                     <input type="hidden" name="csrf" value="<?php echo k_csrf_token(); ?>">
                                     <input type="hidden" name="id" value="<?php echo (int) $book['id']; ?>">
                                     <button type="submit" class="k-btn k-btn--danger-light k-btn--xs"

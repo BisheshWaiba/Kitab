@@ -45,7 +45,7 @@ include 'includes/header.php';
     <?php endif; ?>
 
     <div class="k-tablecard">
-        <table class="k-table k-table--xwide k-table--stack">
+        <table class="k-table k-table--xwide k-table--stack k-table--messages">
             <thead>
                 <tr>
                     <th>From</th>
@@ -70,7 +70,8 @@ include 'includes/header.php';
                             <div class="k-rowactions">
                                 <a href="mailto:<?php echo htmlspecialchars($m['email']); ?>?subject=<?php echo rawurlencode('Re: your message to ' . 'KITAB'); ?>"
                                     class="k-btn k-btn--outline k-btn--xs">Reply</a>
-                                <form method="POST" onsubmit="return confirm('Delete this message?')">
+                                <form method="POST" data-confirm-title="Delete this message?" data-confirm-button="Delete message"
+                                    data-confirm="<?php echo htmlspecialchars('The message from ' . $m['name'] . ' will be removed. This can\'t be undone.'); ?>">
                                     <input type="hidden" name="csrf" value="<?php echo k_csrf_token(); ?>">
                                     <input type="hidden" name="id" value="<?php echo (int) $m['id']; ?>">
                                     <button type="submit" class="k-btn k-btn--danger-light k-btn--xs"

@@ -35,3 +35,65 @@
     }
     window.addEventListener('pageshow', function () { set(false); });
 })();
+
+// "Are you sure?": a form with data-confirm="..." (and optionally data-confirm-title / data-confirm-button) asks in a dialog of our
+// own before it is sent, instead of the browser's plain confirm() box. Cancel, Escape or a click outside closes it and sends nothing.
+(function () {
+    if (!window.HTMLDialogElement) {
+        // an old browser without <dialog>: fall back to the plain box
+        document.addEventListener('submit', function (e) {
+            var form = e.target;
+            if (form.hasAttribute && form.hasAttribute('data-confirm') && !window.confirm(form.getAttribute('data-confirm'))) {
+                e.preventDefault();
+            }
+        }, true);
+        return;
+    }
+    var dialog = null;
+    var title, text, ok, cancel;
+    var pending = null;     // the form waiting for an answer
+    var opener = null;      // what had focus, so it gets it back
+
+    function build() {
+        dialog = document.createElement('dialog');
+        dialog.className = 'k-dialog';
+        dialog.setAttribute('aria-labelledby', 'k-dialog-title');
+        dialog.innerHTML = '<h2 class="k-dialog__title" id="k-dialog-title"></h2><p class="k-dialog__text"></p>' +
+            '<div class="k-dialog__actions"><button type="button" class="k-btn k-btn--outline" data-dialog-cancel>Cancel</button>' +
+            '<button type="button" class="k-btn k-btn--danger-light" data-dialog-ok></button></div>';
+        document.body.appendChild(dialog);
+        title = dialog.querySelector('.k-dialog__title');
+        text = dialog.querySelector('.k-dialog__text');
+        ok = dialog.querySelector('[data-dialog-ok]');
+        cancel = dialog.querySelector('[data-dialog-cancel]');
+        cancel.addEventListener('click', function () { dialog.close(); });
+        ok.addEventListener('click', function () {
+            var form = pending;
+            pending = null;
+            dialog.close();
+            if (form) { form.submit(); } // submit() skips this handler, so it is not asked twice
+        });
+        // a click on the dimmed page (the dialog's own backdrop) closes it too
+        dialog.addEventListener('click', function (e) { if (e.target === dialog) { dialog.close(); } });
+        dialog.addEventListener('close', function () {
+            pending = null;
+            if (opener && opener.focus) { opener.focus(); }
+        });
+    }
+
+    document.addEventListener('submit', function (e) {
+        var form = e.target;
+        if (!form.hasAttribute || !form.hasAttribute('data-confirm')) {
+            return;
+        }
+        e.preventDefault();
+        if (!dialog) { build(); }
+        pending = form;
+        opener = document.activeElement;
+        title.textContent = form.getAttribute('data-confirm-title') || 'Are you sure?';
+        text.textContent = form.getAttribute('data-confirm');
+        ok.textContent = form.getAttribute('data-confirm-button') || 'Delete';
+        dialog.showModal();
+        cancel.focus(); // the safe choice has the focus, so an accidental Enter does not delete
+    });
+})();
