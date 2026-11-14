@@ -1,0 +1,42 @@
+/* Sell a book: the flat form. The panel, the sections (pf-group), the buttons row and the drop-down are shared with Edit profile
+   (flat.css and profile-flat.css); everything here has an sb- name, so no other page picks it up. */
+
+.pf--sell .fl-h1 { margin-bottom: 14px; }
+.sb-lede { margin: 0 0 32px; }
+.pf--sell .pf-notice { margin: 0 0 24px; }
+
+/* a section's title */
+.sb-h { margin: 0; font: 600 20px/1.2 var(--k-display); letter-spacing: -.01em; color: var(--k-ink); }
+.sb-h .k-field__hint { font: 400 15px/1 var(--k-body); letter-spacing: 0; }
+
+/* the fields in a row never push the row wider than the card */
+.pf--sell .k-fields > .k-field,
+.sb-trio > .k-field { min-width: 0; }
+
+/* price, copies and category in one row */
+.sb-trio { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.4fr); gap: 20px; }
+
+/* the cover: a book-shaped box that shows the picture you choose, with the button and the rules beside it */
+.sb-cover { display: flex; flex-wrap: wrap; align-items: center; gap: 20px 28px; }
+.sb-cover__preview { flex: none; display: grid; place-items: center; width: 112px; aspect-ratio: 2 / 3; box-sizing: border-box; overflow: hidden; border: 2px dashed var(--k-border-strong); border-radius: 6px; background: var(--k-band); color: var(--k-muted); }
+.sb-cover__preview img { width: 100%; height: 100%; object-fit: cover; }
+.sb-cover__preview:not(.has-image) img { display: none; }
+.sb-cover__preview.has-image { border: 1px solid var(--k-line); box-shadow: 0 16px 26px -16px rgba(17, 18, 20, .5); }
+.sb-cover__preview.has-image svg { display: none; }
+.sb-cover__side { flex: 1 1 260px; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+.sb-cover__text { margin: 0; max-width: 46ch; font-size: 15px; line-height: 1.55; color: var(--k-ink-2); }
+
+@media (max-width: 640px) {
+  .sb-lede { margin-bottom: 24px; }
+  .sb-trio { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .sb-trio__wide { grid-column: 1 / -1; }
+  .sb-cover { flex-wrap: nowrap; align-items: flex-start; gap: 18px; }
+  .sb-cover__preview { width: 96px; }
+  .sb-cover__side { flex: 1 1 0; }
+  .pf--sell .pf-form__actions .k-btn { flex: 1 1 140px; }
+}
+/* very narrow phones: the picture box on top, the rules and the button under it, so the button never outgrows its column */
+@media (max-width: 350px) {
+  .sb-cover { flex-direction: column; align-items: flex-start; gap: 16px; }
+  .sb-cover__side { flex: none; width: 100%; }
+}
