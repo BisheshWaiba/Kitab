@@ -49,6 +49,30 @@ $shelf_order = [2, 0, 1];
                 </a>
                 <a href="<?php echo BASE_URL; ?>frontend/register.php" class="k-btn k-btn--outline k-btn--lg">Join KITAB</a>
             </div>
+            <?php $return_days = (int) (require __DIR__ . '/includes/legal_pages.php')['site']['return_days']; // the same promises the Book page makes ?>
+            <ul class="fh-trust" aria-label="How buying works">
+                <li>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 7h11v9H3z" /><path d="M14 10h4l3 3v3h-7z" /><circle cx="7" cy="18" r="1.6" /><circle cx="17" cy="18" r="1.6" />
+                    </svg>
+                    Free shipping over Rs. <?php echo number_format(K_FREE_SHIPPING_AT); ?>
+                </li>
+                <li>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="3" y="6" width="18" height="12" rx="2" /><circle cx="12" cy="12" r="2.6" />
+                    </svg>
+                    Pay when it arrives
+                </li>
+                <li>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M4 8h10a5 5 0 0 1 0 10H8" /><path d="M8 4 4 8l4 4" />
+                    </svg>
+                    Return within <?php echo $return_days; ?> days
+                </li>
+            </ul>
         </div>
 
         <div class="fh-shelf">

@@ -5,7 +5,7 @@
    Used by Home and Shop (page-specific parts: home-flat.css, shop-flat.css). */
 
 .fl { color: var(--k-ink); }
-.fl-wrap { width: 100%; max-width: 1280px; margin: 0 auto; padding: 0 40px; box-sizing: border-box; }
+.fl-wrap { width: 100%; max-width: var(--k-wrap); margin: 0 auto; padding: 0 40px; box-sizing: border-box; }
 
 /* ---------- type ---------- */
 .fl-h1 { margin: 0; font: 600 clamp(44px, 5.6vw, 72px)/1.02 var(--k-display); letter-spacing: -.03em; color: var(--k-ink); }
@@ -20,6 +20,8 @@
 .fl-head { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 24px; margin-bottom: 32px; }
 .fl-chips { display: flex; flex-wrap: wrap; gap: 10px; margin: 0; padding: 0; list-style: none; }
 .fl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr)); gap: 24px; }
+/* on big monitors (the page is 1560 wide, see --k-wrap in kitab.css) the cards grow instead of squeezing in a fifth column */
+@media (min-width: 1700px) { .fl-grid { grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); } }
 
 /* ---------- book cards (the shared .k-book card from k_book_card(), styled for these pages only) ---------- */
 /* A product-shot card, like a shop's product tile: no border, a soft shadow, a tall pale stage with the picture large on it,
@@ -33,7 +35,12 @@
 /* the stage: 390 wide to 530 tall like the reference (just over three quarters of the card), a very light grey that fades a little
    towards the bottom. The cover is centred in it, a little above the middle (the bottom padding leaves room for Add to Cart). */
 .fl .k-book__cover { box-sizing: border-box; aspect-ratio: 39 / 53; border-radius: 0; padding: 0 0 8cqw; background: linear-gradient(180deg, var(--k-band), color-mix(in srgb, var(--k-band) 40%, var(--k-white))); }
-.fl .k-book__cover .k-cover { width: 70%; max-width: 100%; box-shadow: 0 2px 4px rgba(20, 22, 28, .14), 0 20px 30px -14px rgba(20, 22, 28, .42); transition: transform .25s; }
+.fl .k-book__cover .k-cover { width: 70%; max-width: 100%; box-shadow: 0 2px 4px rgba(20, 22, 28, .14), 0 20px 30px -14px rgba(20, 22, 28, .42); transition: transform .25s, opacity .5s ease; }
+/* a cover fades in once it has loaded (k_cover() marks it .is-in), instead of popping into the pale stage. If that never happens (a
+   blocked script, a slow image) it shows itself after 4 seconds anyway. Without scripts (.has-js) nothing is hidden. */
+.has-js .fl .k-book__cover img.k-cover:not(.is-in),
+.has-js .gp-stage img.gp-stage__cover:not(.is-in) { opacity: 0; animation: k-cover-show .01s 4s forwards; }
+@keyframes k-cover-show { to { opacity: 1; } }
 .fl .k-book:hover .k-cover { transform: translateY(-6px); }
 
 /* under the stage (38.5% of the card's width tall): stars, name, price. The price sits at the bottom so every card in a row lines up.

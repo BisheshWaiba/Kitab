@@ -6,6 +6,27 @@
 .fh-hero__copy { flex: 1 1 480px; min-width: 0; display: flex; flex-direction: column; gap: 26px; }
 .fh-hero__cta { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 6px; }
 
+/* the three promises under the buttons (the same ones the Book page makes) */
+.fh-trust { display: flex; flex-wrap: wrap; gap: 10px 18px; margin: 4px 0 0; padding: 0; list-style: none; font-size: 14px; color: var(--k-ink-2); }
+.fh-trust li { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.fh-trust svg { flex: none; color: var(--k-ink); }
+
+/* The hero arrives in order: the words rise a little, then the three covers come up onto the shelf one after the other and lift
+   when pointed at. (People who asked for less motion get none of it.) */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes fh-rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+  .fh-hero__copy > * { animation: fh-rise .7s var(--k-ease) backwards; }
+  .fh-hero__copy > :nth-child(2) { animation-delay: .08s; }
+  .fh-hero__copy > :nth-child(3) { animation-delay: .16s; }
+  .fh-hero__copy > :nth-child(4) { animation-delay: .24s; }
+  .fh-shelf a { animation: fh-rise .8s var(--k-ease) backwards; }
+  .fh-shelf a:nth-child(1) { animation-delay: .2s; }
+  .fh-shelf a:nth-child(2) { animation-delay: .34s; }
+  .fh-shelf a:nth-child(3) { animation-delay: .48s; }
+  .fh-shelf .fh-cover { transition: transform .35s var(--k-ease); }
+  .fh-shelf a:hover .fh-cover { transform: translateY(-10px); }
+}
+
 /* three covers standing on a dark shelf */
 .fh-shelf { position: relative; flex: 1 1 440px; min-width: 0; display: flex; align-items: flex-end; justify-content: center; gap: 16px; min-height: 420px; padding: 36px 28px 44px; box-sizing: border-box; border-radius: 28px; background: var(--k-band); overflow: hidden; }
 .fh-shelf::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 22px; background: linear-gradient(#3A3D47, #15171C); }
@@ -36,6 +57,9 @@
 /* ---------- our picks: tabs, then a grid of cards ---------- */
 .fl .k-picks__panel { grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr)); gap: 24px; align-items: stretch; }
 
+@media (min-width: 1700px) {
+  .fl .k-picks__panel { grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); } /* bigger cards on big monitors, like flat.css */
+}
 @media (max-width: 640px) {
   .fl .k-picks__panel { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; } /* two cards across, like the other grids (flat.css) */
 }

@@ -3,6 +3,7 @@
    have not been redesigned yet keep their current look. */
 
 :root {
+  --k-wrap: 1280px;              /* how wide the page content and the header can be; wider on big monitors (below) */
   --k-paper: #FFFFFF;
   --k-white: #FFFFFF;
   --k-band: #F5F5F3;
@@ -95,6 +96,10 @@ body {
   -webkit-text-fill-color: var(--k-ink);
   box-shadow: 0 0 0 100px var(--k-band) inset;
   caret-color: var(--k-ink);
+}
+
+@media (min-width: 1700px) {
+  :root { --k-wrap: 1560px; }
 }
 
 /* ---------- The theme switch in the header ---------- */
@@ -195,7 +200,7 @@ body {
 }
 
 .k-nav__inner {
-  max-width: 1280px;
+  max-width: var(--k-wrap);
   margin: 0 auto;
   padding: 0 40px;
   box-sizing: border-box;
@@ -383,7 +388,7 @@ body {
 .k-footer { background: var(--k-white); color: var(--k-ink-2); font-family: var(--k-body); border-top: 1px solid var(--k-line); }
 
 .k-footer__inner {
-  max-width: 1280px;
+  max-width: var(--k-wrap);
   margin: 0 auto;
   padding: 72px 40px;
   box-sizing: border-box;
@@ -648,7 +653,7 @@ body {
 
 /* ---------- About, Contact and page not found ---------- */
 .k-about {
-  max-width: 1280px;
+  max-width: var(--k-wrap);
   margin: 0 auto;
   padding: 56px 40px 96px;
   box-sizing: border-box;
@@ -758,7 +763,7 @@ body {
 .k-rating__none { color: var(--k-muted); }
 
 .k-reviews {
-  max-width: 1280px;
+  max-width: var(--k-wrap);
   margin: 0 auto;
   padding: 0 40px 96px;
   box-sizing: border-box;
@@ -839,7 +844,7 @@ body {
 
 /* ---------- Home: hero ---------- */
 .k-hero__inner {
-  max-width: 1280px;
+  max-width: var(--k-wrap);
   margin: 0 auto;
   padding: 72px 40px 0;
   box-sizing: border-box;
@@ -875,7 +880,7 @@ body {
 /* The shelf: covers stand on a plank that runs the full width of the page */
 .k-bookshelf { margin-top: 64px; }
 .k-bookshelf__row {
-  max-width: 1280px;
+  max-width: var(--k-wrap);
   margin: 0 auto;
   padding: 0 40px;
   box-sizing: border-box;
@@ -928,7 +933,7 @@ body {
 }
 
 /* ---------- Home: genres ---------- */
-.k-genres { max-width: 1280px; margin: 0 auto; padding: 88px 40px 88px; box-sizing: border-box; }
+.k-genres { max-width: var(--k-wrap); margin: 0 auto; padding: 88px 40px 88px; box-sizing: border-box; }
 
 .k-genres__list {
   display: flex;
@@ -959,7 +964,7 @@ body {
 .k-section--white { background: var(--k-white); border-top: 1px solid var(--k-line); border-bottom: 1px solid var(--k-line); }
 
 .k-section__inner {
-  max-width: 1280px;
+  max-width: var(--k-wrap);
   margin: 0 auto;
   padding: 80px 40px 88px;
   box-sizing: border-box;
@@ -998,7 +1003,7 @@ body {
 .k-picks { background: var(--k-band); color: var(--k-ink); border-top: 1px solid var(--k-line); }
 
 .k-picks__inner {
-  max-width: 1280px;
+  max-width: var(--k-wrap);
   margin: 0 auto;
   padding: 96px 40px;
   box-sizing: border-box;
@@ -1043,7 +1048,7 @@ body {
 /* ---------- Page header band (Shop, and later pages) ---------- */
 .k-pagehead { background: var(--k-white); border-bottom: 1px solid var(--k-line); }
 
-.k-pagehead__inner { max-width: 1280px; margin: 0 auto; padding: 56px 40px 44px; box-sizing: border-box; }
+.k-pagehead__inner { max-width: var(--k-wrap); margin: 0 auto; padding: 56px 40px 44px; box-sizing: border-box; }
 
 .k-h1 {
   margin: 0;
@@ -1058,7 +1063,7 @@ body {
 
 /* ---------- Shop ---------- */
 .k-shop {
-  max-width: 1280px;
+  max-width: var(--k-wrap);
   margin: 0 auto;
   padding: 48px 40px 96px;
   box-sizing: border-box;
@@ -1104,7 +1109,7 @@ body {
 }
 
 /* ---------- Generic page wrapper ---------- */
-.k-page { max-width: 1280px; margin: 0 auto; padding: 72px 40px 96px; box-sizing: border-box; }
+.k-page { max-width: var(--k-wrap); margin: 0 auto; padding: 72px 40px 96px; box-sizing: border-box; }
 
 .k-page--stack { display: flex; flex-direction: column; gap: 36px; padding-top: 56px; }
 
@@ -1528,7 +1533,7 @@ select.k-input { appearance: auto; }
 
 .k-hello { background: var(--k-band); color: var(--k-ink); border-bottom: 1px solid var(--k-line); }
 .k-hello__inner {
-  max-width: 1280px;
+  max-width: var(--k-wrap);
   margin: 0 auto;
   padding: 56px 40px;
   box-sizing: border-box;
@@ -1568,7 +1573,7 @@ select.k-input { appearance: auto; }
 .k-hello__actions { display: flex; flex-wrap: wrap; gap: 12px; }
 
 .k-account {
-  max-width: 1280px;
+  max-width: var(--k-wrap);
   margin: 0 auto;
   padding: 72px 40px 96px;
   box-sizing: border-box;
@@ -1714,7 +1719,7 @@ select.k-input { appearance: auto; }
 
 /* ---------- Product ---------- */
 .k-product {
-  max-width: 1280px;
+  max-width: var(--k-wrap);
   margin: 0 auto;
   padding: 56px 40px 96px;
   box-sizing: border-box;
@@ -1835,7 +1840,7 @@ select.k-input { appearance: auto; }
 .k-qty__box input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
 .k-related {
-  max-width: 1280px;
+  max-width: var(--k-wrap);
   margin: 0 auto;
   padding: 0 40px 96px;
   box-sizing: border-box;

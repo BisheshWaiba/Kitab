@@ -335,8 +335,9 @@ function k_cover(array $b, string $class = 'k-cover', bool $lazy = true): void
         return;
     }
     $src = strpos($img, 'http') === 0 ? $img : BASE_URL . $img;
+    // onload / onerror mark the picture as arrived (.is-in), so book cards and the Book page can fade it in (flat.css)
     echo '<img class="' . $class . '" src="' . htmlspecialchars($src) . '" alt="' . htmlspecialchars($b['title']) . '"'
-        . ($lazy ? ' loading="lazy"' : '') . '>';
+        . ($lazy ? ' loading="lazy"' : '') . ' onload="this.classList.add(\'is-in\')" onerror="this.classList.add(\'is-in\')">';
 }
 
 // Decorative covers beside the login/register forms. $offset chooses which books.
