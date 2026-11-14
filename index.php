@@ -51,44 +51,6 @@ $fan_order = [2, 0, 1];
             <div class="fh-hero__copy">
                 <h1 class="fl-h1">Discover Your Next <em>Favorite Book</em></h1>
                 <p class="fl-lede">Fiction, business, history, art and more, brought to your door.</p>
-                <div class="fh-hero__cta">
-                    <a href="<?php echo BASE_URL; ?>frontend/shop.php" class="k-btn k-btn--primary k-btn--lg">Shop Now
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M5 12h14M13 6l6 6-6 6" />
-                        </svg>
-                    </a>
-                    <a href="<?php echo BASE_URL; ?>frontend/register.php" class="k-btn k-btn--outline k-btn--lg">Join KITAB</a>
-                </div>
-                <?php $return_days = (int) (require __DIR__ . '/includes/legal_pages.php')['site']['return_days']; // the same promises the Book page makes ?>
-                <?php // One panel for the promises: "Pay when it arrives" gets the big half, shipping and returns share the other half. ?>
-                <div class="fh-promise">
-                    <div class="fh-pay">
-                        <span class="fh-pay__icon" aria-hidden="true">
-                            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
-                                stroke-linecap="round" stroke-linejoin="round">
-                                <rect x="2.5" y="6" width="19" height="12" rx="2.2" /><circle cx="12" cy="12" r="2.8" /><path d="M6 9.5v.01M18 14.5v.01" />
-                            </svg>
-                        </span>
-                        <p class="fh-pay__text"><strong>Pay when it arrives</strong><span>Cash on delivery. No card needed.</span></p>
-                    </div>
-                    <ul class="fh-trust" aria-label="More about buying">
-                        <li>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-                                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="M3 7h11v9H3z" /><path d="M14 10h4l3 3v3h-7z" /><circle cx="7" cy="18" r="1.6" /><circle cx="17" cy="18" r="1.6" />
-                            </svg>
-                            <span><strong>Free shipping</strong>over Rs. <?php echo number_format(K_FREE_SHIPPING_AT); ?></span>
-                        </li>
-                        <li>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-                                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="M4 8h10a5 5 0 0 1 0 10H8" /><path d="M8 4 4 8l4 4" />
-                            </svg>
-                            <span><strong>Returns</strong>within <?php echo $return_days; ?> days</span>
-                        </li>
-                    </ul>
-                </div>
             </div>
 
             <?php // The stage: a golden disc, the covers fanned out in front of it, and two glass cards with real numbers (the shop's average rating, the featured book). ?>

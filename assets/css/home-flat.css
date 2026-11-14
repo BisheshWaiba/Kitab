@@ -9,22 +9,6 @@
 .fh-hero { display: flex; flex-wrap: wrap; align-items: center; gap: 56px; padding-top: 64px; padding-bottom: 72px; }
 .fh-hero__copy { flex: 1 1 480px; min-width: 0; display: flex; flex-direction: column; gap: 28px; }
 .fh-hero__copy .fl-lede { max-width: 30em; text-wrap: balance; }
-.fh-hero__cta { display: flex; flex-wrap: wrap; gap: 14px; }
-
-/* One quiet panel for the promises. "Pay when it arrives" is the shop's best selling point, so it gets the big half (a gold icon, the
-   promise in the display type); free shipping and returns share the other half, one above the other. */
-.fh-promise { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); max-width: 580px; overflow: hidden; border-radius: 20px; border: 1px solid var(--k-line); background: var(--k-white); box-shadow: 0 16px 32px -24px rgba(17, 18, 20, .45); }
-.fh-pay { display: flex; align-items: center; gap: 14px; min-width: 0; padding: 20px 20px 20px 18px; background: linear-gradient(135deg, color-mix(in srgb, var(--k-gold) 14%, var(--k-white)), var(--k-white) 75%); }
-.fh-pay__icon { flex: none; display: grid; place-items: center; width: 54px; height: 54px; border-radius: 15px; color: #1B130A; background: linear-gradient(180deg, #FBD774, #EFB335); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .6), 0 8px 16px -10px rgba(190, 120, 0, .8); }
-.fh-pay__text { display: flex; flex-direction: column; gap: 3px; min-width: 0; margin: 0; }
-.fh-pay__text strong { font: 600 20px/1.15 var(--k-display); letter-spacing: -.01em; color: var(--k-ink); }
-.fh-pay__text span { font-size: 14px; line-height: 1.4; color: var(--k-ink-2); }
-
-.fh-trust { display: flex; flex-direction: column; justify-content: center; gap: 14px; margin: 0; padding: 16px 20px; list-style: none; border-left: 1px solid var(--k-line); }
-.fh-trust li { display: flex; align-items: center; gap: 12px; }
-.fh-trust svg { flex: none; color: var(--k-ink); }
-.fh-trust span { display: flex; flex-direction: column; gap: 1px; font-size: 13px; line-height: 1.25; color: var(--k-muted); }
-.fh-trust strong { font-size: 14px; font-weight: 600; color: var(--k-ink); }
 
 /* The hero arrives in order: the words rise a little, then the covers come up one after the other and the glass cards settle in.
    (People who asked for less motion get none of it.) */
@@ -33,9 +17,7 @@
   @keyframes fh-bob { 50% { translate: 0 -7px; } }
   @keyframes fh-spin { to { rotate: 360deg; } }
   .fh-hero__copy > * { animation: fh-rise .7s var(--k-ease) backwards; }
-  .fh-hero__copy > :nth-child(2) { animation-delay: .07s; }
-  .fh-hero__copy > :nth-child(3) { animation-delay: .15s; }
-  .fh-hero__copy > :nth-child(4) { animation-delay: .25s; }
+  .fh-hero__copy > :nth-child(2) { animation-delay: .1s; }
   .fh-fan a { animation: fh-rise .8s var(--k-ease) backwards; }
   .fh-fan a:nth-child(1) { animation-delay: .22s; }
   .fh-fan a:nth-child(2) { animation-delay: .36s; }
@@ -126,9 +108,6 @@
   .fh-chip--book { padding: 8px 8px 8px 14px; }
   .fh-chip__text strong { font-size: 14px; }
   .fh-chip__go { width: 34px; height: 34px; }
-  .fh-promise { grid-template-columns: minmax(0, 1fr); }
-  .fh-pay { padding: 16px 18px 16px 16px; }
-  .fh-trust { flex-direction: row; justify-content: flex-start; gap: 12px 28px; padding: 14px 18px; border-left: 0; border-top: 1px solid var(--k-line); }
   .fh-best { gap: 36px; }
   .fh-best__row { grid-template-columns: repeat(3, minmax(0, 128px)); gap: 28px 14px; }
 }
