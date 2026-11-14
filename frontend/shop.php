@@ -9,8 +9,7 @@ $meta_description = 'Browse the full KITAB catalog and filter by category, autho
 require_once '../includes/header.php';
 
 // ---------- What the visitor asked for (every value is checked before it goes near the database) ----------
-$has_search = is_string($_GET['search'] ?? null); // "Search results for" shows once a search was made, even an empty one
-$search_text = $has_search ? $_GET['search'] : '';
+$search_text = is_string($_GET['search'] ?? null) ? $_GET['search'] : '';
 $author_filter = is_string($_GET['author'] ?? null) ? trim($_GET['author']) : '';   // linked from the Authors page and the product page
 $active_category = is_string($_GET['category'] ?? null) ? $_GET['category'] : '';
 
@@ -32,11 +31,20 @@ if ($min_price !== null && $max_price !== null && $min_price > $max_price) {
     [$min_price, $max_price] = [$max_price, $min_price];
 }
 
-// Sort: only these three exist, anything else means "newest"
+// "4 stars and up": the only rating filter there is (rating=4); anything else means no filter
+$rating_on = ($_GET['rating'] ?? null) === '4';
+
+// The average and number of published (approved) reviews for each book, joined to the books so they can be sorted and filtered on.
+// A book with no reviews has NULL here: it never passes the rating filter and comes last in "Top rated".
+$rating_join = "LEFT JOIN (SELECT book_id, AVG(rating) AS avg_rating, COUNT(*) AS review_count FROM reviews WHERE status = 'approved' GROUP BY book_id) rt ON rt.book_id = books.id";
+$top_rated_order = 'rt.avg_rating IS NULL, rt.avg_rating DESC, rt.review_count DESC, books.id DESC';
+
+// Sort: only these four exist, anything else means "newest"
 $sorts = [
-    'newest' => ['Newest', 'created_at DESC, id DESC'],
-    'price_asc' => ['Price: low to high', 'price ASC, id DESC'],
-    'price_desc' => ['Price: high to low', 'price DESC, id DESC'],
+    'newest' => ['Newest', 'books.created_at DESC, books.id DESC'],
+    'rating' => ['Top rated', $top_rated_order],
+    'price_asc' => ['Price: low to high', 'books.price ASC, books.id DESC'],
+    'price_desc' => ['Price: high to low', 'books.price DESC, books.id DESC'],
 ];
 $sort = (is_string($_GET['sort'] ?? null) && isset($sorts[$_GET['sort']])) ? $_GET['sort'] : 'newest';
 
@@ -60,10 +68,19 @@ if ($min_price !== null) {
 if ($max_price !== null) {
     $where_clauses[] = 'price <= ' . number_format($max_price, 2, '.', '');
 }
+if ($rating_on) {
+    $where_clauses[] = 'rt.avg_rating >= 4';
+}
 
 $where_sql = $where_clauses ? 'WHERE ' . implode(' AND ', $where_clauses) : '';
-$result = $conn->query("SELECT * FROM books $where_sql ORDER BY " . $sorts[$sort][1]);
+$result = $conn->query("SELECT books.* FROM books $rating_join $where_sql ORDER BY " . $sorts[$sort][1]);
 $books = $result->fetch_all(MYSQLI_ASSOC);
+
+// When nothing matches: the best-rated books, so the page is never a dead end
+$popular = [];
+if (!$books && $where_clauses) {
+    $popular = $conn->query("SELECT books.* FROM books $rating_join ORDER BY $top_rated_order LIMIT 4")->fetch_all(MYSQLI_ASSOC);
+}
 
 // Category types shown above the books
 $cat_result = $conn->query("SELECT DISTINCT category FROM books WHERE category IS NOT NULL AND category <> '' ORDER BY category ASC");
@@ -76,7 +93,7 @@ $filters_active = $where_clauses !== [];
 // Address of this page with some of the choices changed (null removes one); sort and price travel along
 $plain = fn(float $n): string => rtrim(rtrim(number_format($n, 2, '.', ''), '0'), '.');
 $money = fn(float $n): string => 'Rs. ' . number_format($n, $n == floor($n) ? 0 : 2);
-$build = function (array $change = []) use ($search_text, $author_filter, $active_category, $sort, $min_price, $max_price, $plain): string {
+$build = function (array $change = []) use ($search_text, $author_filter, $active_category, $sort, $min_price, $max_price, $rating_on, $plain): string {
     $q = [
         'search' => $search_text,
         'author' => $author_filter,
@@ -84,6 +101,7 @@ $build = function (array $change = []) use ($search_text, $author_filter, $activ
         'sort' => $sort !== 'newest' ? $sort : '',
         'min' => $min_price !== null ? $plain($min_price) : '',
         'max' => $max_price !== null ? $plain($max_price) : '',
+        'rating' => $rating_on ? '4' : '',
     ];
     foreach ($change as $key => $value) {
         $q[$key] = $value === null ? '' : $value;
@@ -92,25 +110,30 @@ $build = function (array $change = []) use ($search_text, $author_filter, $activ
     return 'shop.php' . ($q ? '?' . http_build_query($q) : '');
 };
 
-// "3 of 18 books", then what is narrowing them down
+// "3 of 18 books", and under it one removable tag for each thing that is narrowing them down: [words, address without it]
 $count = count($books);
-$notes = [];
+$price_active = $min_price !== null || $max_price !== null;
+$tags = [];
 if ($active_category !== '') {
-    $notes[] = $active_category;
+    $tags[] = [$active_category, $build(['category' => null])];
 }
 if ($author_filter !== '') {
-    $notes[] = 'by ' . $author_filter;
+    $tags[] = ['by ' . $author_filter, $build(['author' => null])];
 }
 if ($search_text !== '') {
-    $notes[] = '"' . $search_text . '"';
+    $tags[] = ['"' . $search_text . '"', $build(['search' => null])];
 }
 if ($min_price !== null && $max_price !== null) {
-    $notes[] = $money($min_price) . ' to ' . $money($max_price);
+    $tags[] = [$money($min_price) . ' to ' . $money($max_price), $build(['min' => null, 'max' => null])];
 } elseif ($min_price !== null) {
-    $notes[] = $money($min_price) . ' and up';
+    $tags[] = [$money($min_price) . ' and up', $build(['min' => null])];
 } elseif ($max_price !== null) {
-    $notes[] = 'up to ' . $money($max_price);
+    $tags[] = ['up to ' . $money($max_price), $build(['max' => null])];
 }
+if ($rating_on) {
+    $tags[] = ['4 stars and up', $build(['rating' => null])];
+}
+$clear_all = $build(['search' => null, 'author' => null, 'category' => null, 'min' => null, 'max' => null, 'rating' => null]);
 ?>
 
 <main class="fl">
@@ -136,27 +159,16 @@ if ($min_price !== null && $max_price !== null) {
         </ul>
     </nav>
 
-    <?php if ($author_filter !== ''): ?>
-        <p class="k-results">Books by <strong><?php echo htmlspecialchars($author_filter); ?></strong>
-            &middot; <a href="shop.php">Show all books</a></p>
-    <?php endif; ?>
-
-    <?php if ($has_search): ?>
-        <p class="k-results">Search results for
-            "<strong><?php echo htmlspecialchars($search_text); ?></strong>"</p>
-    <?php endif; ?>
-
     <div class="gs-controls">
         <p class="gs-count" aria-live="polite">
             <strong><?php echo $count; ?></strong><?php echo $filters_active ? ' of ' . $total_books : ''; ?>
             <?php echo ($filters_active ? $total_books : $count) === 1 ? 'book' : 'books'; ?>
-            <?php if ($notes): ?><span>&middot; <?php echo htmlspecialchars(implode(' · ', $notes)); ?></span><?php endif; ?>
         </p>
 
-        <?php $price_active = $min_price !== null || $max_price !== null; ?>
-        <?php // On phones the price boxes sit behind a "Price" button (shown only with scripts on); they are open from the start while a price range is applied. ?>
-        <form method="GET" action="shop.php" class="gs-tools<?php echo $price_active ? ' is-filters-open' : ''; ?>" data-shop-tools data-validate>
-            <?php foreach (['search' => $search_text, 'author' => $author_filter, 'category' => $active_category] as $name => $value): ?>
+        <?php $filter_applied = $price_active || $rating_on; ?>
+        <?php // On phones the rating and price filters sit behind a "Filters" button (shown only with scripts on); they are open from the start while one is applied. ?>
+        <form method="GET" action="shop.php" class="gs-tools<?php echo $filter_applied ? ' is-filters-open' : ''; ?>" data-shop-tools data-validate>
+            <?php foreach (['search' => $search_text, 'author' => $author_filter, 'category' => $active_category, 'rating' => $rating_on ? '4' : ''] as $name => $value): ?>
                 <?php if ($value !== ''): ?>
                     <input type="hidden" name="<?php echo $name; ?>" value="<?php echo htmlspecialchars($value); ?>">
                 <?php endif; ?>
@@ -173,29 +185,58 @@ if ($min_price !== null && $max_price !== null) {
                 </select>
             </label>
 
-            <button type="button" class="k-btn k-btn--outline gs-filterbtn" data-filter-toggle aria-expanded="<?php echo $price_active ? 'true' : 'false'; ?>" aria-controls="gs-price-panel">
+            <button type="button" class="k-btn k-btn--outline gs-filterbtn" data-filter-toggle aria-expanded="<?php echo $filter_applied ? 'true' : 'false'; ?>" aria-controls="gs-filters">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                     stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10" /><circle cx="16" cy="7" r="2" /><circle cx="8" cy="17" r="2" /></svg>
-                <span>Price</span>
-                <?php if ($price_active): ?><span class="gs-filterbtn__dot" aria-hidden="true"></span><span class="k-sr">(range applied)</span><?php endif; ?>
+                <span>Filters</span>
+                <?php if ($filter_applied): ?><span class="gs-filterbtn__dot" aria-hidden="true"></span><span class="k-sr">(applied)</span><?php endif; ?>
             </button>
 
-            <div class="gs-price" id="gs-price-panel" role="group" aria-labelledby="gs-price-label">
-                <span id="gs-price-label" class="gs-price__label">Price (Rs.)</span>
-                <input type="number" name="min" class="k-input gs-num" min="0" step="any" inputmode="numeric"
-                    placeholder="<?php echo (int) $price_lo; ?>" aria-label="Lowest price" data-msg-invalid="Enter a lowest price of 0 or more."
-                    value="<?php echo $min_price !== null ? $plain($min_price) : ''; ?>">
-                <span aria-hidden="true">to</span>
-                <input type="number" name="max" class="k-input gs-num" min="0" step="any" inputmode="numeric"
-                    placeholder="<?php echo (int) $price_hi; ?>" aria-label="Highest price" data-msg-invalid="Enter a highest price of 0 or more."
-                    value="<?php echo $max_price !== null ? $plain($max_price) : ''; ?>">
-                <button type="submit" class="k-btn k-btn--outline k-btn--sm">Apply</button>
-                <?php if ($price_active): ?>
-                    <a href="<?php echo htmlspecialchars($build(['min' => null, 'max' => null])); ?>" class="gs-clear">Clear price</a>
-                <?php endif; ?>
+            <div class="gs-filters" id="gs-filters">
+                <?php // a link, so it works without scripts: it adds the filter, or takes it off when it is already on ?>
+                <div class="gs-rate-group">
+                    <span class="gs-price__label gs-rate-group__label">Rating</span>
+                    <a href="<?php echo htmlspecialchars($build(['rating' => $rating_on ? null : '4'])); ?>" class="k-genre gs-rate<?php echo $rating_on ? ' is-active' : ''; ?>"
+                        aria-label="<?php echo $rating_on ? 'Rated 4 stars and up: on. Select to turn it off' : 'Show only books rated 4 stars and up'; ?>"
+                        <?php echo $rating_on ? 'aria-current="true"' : ''; ?>>
+                        <span class="gs-rate__star" aria-hidden="true">&#9733;</span> 4 &amp; up
+                    </a>
+                </div>
+
+                <div class="gs-price" role="group" aria-labelledby="gs-price-label">
+                    <span id="gs-price-label" class="gs-price__label">Price (Rs.)</span>
+                    <input type="number" name="min" class="k-input gs-num" min="0" step="any" inputmode="numeric"
+                        placeholder="<?php echo (int) $price_lo; ?>" aria-label="Lowest price" data-msg-invalid="Enter a lowest price of 0 or more."
+                        value="<?php echo $min_price !== null ? $plain($min_price) : ''; ?>">
+                    <span aria-hidden="true">to</span>
+                    <input type="number" name="max" class="k-input gs-num" min="0" step="any" inputmode="numeric"
+                        placeholder="<?php echo (int) $price_hi; ?>" aria-label="Highest price" data-msg-invalid="Enter a highest price of 0 or more."
+                        value="<?php echo $max_price !== null ? $plain($max_price) : ''; ?>">
+                    <button type="submit" class="k-btn k-btn--outline k-btn--sm">Apply</button>
+                    <?php if ($price_active): ?>
+                        <a href="<?php echo htmlspecialchars($build(['min' => null, 'max' => null])); ?>" class="gs-clear">Clear price</a>
+                    <?php endif; ?>
+                </div>
             </div>
         </form>
     </div>
+
+    <?php if ($tags): ?>
+        <ul class="gs-tags" aria-label="Filters in use">
+            <?php foreach ($tags as [$words, $without]): ?>
+                <li>
+                    <a href="<?php echo htmlspecialchars($without); ?>" class="gs-tag" aria-label="Remove filter: <?php echo htmlspecialchars($words); ?>">
+                        <span><?php echo htmlspecialchars($words); ?></span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"
+                            aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+                    </a>
+                </li>
+            <?php endforeach; ?>
+            <?php if (count($tags) > 1): ?>
+                <li><a href="<?php echo htmlspecialchars($clear_all); ?>" class="gs-clear">Clear all</a></li>
+            <?php endif; ?>
+        </ul>
+    <?php endif; ?>
 
     <?php if ($books): ?>
         <div class="fl-grid">
@@ -204,7 +245,17 @@ if ($min_price !== null && $max_price !== null) {
             <?php endforeach; ?>
         </div>
     <?php elseif ($filters_active): ?>
-        <?php k_empty_state('cart', 'No books found', 'Nothing matches your search or filters. Try something different, or start again.', 'Clear Filters', 'shop.php'); ?>
+        <?php k_empty_state('cart', 'No books found', count($tags) > 1 ? 'Nothing matches all of the filters above. Take one off, or clear them all.' : 'Nothing matches ' . $tags[0][0] . '. Take it off to see every book, or try something else.', 'Clear Filters', $clear_all); ?>
+        <?php if ($popular): ?>
+            <section class="gs-popular" aria-labelledby="gs-popular-title">
+                <h2 class="fl-h2" id="gs-popular-title">Popular books to try</h2>
+                <div class="fl-grid">
+                    <?php foreach ($popular as $row): ?>
+                        <?php k_book_card($row, 'primary'); ?>
+                    <?php endforeach; ?>
+                </div>
+            </section>
+        <?php endif; ?>
     <?php else: ?>
         <?php k_empty_state('cart', 'No books yet', 'The shelves are being filled. Please check back soon.', 'Back to Home', BASE_URL . 'index.php'); ?>
     <?php endif; ?>
