@@ -321,6 +321,7 @@ body {
 .k-navbar { display: none; }
 .k-search-panel { display: contents; }
 .k-theme--row,
+.k-link--menu,
 .k-links__label { display: none; }
 .k-navbtn { padding: 0; border: 0; background: transparent; font: inherit; cursor: pointer; }
 .k-navbtn .k-navbtn__close,
@@ -352,6 +353,7 @@ body {
   .has-js .k-nav.is-open-menu .k-links { display: flex; flex-direction: column; align-items: stretch; gap: 0; padding: 4px 16px 18px; animation: k-panel-in .18s ease-out; }
 
   /* the menu rows: Home, Shop, Wishlist, the dark mode switch, then Log In / Sign Up (or My account) */
+  .has-js .k-links .k-link--menu { display: inline-flex; }
   .has-js .k-links .k-link { order: 1; width: 100%; height: 54px; box-sizing: border-box; border-bottom: 1px solid var(--k-line); box-shadow: none; font-size: 17px; color: var(--k-ink); }
   .has-js .k-links .k-link.is-active { font-weight: 600; box-shadow: none; }
   .has-js .k-links .k-link.is-active::after { content: ""; margin-left: auto; width: 8px; height: 8px; border-radius: 50%; background: var(--k-gold); }
@@ -1485,6 +1487,10 @@ select.k-input { appearance: auto; }
 
 .k-alert { padding: 12px 16px; border-radius: 10px; font-size: 15px; line-height: 1.5; }
 .k-alert--error { background: var(--k-bad-bg); color: var(--k-bad); }
+.k-alert--warn { background: var(--k-warn-bg); color: var(--k-warn); }
+
+/* "Out of stock" in the corner of a book card's picture (the card is .k-book, see k_book_card()) */
+.k-book__tag { position: absolute; top: 10px; left: 10px; z-index: 2; display: inline-flex; align-items: center; height: 28px; padding: 0 12px; border-radius: 999px; background: var(--k-white); border: 1px solid var(--k-line); font-size: 12px; font-weight: 600; letter-spacing: .02em; color: var(--k-ink); }
 
 .k-authpage__text { margin: 0; font-size: 17px; line-height: 1.6; color: var(--k-ink-2); }
 .k-authpage__text strong { color: var(--k-ink); overflow-wrap: anywhere; }

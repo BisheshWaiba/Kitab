@@ -37,6 +37,7 @@ unset($_SESSION['flash']);
                     <th>Author</th>
                     <th>Category</th>
                     <th>Price</th>
+                    <th>Stock</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -55,6 +56,7 @@ unset($_SESSION['flash']);
                             <?php endif; ?>
                         </td>
                         <td class="k-num k-num--strong">Rs. <?php echo number_format($book['price']); ?></td>
+                        <td class="k-num"><?php echo (int) ($book['stock'] ?? 0) > 0 ? (int) $book['stock'] : '<span class="k-pill k-pill--cancelled">Sold out</span>'; ?></td>
                         <td>
                             <div class="k-rowactions">
                                 <a href="<?php echo BASE_URL; ?>admin/edit_book.php?id=<?php echo (int) $book['id']; ?>"
@@ -74,7 +76,7 @@ unset($_SESSION['flash']);
                 <?php endwhile; ?>
                 <?php if ($books->num_rows == 0): ?>
                     <tr>
-                        <td colspan="7" class="k-table__empty">No books yet. <a href="<?php echo BASE_URL; ?>admin/add_book.php">Add the first one</a>.</td>
+                        <td colspan="8" class="k-table__empty">No books yet. <a href="<?php echo BASE_URL; ?>admin/add_book.php">Add the first one</a>.</td>
                     </tr>
                 <?php endif; ?>
             </tbody>

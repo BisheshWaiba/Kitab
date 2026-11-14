@@ -6,6 +6,15 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// The cart has to fit the stock before anything else (a book may have sold out since it was added). If it had to change, the
+// visitor goes back to the cart, which shows what changed.
+$fit_notes = k_cart_fit($conn);
+if ($fit_notes) {
+    $_SESSION['cart_flash'] = $fit_notes;
+    header("Location: cart.php");
+    exit();
+}
+
 $cart_items = [];
 $total_price = 0;
 
@@ -88,7 +97,20 @@ if (!isset($_POST['place_order']) && isset($_SESSION['user_id'])) {
 }
 
 // Handle Order Submission (only when every field is fine; otherwise the form comes back with the messages)
+$place_error = '';
 if (isset($_POST['place_order']) && !$errors) {
+    // The copies come out of stock first. If someone else bought the last one a moment ago, nothing is ordered and the cart says so.
+    $lines = [];
+    foreach ($cart_items as $item) {
+        $lines[(int) $item['id']] = (int) $item['qty'];
+    }
+    $short = k_take_stock($conn, $lines);
+    if ($short !== null) {
+        $_SESSION['cart_flash'] = ['"' . $short . '" ran out while you were checking out, so your order was not placed.'];
+        header("Location: cart.php");
+        exit();
+    }
+
     $name = $conn->real_escape_string($_POST['name']);
     $address = $conn->real_escape_string($_POST['address']);
     $email = $conn->real_escape_string($_POST['email']);
@@ -119,22 +141,30 @@ if (isset($_POST['place_order']) && !$errors) {
         $sql_order = "INSERT INTO orders (user_id, name, email, address, total) VALUES ($user_id, '$name', '$email', '$address', $total_price)";
     }
 
-    if ($conn->query($sql_order)) {
-        $order_id = $conn->insert_id;
+    try {
+        if ($conn->query($sql_order)) {
+            $order_id = $conn->insert_id;
 
-        // Insert Order Items
-        foreach ($cart_items as $item) {
-            $book_id = $item['id'];
-            $quantity = $item['qty'];
-            $price = $item['price'];
-            $sql_item = "INSERT INTO order_items (order_id, book_id, quantity, price) VALUES ($order_id, $book_id, $quantity,
+            // Insert Order Items
+            foreach ($cart_items as $item) {
+                $book_id = $item['id'];
+                $quantity = $item['qty'];
+                $price = $item['price'];
+                $sql_item = "INSERT INTO order_items (order_id, book_id, quantity, price) VALUES ($order_id, $book_id, $quantity,
 $price)";
-            $conn->query($sql_item);
-        }
+                $conn->query($sql_item);
+            }
 
-        // Clear Cart
-        unset($_SESSION['cart']);
-        $order_placed = true;
+            // Clear Cart
+            unset($_SESSION['cart']);
+            $order_placed = true;
+        }
+    } catch (Throwable $e) {
+        error_log('KITAB checkout: the order could not be saved: ' . $e->getMessage());
+    }
+    if (!$order_placed) {
+        k_return_stock($conn, $lines); // nothing was ordered, so the copies go back on the shelf
+        $place_error = 'Something went wrong placing your order. Nothing was charged. Please try again.';
     }
 }
 
@@ -169,6 +199,7 @@ require_once '../includes/header.php';
             <div class="gk-success__actions">
                 <?php if ($user_id !== null): ?>
                     <a href="order.php?id=<?php echo (int) $order_id; ?>" class="k-btn k-btn--outline">View Order</a>
+                    <a href="orders.php" class="k-btn k-btn--outline">My orders</a>
                 <?php endif; ?>
                 <a href="shop.php" class="k-btn k-btn--primary">Continue Shopping</a>
             </div>
@@ -176,6 +207,9 @@ require_once '../includes/header.php';
     <?php else: ?>
         <div class="gk-grid">
             <form method="POST" class="gk-form fl-panel" data-validate>
+                <?php if ($place_error !== ''): ?>
+                    <div class="k-alert k-alert--error" role="alert"><?php echo htmlspecialchars($place_error); ?></div>
+                <?php endif; ?>
                 <h2 class="fl-h2">Billing Details</h2>
                 <?php if ($prefilled): ?>
                     <p class="gk-form__note">We filled this in from your account and your last order. Change anything that is different.</p>

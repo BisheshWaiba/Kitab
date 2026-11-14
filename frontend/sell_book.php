@@ -49,6 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $image = ''; // no cover: pages show a titled placeholder
 
     $price_text = trim((string) ($_POST['price'] ?? ''));
+    $stock_text = trim((string) ($_POST['stock'] ?? '1'));
     if ($title === '') {
         $errors['title'] = "Enter the book's title.";
     } elseif (mb_strlen($title) > 255) {
@@ -66,6 +67,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     if (!in_array($category, $categories, true)) {
         $errors['category'] = "Choose a category.";
+    }
+    if (!preg_match('/^\d{1,4}$/', $stock_text) || (int) $stock_text < 1) {
+        $errors['stock'] = "Enter how many copies you have, from 1 up.";
     }
     if (mb_strlen($isbn) > 20) {
         $errors['isbn'] = "Use 20 characters or fewer.";
@@ -92,8 +96,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Insert
         // Note: IF seller_id doesn't exist in DB schema, this will fail. ensure schema is updated.
-        $sql = "INSERT INTO books (title, author, description, price, image, category, publisher, pages, isbn, seller_id, created_at)
-                VALUES ('$title_sql', '$author_sql', '$description_sql', $price, '$image_sql', '$category_sql', '$publisher_sql', $pages, '$isbn_sql', $seller_id, NOW())";
+        $sql = "INSERT INTO books (title, author, description, price, image, category, publisher, pages, isbn, seller_id, stock, created_at)
+                VALUES ('$title_sql', '$author_sql', '$description_sql', $price, '$image_sql', '$category_sql', '$publisher_sql', $pages, '$isbn_sql', $seller_id, " . (int) $stock_text . ", NOW())";
 
         if ($conn->query($sql) === TRUE) {
             $success = "Book listed successfully! It is now visible in the shop.";
@@ -164,6 +168,14 @@ $old_category = $old['category'] ?? '';
                 </select>
                 <?php k_field_error($errors, 'category'); ?>
             </div>
+        </div>
+
+        <div class="k-field">
+            <label for="stock">Copies available *</label>
+            <input type="number" id="stock" name="stock" class="k-input" required min="1" max="9999" step="1"
+                data-msg-missing="Enter how many copies you have." data-msg-invalid="Enter how many copies you have, from 1 up."
+                value="<?php echo htmlspecialchars($old['stock'] ?? '1'); ?>" <?php k_field_invalid($errors, 'stock'); ?>>
+            <?php k_field_error($errors, 'stock'); ?>
         </div>
 
         <div class="k-field">

@@ -37,6 +37,12 @@ if (isset($_POST['update_cart'])) {
     exit();
 }
 
+// Make the cart fit the stock first: what checkout sent back (a book sold out while the order was being placed) and anything that
+// no longer fits now. The messages are shown above the list.
+$stock_notes = (array) ($_SESSION['cart_flash'] ?? []);
+unset($_SESSION['cart_flash']);
+$stock_notes = array_merge($stock_notes, k_cart_fit($conn));
+
 $cart_items = [];
 $total_price = 0;
 
@@ -76,6 +82,11 @@ if ($cart_items && $left > 0) {
 </section>
 
 <div class="fl-wrap gc-main">
+    <?php if ($stock_notes): ?>
+        <div class="k-alert k-alert--warn gc-notes" role="alert">
+            <?php foreach ($stock_notes as $note): ?><p><?php echo htmlspecialchars($note); ?></p><?php endforeach; ?>
+        </div>
+    <?php endif; ?>
     <?php if (empty($cart_items)): ?>
         <?php k_empty_state('cart', 'Your cart is empty', "Looks like you haven't added any books yet.", 'Start Shopping', 'shop.php'); ?>
     <?php else: ?>
@@ -85,7 +96,11 @@ if ($cart_items && $left > 0) {
                     <input type="hidden" name="update_cart" value="1">
                     <ul>
                         <?php foreach ($cart_items as $item): ?>
-                            <?php $href = 'product.php?id=' . (int) $item['id']; ?>
+                            <?php
+                            $href = 'product.php?id=' . (int) $item['id'];
+                            $item_stock = k_stock_of($item);
+                            $item_max = max(1, k_max_qty($item_stock)); // the quantity box stops at what is left
+                            ?>
                             <li class="gc-row">
                                 <a class="gc-row__cover" href="<?php echo $href; ?>" tabindex="-1" aria-hidden="true">
                                     <?php k_cover($item, 'gc-row__img', false); ?>
@@ -93,6 +108,9 @@ if ($cart_items && $left > 0) {
                                 <div class="gc-row__info">
                                     <a class="gc-row__title" href="<?php echo $href; ?>"><?php echo htmlspecialchars($item['title']); ?></a>
                                     <span class="gc-row__by"><?php echo htmlspecialchars($item['author']); ?></span>
+                                    <?php if ($item_stock !== null && $item_stock <= 5): ?>
+                                        <span class="gc-row__stock">Only <?php echo $item_stock; ?> left</span>
+                                    <?php endif; ?>
                                     <a href="cart.php?remove=<?php echo (int) $item['id']; ?>" class="gc-remove k-btn k-btn--ghost k-btn--sm"
                                         aria-label="Remove <?php echo htmlspecialchars($item['title']); ?> from cart">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -111,7 +129,7 @@ if ($cart_items && $left > 0) {
                                         </svg>
                                     </button>
                                     <input type="number" name="qty[<?php echo (int) $item['id']; ?>]"
-                                        value="<?php echo (int) $item['qty']; ?>" min="1" max="100"
+                                        value="<?php echo (int) $item['qty']; ?>" min="1" max="<?php echo $item_max; ?>"
                                         aria-label="Quantity for <?php echo htmlspecialchars($item['title']); ?>">
                                     <button type="button" class="gp-qty__btn" data-step="1" aria-label="Increase quantity">
                                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"

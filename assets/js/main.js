@@ -423,7 +423,8 @@ function initToast(toast) {
     start();
 }
 
-function showCartToast(title, cover, added) {
+// added = how many copies went in (0 when none could, say because the book is sold out); note = why fewer or none, when that is so
+function showCartToast(title, cover, added, note) {
     var box = document.querySelector('.gt-toasts');
     if (!box) {
         box = document.createElement('div');
@@ -446,17 +447,27 @@ function showCartToast(title, cover, added) {
     var text = document.createElement('div');
     text.className = 'gt-toast__text';
     var strong = document.createElement('strong');
-    strong.textContent = 'Added to your cart';
-    var line = document.createElement('span');
-    line.textContent = title + ' × ' + added; // the title is plain text, never HTML
+    strong.textContent = added > 0 ? 'Added to your cart' : "Couldn't add it";
     text.appendChild(strong);
-    text.appendChild(line);
+    if (added > 0) {
+        var line = document.createElement('span');
+        line.textContent = title + ' × ' + added; // the title is plain text, never HTML
+        text.appendChild(line);
+    }
+    if (note) {
+        var why = document.createElement('span');
+        why.className = 'gt-toast__note';
+        why.textContent = note;
+        text.appendChild(why);
+    }
     toast.appendChild(text);
-    var view = document.createElement('a');
-    view.className = 'k-btn k-btn--primary k-btn--sm';
-    view.href = 'cart.php';
-    view.textContent = 'View cart';
-    toast.appendChild(view);
+    if (added > 0) {
+        var view = document.createElement('a');
+        view.className = 'k-btn k-btn--primary k-btn--sm';
+        view.href = 'cart.php';
+        view.textContent = 'View cart';
+        toast.appendChild(view);
+    }
     var close = document.createElement('button');
     close.type = 'button';
     close.className = 'gt-toast__close';
@@ -505,15 +516,22 @@ document.querySelectorAll('form[data-add-form]').forEach(function (form) {
                 return response.ok ? response.json() : Promise.reject();
             })
             .then(function (data) {
-                bumpCartBadge(data.count);
-                showCartToast(form.dataset.title, form.dataset.cover, data.added);
+                var added = data.added || 0;
+                if (added > 0) {
+                    bumpCartBadge(data.count);
+                }
+                showCartToast(form.dataset.title, form.dataset.cover, added, data.note || '');
                 if (data.shipNote) { // the free-shipping line on the Book page, now with this book in the cart
                     document.querySelectorAll('[data-ship-text]').forEach(function (el) { el.textContent = data.shipNote; });
                 }
                 if (label) {
-                    label.textContent = 'Added';
-                    button.classList.add('is-added'); // on phones the button has no words: this swaps the cart icon for a tick
-                    setTimeout(function () { label.textContent = normal; button.classList.remove('is-added'); }, 1800);
+                    if (added > 0) {
+                        label.textContent = 'Added';
+                        button.classList.add('is-added'); // on phones the button has no words: this swaps the cart icon for a tick
+                        setTimeout(function () { label.textContent = normal; button.classList.remove('is-added'); }, 1800);
+                    } else {
+                        label.textContent = normal; // nothing went in: the message says why
+                    }
                 }
                 button.disabled = false;
             })
@@ -587,7 +605,7 @@ document.querySelectorAll('form[data-cart-form]').forEach(function (form) {
         timer = setTimeout(function () {
             form.querySelectorAll('input[type="number"]').forEach(function (input) {
                 var n = parseInt(input.value, 10);
-                input.value = !n || n < 1 ? 1 : Math.min(n, 100); // an empty box must not remove the book
+                input.value = !n || n < 1 ? 1 : Math.min(n, parseInt(input.max, 10) || 100); // an empty box must not remove the book; stock sets the top
             });
             form.submit();
         }, 450);

@@ -33,6 +33,95 @@ function k_ship_note(float $cart_total, float $price): string
         : 'Free shipping on orders over Rs. ' . number_format(K_FREE_SHIPPING_AT) . '.';
 }
 
+// ---------- Stock ----------
+// books.stock is the number of copies still for sale. Checkout takes copies out of it (k_take_stock), the cart never holds more than
+// is left (k_cart_fit), and the Book page and the cards say when a book is sold out.
+
+// Copies left, from a row of the books table. null when the row has no stock column, so nothing is claimed about it.
+function k_stock_of(array $book): ?int
+{
+    return isset($book['stock']) ? max(0, (int) $book['stock']) : null;
+}
+
+// The most copies of one book that can go in a cart: the shop's limit of 100, or fewer when fewer are left
+function k_max_qty(?int $stock): int
+{
+    return $stock === null ? 100 : max(0, min(100, $stock));
+}
+
+// "Only 1 copy is" / "Only 3 copies are": the little grammar the stock messages need
+function k_copies(int $n): string
+{
+    return $n . ($n === 1 ? ' copy' : ' copies');
+}
+
+// Brings the session cart in line with the stock: a book that is sold out (or gone) leaves the cart and a quantity above what is
+// left is lowered to it. Returns the messages to show, and an empty list when everything already fits.
+function k_cart_fit(mysqli $conn): array
+{
+    $cart = $_SESSION['cart'] ?? [];
+    if (!$cart) {
+        return [];
+    }
+    $ids = implode(',', array_map('intval', array_keys($cart)));
+    $books = [];
+    foreach ($conn->query("SELECT id, title, stock FROM books WHERE id IN ($ids)")->fetch_all(MYSQLI_ASSOC) as $row) {
+        $books[(int) $row['id']] = $row;
+    }
+    $notes = [];
+    foreach ($cart as $id => $qty) {
+        $id = (int) $id;
+        if (!isset($books[$id])) {
+            unset($_SESSION['cart'][$id]); // the book was removed from the shop
+            continue;
+        }
+        $max = k_max_qty(k_stock_of($books[$id]));
+        $title = (string) $books[$id]['title'];
+        if ($max <= 0) {
+            unset($_SESSION['cart'][$id]);
+            $notes[] = '"' . $title . '" is sold out, so we took it out of your cart.';
+        } elseif ((int) $qty > $max) {
+            $_SESSION['cart'][$id] = $max;
+            $notes[] = 'Only ' . k_copies($max) . ' of "' . $title . '" ' . ($max === 1 ? 'is' : 'are') . ' left, so we lowered the quantity to ' . $max . '.';
+        }
+    }
+    return $notes;
+}
+
+// Puts copies back in stock: $lines is [book id => quantity]
+function k_return_stock(mysqli $conn, array $lines): void
+{
+    $stmt = $conn->prepare('UPDATE books SET stock = stock + ? WHERE id = ?');
+    foreach ($lines as $book_id => $qty) {
+        $qty = (int) $qty;
+        $book_id = (int) $book_id;
+        $stmt->bind_param('ii', $qty, $book_id);
+        $stmt->execute();
+    }
+}
+
+// Takes copies out of stock for an order: $lines is [book id => quantity]. All or nothing. Each book is one UPDATE that only
+// succeeds while enough copies are left, so two people buying the last copy cannot both get it. When a book is short, what was
+// already taken goes back and that book's title is returned; null means everything was taken.
+function k_take_stock(mysqli $conn, array $lines): ?string
+{
+    $taken = [];
+    $stmt = $conn->prepare('UPDATE books SET stock = stock - ? WHERE id = ? AND stock >= ?');
+    foreach ($lines as $book_id => $qty) {
+        $qty = (int) $qty;
+        $book_id = (int) $book_id;
+        $stmt->bind_param('iii', $qty, $book_id, $qty);
+        $stmt->execute();
+        if ($stmt->affected_rows !== 1) {
+            k_return_stock($conn, $taken);
+            $row = $conn->query('SELECT title FROM books WHERE id = ' . $book_id)->fetch_assoc();
+            return (string) ($row['title'] ?? 'a book in your cart');
+        }
+        $taken[$book_id] = $qty;
+    }
+    return null;
+}
+
 // The delivery address of an order. Older orders kept it in shipping_address instead of address.
 function k_order_address(array $order): string
 {
@@ -506,18 +595,21 @@ function k_book_card(array $b, string $cta = 'outline'): void
     $href = BASE_URL . 'frontend/product.php?id=' . (int) $b['id'];
     $cover_img = trim((string) ($b['image'] ?? ''));
     $cover_url = $cover_img === '' ? '' : (strpos($cover_img, 'http') === 0 ? $cover_img : BASE_URL . $cover_img);
+    $stock = k_stock_of($b);
+    $sold_out = $stock !== null && $stock <= 0; // a sold-out book can still be opened and saved, but not added to the cart
     ?>
-    <article class="k-book">
+    <article class="k-book<?php echo $sold_out ? ' is-soldout' : ''; ?>">
         <div class="k-book__media">
             <a class="k-book__cover" href="<?php echo $href; ?>" tabindex="-1" aria-hidden="true">
                 <?php k_cover($b); ?>
             </a>
+            <?php if ($sold_out): ?><span class="k-book__tag">Out of stock</span><?php endif; ?>
             <?php k_wish_button($b); ?>
             <form method="POST" action="<?php echo $href; ?>" class="k-book__add" data-add-form
                 data-title="<?php echo htmlspecialchars($b['title']); ?>" data-cover="<?php echo htmlspecialchars($cover_url); ?>">
                 <input type="hidden" name="quantity" value="1">
-                <button type="submit" name="add_to_cart" class="k-btn k-btn--primary"
-                    aria-label="Add to Cart: <?php echo htmlspecialchars($b['title']); ?>">
+                <button type="submit" name="add_to_cart" class="k-btn k-btn--primary"<?php echo $sold_out ? ' disabled' : ''; ?>
+                    aria-label="<?php echo $sold_out ? 'Out of stock' : 'Add to Cart'; ?>: <?php echo htmlspecialchars($b['title']); ?>">
                     <?php // the two icons only show on phones, where the button is a small round one instead of the "Add to Cart" pill (flat.css) ?>
                     <svg class="k-book__add-icon k-book__add-icon--cart" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -527,7 +619,7 @@ function k_book_card(array $b, string $cta = 'outline'): void
                     </svg>
                     <svg class="k-book__add-icon k-book__add-icon--done" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
                         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5" /></svg>
-                    <span data-add-label>Add to Cart</span>
+                    <span data-add-label><?php echo $sold_out ? 'Out of stock' : 'Add to Cart'; ?></span>
                 </button>
             </form>
         </div>

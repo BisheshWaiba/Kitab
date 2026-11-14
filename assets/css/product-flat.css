@@ -21,6 +21,13 @@
 .gp-rating .k-stars { font-size: 16px; letter-spacing: 2px; }
 .gp-rating__none { color: var(--k-muted); }
 .gp-price { margin: 0; font: 600 38px/1 var(--k-display); letter-spacing: -.02em; }
+/* how many copies are left: a dot (green, amber for "Only N left", red when sold out) and the words */
+.gp-stock { display: flex; align-items: center; gap: 9px; margin: -8px 0 0; font-size: 15px; font-weight: 600; color: var(--k-ink-2); }
+.gp-stock__dot { flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--k-ok); }
+.gp-stock--low { color: var(--k-warn); }
+.gp-stock--low .gp-stock__dot { background: var(--k-gold); }
+.gp-stock--out { color: var(--k-bad); }
+.gp-stock--out .gp-stock__dot { background: var(--k-bad); }
 .gp-desc { margin: 0; font-size: 17px; line-height: 1.6; color: var(--k-ink-2); }
 .gp-specs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 24px; margin: 0; padding: 22px 0; border-top: 1px solid var(--k-line); border-bottom: 1px solid var(--k-line); }
 .gp-specs dt { font-size: 13px; color: var(--k-muted); }

@@ -45,24 +45,38 @@ if (isset($_POST['add_to_cart'])) {
         $_SESSION['cart'] = [];
     }
 
-    // Up to 100 copies of one book, the same limit the cart page uses
-    $_SESSION['cart'][$book_id] = min(100, ($_SESSION['cart'][$book_id] ?? 0) + $quantity);
+    // Up to 100 copies of one book (the cart page's limit), and never more than are in stock
+    $max = k_max_qty(k_stock_of($book));
+    $in_cart = (int) ($_SESSION['cart'][$book_id] ?? 0);
+    $added = min($quantity, max(0, $max - $in_cart));
+    $note = '';
+    if ($max <= 0) {
+        $note = 'This book is sold out.';
+    } elseif ($added <= 0) {
+        $note = ($max === 1 ? 'The only copy is' : 'All ' . $max . ' available copies are') . ' already in your cart.';
+    } elseif ($added < $quantity) {
+        $note = 'Only ' . k_copies($max) . ' available, so we added ' . $added . '.';
+    }
+    if ($added > 0) {
+        $_SESSION['cart'][$book_id] = $in_cart + $added;
+    }
 
     // The page's script adds without leaving the book and shows a message; it asks for JSON
     if (strpos($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json') !== false) {
         header('Content-Type: application/json');
         echo json_encode([
-            'ok' => true,
+            'ok' => $added > 0,
             'count' => array_sum($_SESSION['cart']),
-            'added' => $quantity,
-            'inCart' => $_SESSION['cart'][$book_id],
+            'added' => $added,
+            'inCart' => (int) ($_SESSION['cart'][$book_id] ?? 0),
+            'note' => $note, // why fewer (or none) were added; empty when all went in
             'shipNote' => k_ship_note(k_cart_total($conn), (float) $book['price']), // the line under Add to Cart, up to date
         ]);
         exit();
     }
 
     // Without JavaScript: back to the book, where the same message is shown once
-    $_SESSION['cart_toast'] = ['book' => $book_id, 'added' => $quantity];
+    $_SESSION['cart_toast'] = ['book' => $book_id, 'added' => $added, 'note' => $note];
     header("Location: product.php?id=" . $book_id);
     exit();
 }
@@ -110,6 +124,9 @@ require_once '../includes/header.php';
 $cover_img = trim((string) ($book['image'] ?? ''));
 $cover_url = $cover_img === '' ? '' : (strpos($cover_img, 'http') === 0 ? $cover_img : BASE_URL . $cover_img);
 $category = trim((string) ($book['category'] ?? ''));
+$stock = k_stock_of($book);
+$sold_out = $stock !== null && $stock <= 0;
+$max_qty = max(1, k_max_qty($stock)); // the most the quantity box accepts
 ?>
 <main class="fl">
 
@@ -133,6 +150,12 @@ $category = trim((string) ($book['category'] ?? ''));
             <?php endif; ?>
         </p>
         <p class="gp-price">Rs. <?php echo htmlspecialchars(number_format($book['price'])); ?></p>
+        <?php if ($stock !== null): ?>
+            <p class="gp-stock gp-stock--<?php echo $sold_out ? 'out' : ($stock <= 5 ? 'low' : 'ok'); ?>">
+                <span class="gp-stock__dot" aria-hidden="true"></span>
+                <?php echo $sold_out ? 'Out of stock' : ($stock <= 5 ? 'Only ' . $stock . ' left' : 'In stock'); ?>
+            </p>
+        <?php endif; ?>
 
         <?php if ($description !== ''): ?>
             <p class="gp-desc"><?php echo nl2br(htmlspecialchars($description)); ?></p>
@@ -158,6 +181,11 @@ $category = trim((string) ($book['category'] ?? ''));
         </dl>
 
         <div class="gp-actions">
+            <?php if ($sold_out): ?>
+                <div class="gp-buyform">
+                    <button type="button" class="k-btn k-btn--primary k-btn--lg" disabled>Out of stock</button>
+                </div>
+            <?php else: ?>
             <form method="POST" class="gp-buyform" data-add-form data-title="<?php echo htmlspecialchars($book['title']); ?>"
                 data-cover="<?php echo htmlspecialchars($cover_url); ?>">
                 <label class="k-sr" for="quantity">Quantity</label>
@@ -168,7 +196,7 @@ $category = trim((string) ($book['category'] ?? ''));
                             <path d="M5 12h14" />
                         </svg>
                     </button>
-                    <input type="number" id="quantity" name="quantity" value="1" min="1" max="100">
+                    <input type="number" id="quantity" name="quantity" value="1" min="1" max="<?php echo $max_qty; ?>">
                     <button type="button" class="gp-qty__btn" data-step="1" aria-label="Increase quantity">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" aria-hidden="true">
@@ -186,6 +214,7 @@ $category = trim((string) ($book['category'] ?? ''));
                     <span data-add-label>Add to Cart</span>
                 </button>
             </form>
+            <?php endif; ?>
             <?php k_wish_button($book, 'button'); ?>
         </div>
 
@@ -373,15 +402,21 @@ if ($result_related->num_rows > 0):
 <!-- "Added to your cart" message (main.js shows the same one without reloading the page) -->
 <div class="gt-toasts" aria-live="polite">
     <?php if ($cart_toast): ?>
-        <div class="gt-toast" role="status" data-bump>
+        <?php $toast_added = (int) $cart_toast['added']; $toast_note = (string) ($cart_toast['note'] ?? ''); ?>
+        <div class="gt-toast" role="status"<?php echo $toast_added > 0 ? ' data-bump' : ''; ?>>
             <?php if ($cover_url !== ''): ?>
                 <img class="gt-toast__img" src="<?php echo htmlspecialchars($cover_url); ?>" alt="">
             <?php endif; ?>
             <div class="gt-toast__text">
-                <strong>Added to your cart</strong>
-                <span><?php echo htmlspecialchars($book['title']); ?> &times; <?php echo (int) $cart_toast['added']; ?></span>
+                <?php if ($toast_added > 0): ?>
+                    <strong>Added to your cart</strong>
+                    <span><?php echo htmlspecialchars($book['title']); ?> &times; <?php echo $toast_added; ?></span>
+                <?php else: ?>
+                    <strong>Couldn't add it</strong>
+                <?php endif; ?>
+                <?php if ($toast_note !== ''): ?><span class="gt-toast__note"><?php echo htmlspecialchars($toast_note); ?></span><?php endif; ?>
             </div>
-            <a href="cart.php" class="k-btn k-btn--primary k-btn--sm">View cart</a>
+            <?php if ($toast_added > 0): ?><a href="cart.php" class="k-btn k-btn--primary k-btn--sm">View cart</a><?php endif; ?>
             <button type="button" class="gt-toast__close" aria-label="Dismiss">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" aria-hidden="true">
@@ -393,6 +428,7 @@ if ($result_related->num_rows > 0):
 </div>
 
 <?php // Phones and tablets: while the real Add to Cart is off screen, this bar sticks to the bottom (main.js shows it; the click is passed to the real button) ?>
+<?php if (!$sold_out): ?>
 <div class="gp-bar" data-buybar>
     <div class="gp-bar__info">
         <strong class="gp-bar__price">Rs. <?php echo htmlspecialchars(number_format($book['price'])); ?></strong>
@@ -402,5 +438,6 @@ if ($result_related->num_rows > 0):
         <span data-buybar-label>Add to Cart</span>
     </button>
 </div>
+<?php endif; ?>
 
 <?php require_once '../includes/footer.php'; ?>

@@ -36,6 +36,8 @@ if ($book && $_SERVER['REQUEST_METHOD'] == 'POST') {
     $price = floatval($price_text);
     $category = $field('category');
     $description = $field('description');
+    $stock_text = $field('stock');
+    $stock = (int) $stock_text;
     $new_image = null;
 
     if (!k_csrf_valid($_POST['csrf'] ?? '')) {
@@ -48,6 +50,8 @@ if ($book && $_SERVER['REQUEST_METHOD'] == 'POST') {
         $error = "Please enter a price greater than zero.";
     } elseif (!in_array($category, $categories, true)) {
         $error = "Please choose a category.";
+    } elseif (!preg_match('/^\d{1,6}$/', $stock_text)) {
+        $error = "Enter how many copies are in stock, as a whole number from 0 up (0 means sold out).";
     } else {
         // Optional new cover (checked by content, stored under uploads/books/)
         [$new_image, $error] = k_upload_image($_FILES['image'] ?? ['error' => UPLOAD_ERR_NO_FILE], 'books', 'book_admin');
@@ -55,15 +59,15 @@ if ($book && $_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if ($error === '') {
         $image_path = $new_image ?? $book['image'];
-        $stmt = $conn->prepare("UPDATE books SET title = ?, author = ?, price = ?, category = ?, description = ?, image = ? WHERE id = ?");
-        $stmt->bind_param("ssdsssi", $title, $author, $price, $category, $description, $image_path, $id);
+        $stmt = $conn->prepare("UPDATE books SET title = ?, author = ?, price = ?, category = ?, description = ?, image = ?, stock = ? WHERE id = ?");
+        $stmt->bind_param("ssdsssii", $title, $author, $price, $category, $description, $image_path, $stock, $id);
         if ($stmt->execute()) {
             if ($new_image !== null) {
                 k_delete_upload($book['image']); // the replaced cover is no longer used
             }
             $book = array_merge($book, [
                 'title' => $title, 'author' => $author, 'price' => $price, 'category' => $category,
-                'description' => $description, 'image' => $image_path,
+                'description' => $description, 'image' => $image_path, 'stock' => $stock,
             ]);
             $success = "Book updated.";
         } else {
@@ -82,7 +86,7 @@ include 'includes/header.php';
 
 // Show what was typed when there is an error; otherwise the saved values
 $form = ($book && $error !== '') ? [
-    'title' => $title, 'author' => $author, 'price' => $price_text, 'category' => $category, 'description' => $description,
+    'title' => $title, 'author' => $author, 'price' => $price_text, 'category' => $category, 'description' => $description, 'stock' => $stock_text,
 ] : ($book ?: []);
 $cover = trim((string) ($book['image'] ?? ''));
 $cover_url = $cover === '' ? '' : (strpos($cover, 'http') === 0 ? $cover : BASE_URL . $cover);
@@ -153,6 +157,13 @@ $cover_url = $cover === '' ? '' : (strpos($cover, 'http') === 0 ? $cover : BASE_
                             <?php endforeach; ?>
                         </select>
                     </div>
+                </div>
+
+                <div class="k-field">
+                    <label for="stock">Copies in stock</label>
+                    <input type="number" id="stock" name="stock" required min="0" max="999999" step="1" class="k-input"
+                        placeholder="0" value="<?php echo htmlspecialchars((string) ($form['stock'] ?? 0)); ?>">
+                    <p class="k-field__hint">Checkout takes copies out of this. 0 means sold out.</p>
                 </div>
 
                 <div class="k-field">

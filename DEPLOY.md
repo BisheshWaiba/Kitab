@@ -22,6 +22,11 @@ your local database) with new ones, or import without those users.
 
 Import `kitab.sql` into the hosted database with the host's import tool, or HeidiSQL / DBeaver. Then delete `kitab.sql`.
 
+**Stock.** The shop now counts copies: `books.stock` is how many can be bought, checkout takes copies out of it, and a book
+with 0 shows "Out of stock". Make sure your books have a stock before launch (the Admin Add/Edit Book forms and the Sell a
+Book form have a stock field now). Books that were created before the stock field existed have 0, so after importing an
+older dump run `UPDATE books SET stock = 10 WHERE stock = 0;` (or set each one in Admin > Books > Edit).
+
 ## 3. Tell Vercel how to reach it
 
 Project > Settings > Environment Variables (Production), or `vercel env add NAME production`:

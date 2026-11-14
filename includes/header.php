@@ -103,6 +103,10 @@ $user_initial = isset($_SESSION['user_name']) ? strtoupper(mb_substr($_SESSION['
                     class="k-link<?php echo $nav_home ? ' is-active' : ''; ?>">Home</a>
                 <a href="<?php echo BASE_URL; ?>frontend/shop.php"
                     class="k-link<?php echo $nav_shop ? ' is-active' : ''; ?>">Shop</a>
+                <?php if (isset($_SESSION['user_id'])): // a row of the phone menu only (hidden on wide screens, where the account button leads there) ?>
+                    <a href="<?php echo BASE_URL; ?>frontend/orders.php"
+                        class="k-link k-link--menu<?php echo $current_page === 'orders.php' ? ' is-active' : ''; ?>">My orders</a>
+                <?php endif; ?>
                 <a href="<?php echo BASE_URL; ?>frontend/wishlist.php"
                     class="k-cart k-cart--wish<?php echo $nav_wish ? ' is-active' : ''; ?><?php echo isset($_SESSION['user_id']) ? '' : ' k-cart--guest'; ?>"
                     aria-label="Wishlist<?php echo $wish_count > 0 ? ', ' . $wish_count . ' saved' : ''; ?>"

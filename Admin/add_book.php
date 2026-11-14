@@ -24,6 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $price = floatval($_POST['price'] ?? 0);
     $category = $_POST['category'] ?? '';
     $description = trim($_POST['description'] ?? '');
+    $stock_text = trim((string) ($_POST['stock'] ?? '1'));
 
     $image_path = '';
     if ($title === '' || $author === '') {
@@ -32,6 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $error = "Please enter a price greater than zero.";
     } elseif (!in_array($category, $categories, true)) {
         $error = "Please choose a category.";
+    } elseif (!preg_match('/^\d{1,6}$/', $stock_text)) {
+        $error = "Enter how many copies are in stock, as a whole number from 0 up (0 means sold out).";
     } elseif (!isset($_FILES['image']) || $_FILES['image']['error'] == UPLOAD_ERR_NO_FILE) {
         $error = "Please upload a book cover image.";
     } else {
@@ -46,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $description_sql = $conn->real_escape_string($description);
         $image_sql = $conn->real_escape_string($image_path);
 
-        $sql = "INSERT INTO books (title, author, price, category, description, image) VALUES ('$title_sql', '$author_sql', $price, '$category_sql', '$description_sql', '$image_sql')";
+        $sql = "INSERT INTO books (title, author, price, category, description, image, stock) VALUES ('$title_sql', '$author_sql', $price, '$category_sql', '$description_sql', '$image_sql', " . (int) $stock_text . ")";
         if ($conn->query($sql)) {
             $success = "Book added successfully!";
         } else {
@@ -114,6 +117,13 @@ $old_category = $old['category'] ?? '';
                         <?php endforeach; ?>
                     </select>
                 </div>
+            </div>
+
+            <div class="k-field">
+                <label for="stock">Copies in stock</label>
+                <input type="number" id="stock" name="stock" required min="0" max="999999" step="1" class="k-input"
+                    value="<?php echo htmlspecialchars($old['stock'] ?? '1'); ?>">
+                <p class="k-field__hint">Checkout takes copies out of this. 0 means sold out.</p>
             </div>
 
             <div class="k-field">
