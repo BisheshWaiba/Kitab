@@ -159,3 +159,17 @@ body.is-terra .k-search { border-radius: var(--btn-r); }
 body.is-terra .fh-pill__badge { border-radius: 8px; }
 /* the small round "add to cart" button on phone cards is icon-only, so it stays round like the heart above it */
 @media (max-width: 640px) { body.is-terra .fl .k-book__add .k-btn { border-radius: 50%; } }
+
+/* ---------- fonts: Playfair Display for headings, DM Sans for everything else ----------
+   The two font tokens every page already reads (--k-display for headings, --k-body for text) are switched here, so the swap reaches every
+   page at once. The fonts are loaded in includes/header.php. Headings, page titles and the logo stay in the serif; navigation, buttons,
+   product titles, prices, descriptions and the footer are DM Sans. The admin area has no is-terra class and keeps its own fonts. */
+body.is-terra {
+  --k-display: 'Playfair Display', Georgia, serif;
+  --k-body: 'DM Sans', system-ui, -apple-system, sans-serif;
+  font-family: var(--k-body);
+  font-feature-settings: "lnum" 1; /* Playfair's default numerals dip below the line ("Order #4", "18 books"); lining numerals sit level with the letters */
+}
+/* product titles and prices (the Book page title, cart and checkout lines, the featured book, totals) are DM Sans too */
+body.is-terra :is(.gp-title, .gc-row__title, .gc-mini strong, .gk-item__title, .k-cartbook__title, .k-sumitem__title, .fh-chip__text strong) { font-family: var(--k-body); letter-spacing: -.01em; }
+body.is-terra :is(.gp-price, .gc-summary__total strong, .gk-total strong, .fh-chip--rating .fh-chip__line strong) { font-family: var(--k-body); }
