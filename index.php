@@ -37,7 +37,7 @@ foreach ($curated_cats as $cat) {
     $curated_data[$cat] = $stmt->get_result();
 }
 
-// Collections: each genre with a small line icon (24x24 paths) and how many books the shop has in it
+// Collections: each genre with a small line icon (24x24 paths)
 $genres = [
     'Fiction'   => '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
     'Business'  => '<path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/>',
@@ -50,10 +50,6 @@ $genres = [
     'Romance'   => '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
     'Fantasy'   => '<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4M22 5h-4M4 17v2M5 18H3"/>',
 ];
-$genre_counts = [];
-foreach ($conn->query("SELECT category, COUNT(*) AS n FROM books GROUP BY category")->fetch_all(MYSQLI_ASSOC) as $r) {
-    $genre_counts[$r['category']] = (int) $r['n'];
-}
 
 // Which hero cover takes which spot in the fan (left, middle and right): index in $hero_books
 $fan_order = [2, 0, 1];
@@ -118,22 +114,25 @@ $fan_order = [2, 0, 1];
                     </svg>
                 </a>
             </div>
-            <ul class="fh-colls">
-                <?php foreach ($genres as $genre => $icon): $n = $genre_counts[$genre] ?? 0; ?>
-                    <li>
-                        <a class="fh-coll" href="<?php echo BASE_URL; ?>frontend/shop.php?category=<?php echo urlencode($genre); ?>">
-                            <span class="fh-coll__icon" aria-hidden="true">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><?php echo $icon; ?></svg>
-                            </span>
-                            <span class="fh-coll__text">
-                                <strong><?php echo htmlspecialchars($genre); ?></strong>
-                                <span><?php echo $n > 0 ? $n . ($n === 1 ? ' book' : ' books') : 'Coming soon'; ?></span>
-                            </span>
-                            <svg class="fh-coll__go" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-                        </a>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
+            <?php // One scrolling row of pills. The arrows (mouse only) and the edge fades appear only when there is more to see in that direction (assets/js/main.js, data-rail). ?>
+            <div class="fh-rail" data-rail>
+                <button type="button" class="k-chip fh-rail__nav fh-rail__nav--prev" data-rail-prev aria-label="Scroll collections left">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
+                </button>
+                <ul class="fh-rail__list" data-rail-list>
+                    <?php foreach ($genres as $genre => $icon): ?>
+                        <li>
+                            <a class="k-genre fh-pill" href="<?php echo BASE_URL; ?>frontend/shop.php?category=<?php echo urlencode($genre); ?>">
+                                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><?php echo $icon; ?></svg>
+                                <span><?php echo htmlspecialchars($genre); ?></span>
+                            </a>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+                <button type="button" class="k-chip fh-rail__nav fh-rail__nav--next" data-rail-next aria-label="Scroll collections right">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                </button>
+            </div>
         </div>
     </section>
 

@@ -778,3 +778,29 @@ document.querySelectorAll('form[data-helpful]').forEach(function (form) {
         });
     });
 })();
+
+// A sideways-scrolling row (data-rail, the Home collections): the arrows move it by most of its width, and an arrow or edge fade shows
+// only on a side where there is more to see (the .can-prev / .can-next classes, which home-flat.css styles)
+document.querySelectorAll('[data-rail]').forEach(function (rail) {
+    var list = rail.querySelector('[data-rail-list]');
+    var prev = rail.querySelector('[data-rail-prev]');
+    var next = rail.querySelector('[data-rail-next]');
+    if (!list) {
+        return;
+    }
+    function update() {
+        var max = list.scrollWidth - list.clientWidth;
+        rail.classList.toggle('can-prev', list.scrollLeft > 4);
+        rail.classList.toggle('can-next', list.scrollLeft < max - 4);
+    }
+    function go(dir) {
+        var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        list.scrollBy({ left: dir * list.clientWidth * 0.8, behavior: calm ? 'auto' : 'smooth' });
+    }
+    if (prev) { prev.addEventListener('click', function () { go(-1); }); }
+    if (next) { next.addEventListener('click', function () { go(1); }); }
+    list.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    window.addEventListener('load', update);
+    update();
+});
