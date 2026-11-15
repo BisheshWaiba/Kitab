@@ -114,25 +114,22 @@ $fan_order = [2, 0, 1];
                     </svg>
                 </a>
             </div>
-            <?php // One scrolling row of pills. The arrows (mouse only) and the edge fades appear only when there is more to see in that direction (assets/js/main.js, data-rail). ?>
-            <div class="fh-rail" data-rail>
-                <button type="button" class="k-chip fh-rail__nav fh-rail__nav--prev" data-rail-prev aria-label="Scroll collections left">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6" /></svg>
-                </button>
-                <ul class="fh-rail__list" data-rail-list>
+        </div>
+
+        <?php // An endless, slowly moving row of pills (it stops under the pointer or keyboard focus). The list is printed four times so the loop has no gap on a wide screen; the copies are hidden from screen readers and keyboard tabbing. ?>
+        <div class="fh-marquee">
+            <ul class="fh-marquee__track">
+                <?php for ($copy = 0; $copy < 4; $copy++): ?>
                     <?php foreach ($genres as $genre => $icon): ?>
-                        <li>
-                            <a class="k-genre fh-pill" href="<?php echo BASE_URL; ?>frontend/shop.php?category=<?php echo urlencode($genre); ?>">
+                        <li<?php echo $copy ? ' aria-hidden="true"' : ''; ?>>
+                            <a class="k-genre fh-pill" href="<?php echo BASE_URL; ?>frontend/shop.php?category=<?php echo urlencode($genre); ?>"<?php echo $copy ? ' tabindex="-1"' : ''; ?>>
                                 <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><?php echo $icon; ?></svg>
                                 <span><?php echo htmlspecialchars($genre); ?></span>
                             </a>
                         </li>
                     <?php endforeach; ?>
-                </ul>
-                <button type="button" class="k-chip fh-rail__nav fh-rail__nav--next" data-rail-next aria-label="Scroll collections right">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-                </button>
-            </div>
+                <?php endfor; ?>
+            </ul>
         </div>
     </section>
 

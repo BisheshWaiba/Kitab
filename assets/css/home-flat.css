@@ -1,4 +1,4 @@
-/* The parts of the flat Home page that no other page has: the hero, the collections row, Best Sellers and the Our picks grid.
+/* The parts of the flat Home page that no other page has: the hero, the collections marquee, Best Sellers and the Our picks grid.
    Shared pieces (wrap, headings, sections, book cards) are in flat.css. Everything here starts with .fh- or sits under .fl. */
 
 /* ---------- hero ---------- */
@@ -67,36 +67,30 @@
 .fh-cover { display: block; width: 100%; height: auto; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 4px rgba(17, 18, 20, .25), 0 18px 28px -12px rgba(17, 18, 20, .5); }
 .fh-cover.k-cover--empty { overflow: hidden; padding: 8px; font-size: 13px; }
 
-/* ---------- collections: one scrolling row of glass pills, each with its icon and title ----------
-   The pills are the usual .k-genre glass buttons (glass-buttons.css). The row scrolls sideways with a swipe, a trackpad or the two arrows
-   (mouse only); the edges fade out and an arrow shows only on a side where there is more to see (assets/js/main.js sets .can-prev / .can-next). */
-.fh-rail { position: relative; display: flow-root; } /* flow-root keeps the list's negative margins (room for the hover lift and shadows) inside the rail, so the arrows centre on the pills */
-.fh-rail__list { --fade-l: 0px; --fade-r: 0px; display: flex; gap: 12px; margin: -8px 0 -20px; padding: 8px 0 20px; list-style: none; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; scrollbar-width: none;
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 var(--fade-l), #000 calc(100% - var(--fade-r)), transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 var(--fade-l), #000 calc(100% - var(--fade-r)), transparent); }
-.fh-rail__list::-webkit-scrollbar { display: none; }
-.fh-rail.can-prev .fh-rail__list { --fade-l: 96px; }
-.fh-rail.can-next .fh-rail__list { --fade-r: 96px; }
-.fh-rail__list li { flex: none; scroll-snap-align: start; }
-body.is-gbtn .fh-pill { display: inline-flex; align-items: center; gap: 10px; padding: 0 22px 0 16px; white-space: nowrap; }
+/* ---------- collections: an endless row of glass pills, each with its icon and title, drifting slowly to the left ----------
+   The pills are the usual .k-genre glass buttons (glass-buttons.css). The row runs the full width of the page and fades out at both edges.
+   index.php prints the list four times; the track slides left by exactly one copy and starts over, so the loop never shows a seam.
+   It stops while the pointer or keyboard focus is on it. People who asked for less motion get a still, wrapped row of the first copy. */
+.fh-marquee { overflow: hidden; margin: -10px 0 -24px; padding: 10px 0 24px; /* room for the hover lift and the shadows, which the clipping would cut off */
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent); }
+.fh-marquee__track { display: flex; width: max-content; margin: 0; padding: 0; list-style: none; animation: fh-marquee 36s linear infinite; will-change: transform; }
+.fh-marquee__track li { flex: none; margin-right: 12px; }
+.fh-marquee:hover .fh-marquee__track,
+.fh-marquee:focus-within .fh-marquee__track { animation-play-state: paused; }
+@keyframes fh-marquee { to { transform: translateX(-25%); } }
+/* the band behind the pills is one flat colour, so the glass blur adds nothing here and would only cost speed while they move */
+body.is-gbtn .fh-marquee .fh-pill { -webkit-backdrop-filter: none; backdrop-filter: none; display: inline-flex; align-items: center; gap: 10px; padding: 0 22px 0 16px; white-space: nowrap; }
 .fh-pill svg { flex: none; opacity: .75; transition: opacity .2s; }
-.fh-pill:hover svg { opacity: 1; }
+.fh-pill:hover svg, .fh-pill:focus-visible svg { opacity: 1; }
 .fh-pill span { font-weight: 600; letter-spacing: .005em; }
-
-/* the arrows sit on the faded edges */
-body.is-gbtn .fh-rail__nav.k-chip { position: absolute; top: 50%; margin-top: -22px; z-index: 2; display: inline-flex; align-items: center; justify-content: center; width: 44px; padding: 0; cursor: pointer; visibility: hidden; opacity: 0; }
-body.is-gbtn .fh-rail__nav--prev { left: 0; }
-body.is-gbtn .fh-rail__nav--next { right: 0; }
-body.is-gbtn .fh-rail.can-prev .fh-rail__nav--prev,
-body.is-gbtn .fh-rail.can-next .fh-rail__nav--next { visibility: visible; opacity: 1; }
-@media (hover: none) { body.is-gbtn .fh-rail__nav.k-chip { display: none; } } /* a finger swipes instead */
-@media (max-width: 600px) {
-  body.is-gbtn .fh-rail__nav.k-chip { display: none; }
-  /* on a phone the row runs to the screen edges, so it is clear it carries on */
-  .fh-rail__list { margin-inline: -20px; padding-inline: 20px; scroll-padding-inline: 20px; }
-  .fh-rail.can-prev .fh-rail__list { --fade-l: 20px; }
-  .fh-rail.can-next .fh-rail__list { --fade-r: 36px; }
+@media (prefers-reduced-motion: reduce) {
+  .fh-marquee { -webkit-mask-image: none; mask-image: none; }
+  .fh-marquee__track { animation: none; width: auto; max-width: var(--k-wrap); margin: 0 auto; padding: 0 40px; box-sizing: border-box; flex-wrap: wrap; gap: 10px; }
+  .fh-marquee__track li { margin-right: 0; }
+  .fh-marquee__track li[aria-hidden] { display: none; }
 }
+@media (prefers-reduced-motion: reduce) and (max-width: 600px) { .fh-marquee__track { padding: 0 20px; } }
 
 /* ---------- best sellers: five covers and their prices ---------- */
 .fh-best { display: flex; flex-wrap: wrap; align-items: center; gap: 56px; }
