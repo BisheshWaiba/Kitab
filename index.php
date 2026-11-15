@@ -37,7 +37,23 @@ foreach ($curated_cats as $cat) {
     $curated_data[$cat] = $stmt->get_result();
 }
 
-$genres = ['Fiction', 'Business', 'Tech', 'Science', 'History', 'Biography', 'Self-Help', 'Mystery', 'Romance', 'Fantasy'];
+// Collections: each genre with a small line icon (24x24 paths) and how many books the shop has in it
+$genres = [
+    'Fiction'   => '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+    'Business'  => '<path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/>',
+    'Tech'      => '<rect width="16" height="16" x="4" y="4" rx="2"/><rect width="6" height="6" x="9" y="9" rx="1"/><path d="M15 2v2M15 20v2M2 15h2M2 9h2M20 15h2M20 9h2M9 2v2M9 20v2"/>',
+    'Science'   => '<path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/>',
+    'History'   => '<path d="M3 22h18"/><path d="M6 18v-7M10 18v-7M14 18v-7M18 18v-7"/><path d="M12 2l8 5H4z"/>',
+    'Biography' => '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+    'Self-Help' => '<path d="M7 20h10"/><path d="M10 20c5.5-2.5.8-6.4 3-10"/><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"/>',
+    'Mystery'   => '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+    'Romance'   => '<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
+    'Fantasy'   => '<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4M22 5h-4M4 17v2M5 18H3"/>',
+];
+$genre_counts = [];
+foreach ($conn->query("SELECT category, COUNT(*) AS n FROM books GROUP BY category")->fetch_all(MYSQLI_ASSOC) as $r) {
+    $genre_counts[$r['category']] = (int) $r['n'];
+}
 
 // Which hero cover takes which spot in the fan (left, middle and right): index in $hero_books
 $fan_order = [2, 0, 1];
@@ -95,11 +111,26 @@ $fan_order = [2, 0, 1];
                     <h2 class="fl-h2" id="fh-collections">Browse by collection</h2>
                     <p class="fl-sub">Start from what you love to read.</p>
                 </div>
+                <a href="<?php echo BASE_URL; ?>frontend/shop.php" class="k-more">All books
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M5 12h14M13 6l6 6-6 6" />
+                    </svg>
+                </a>
             </div>
-            <ul class="fl-chips">
-                <?php foreach ($genres as $genre): ?>
-                    <li><a class="k-genre"
-                            href="<?php echo BASE_URL; ?>frontend/shop.php?category=<?php echo urlencode($genre); ?>"><?php echo htmlspecialchars($genre); ?></a>
+            <ul class="fh-colls">
+                <?php foreach ($genres as $genre => $icon): $n = $genre_counts[$genre] ?? 0; ?>
+                    <li>
+                        <a class="fh-coll" href="<?php echo BASE_URL; ?>frontend/shop.php?category=<?php echo urlencode($genre); ?>">
+                            <span class="fh-coll__icon" aria-hidden="true">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><?php echo $icon; ?></svg>
+                            </span>
+                            <span class="fh-coll__text">
+                                <strong><?php echo htmlspecialchars($genre); ?></strong>
+                                <span><?php echo $n > 0 ? $n . ($n === 1 ? ' book' : ' books') : 'Coming soon'; ?></span>
+                            </span>
+                            <svg class="fh-coll__go" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                        </a>
                     </li>
                 <?php endforeach; ?>
             </ul>

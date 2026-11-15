@@ -1,4 +1,4 @@
-/* The parts of the flat Home page that no other page has: the hero, Best Sellers and the Our picks grid.
+/* The parts of the flat Home page that no other page has: the hero, the collection tiles, Best Sellers and the Our picks grid.
    Shared pieces (wrap, headings, sections, book cards) are in flat.css. Everything here starts with .fh- or sits under .fl. */
 
 /* ---------- hero ---------- */
@@ -66,6 +66,36 @@
 /* a standing cover (a picture, or the titled box k_cover() shows when a book has no picture) */
 .fh-cover { display: block; width: 100%; height: auto; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 4px rgba(17, 18, 20, .25), 0 18px 28px -12px rgba(17, 18, 20, .5); }
 .fh-cover.k-cover--empty { overflow: hidden; padding: 8px; font-size: 13px; }
+
+/* ---------- collections: a grid of flat tiles (icon, genre, how many books, arrow), five across on a wide screen ---------- */
+.fh-colls { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(210px, 100%), 1fr)); gap: 16px; margin: 0; padding: 0; list-style: none; }
+@media (min-width: 1100px) { .fh-colls { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+.fh-coll { position: relative; display: flex; align-items: center; gap: 14px; min-height: 88px; padding: 16px 18px; box-sizing: border-box; border-radius: 16px; color: var(--k-ink); text-decoration: none;
+  background: var(--k-white); border: 1px solid var(--k-line); box-shadow: 0 1px 2px rgba(17, 18, 20, .06), 0 10px 22px -16px rgba(17, 18, 20, .28);
+  transition: transform .25s var(--k-ease), box-shadow .25s, border-color .25s; }
+.fh-coll:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--k-gold) 70%, var(--k-line)); box-shadow: 0 2px 4px rgba(17, 18, 20, .08), 0 18px 32px -16px rgba(17, 18, 20, .4); }
+.fh-coll:focus-visible { outline: 3px solid var(--k-accent); outline-offset: 3px; }
+.fh-coll__icon { flex: none; display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; color: var(--k-ink);
+  background: color-mix(in srgb, var(--k-gold) 22%, var(--k-white)); transition: background-color .25s, color .25s; }
+.fh-coll:hover .fh-coll__icon { background: linear-gradient(180deg, #FBD774, #EFB335); color: #1B130A; }
+.fh-coll__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.fh-coll__text strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 600 19px/1.25 var(--k-display); letter-spacing: -.01em; }
+.fh-coll__text span { font-size: 14px; color: var(--k-muted); font-variant-numeric: tabular-nums; }
+.fh-coll__go { flex: none; color: var(--k-muted); opacity: 0; transform: translateX(-6px); transition: opacity .25s, transform .25s var(--k-ease), color .25s; }
+.fh-coll:hover .fh-coll__go, .fh-coll:focus-visible .fh-coll__go { opacity: 1; transform: none; color: var(--k-ink); }
+@media (hover: none) { .fh-coll__go { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .fh-coll, .fh-coll__icon, .fh-coll__go { transition: none; }
+  .fh-coll:hover { transform: none; }
+}
+@media (max-width: 640px) {
+  .fh-colls { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .fh-coll { flex-direction: column; align-items: flex-start; gap: 12px; min-height: 0; padding: 14px; border-radius: 14px; }
+  .fh-coll__icon { width: 40px; height: 40px; }
+  .fh-coll__text strong { font-size: 17px; }
+  .fh-coll__text span { font-size: 13px; }
+  .fh-coll__go { position: absolute; top: 16px; right: 14px; }
+}
 
 /* ---------- best sellers: five covers and their prices ---------- */
 .fh-best { display: flex; flex-wrap: wrap; align-items: center; gap: 56px; }
