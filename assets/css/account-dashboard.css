@@ -1,0 +1,103 @@
+/* The My account dashboard: a row of plain panels (recent orders, selling, saved books, reviews, profile) above the account details.
+   One level of cards only, rows with hairlines inside them, no big-number tiles. Shared pieces (wrap, headings, the .fl-panel card, the
+   detail rows) are in flat.css and profile-flat.css; everything here has an ad- name, so no other page picks it up. */
+
+.pf.ad { max-width: var(--k-wrap); }
+
+/* ---------- who it is ---------- */
+.ad-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px 32px; margin-bottom: 32px; }
+.ad-head__id { display: flex; align-items: center; gap: 20px; min-width: 0; }
+.ad-head .pf-avatar { width: 72px; height: 72px; font-size: 30px; }
+.ad-head__text { min-width: 0; }
+.pf.ad .ad-head .fl-h1 { margin: 0; font-size: clamp(32px, 3.6vw, 44px); }
+.ad-head__sub { margin: 6px 0 0; font-size: 16px; color: var(--k-muted); overflow-wrap: anywhere; }
+.ad-head__actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.ad .pf-notice { margin: 0 0 24px; }
+
+/* ---------- the panels ---------- */
+/* two columns that each flow on their own (so a short panel never leaves a gap under it) */
+.ad-grid { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.ad-col { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+
+.ad-panel,
+.ad-details { padding: 24px 26px 26px; min-width: 0; }
+.ad-panel__head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+.ad-panel__title { margin: 0; font: 600 22px/1.2 var(--k-display); letter-spacing: -.01em; color: var(--k-ink); }
+.ad-link { font-size: 15px; font-weight: 600; color: var(--k-accent); text-decoration: underline; text-underline-offset: 3px; white-space: nowrap; }
+.ad-link:hover { color: var(--k-accent-dark); }
+.ad-panel__sub { margin: 6px 0 0; font-size: 15px; line-height: 1.5; color: var(--k-muted); }
+.ad-empty { margin: 14px 0 0; font-size: 16px; line-height: 1.55; color: var(--k-ink-2); }
+.ad-panel__actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+
+/* rows inside a panel: a hairline between them, the whole row is a link */
+.ad-rows { margin: 16px 0 0; padding: 0; list-style: none; }
+.ad-row { border-top: 1px solid var(--k-line); }
+.ad-row__link { display: flex; align-items: center; gap: 14px; padding: 14px 0; color: inherit; text-decoration: none; }
+.ad-row__link:hover .ad-row__title { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.ad-row__link:focus-visible { outline: 3px solid var(--k-accent); outline-offset: 2px; border-radius: 8px; }
+.ad-row__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.ad-row__title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 16px; font-weight: 600; color: var(--k-ink); }
+.ad-row__meta { font-size: 14px; color: var(--k-muted); }
+.ad-row__meta .k-stars { font-size: 14px; vertical-align: -1px; }
+.ad-row__end { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.ad-row__amount { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--k-ink); }
+
+.ad-cover { flex: none; display: block; width: 44px; height: auto; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 4px; box-shadow: 0 1px 3px rgba(17, 18, 20, .3), 0 6px 10px -6px rgba(17, 18, 20, .4); }
+.ad-cover.k-cover--empty { padding: 3px; font-size: 7px; overflow: hidden; }
+
+/* an order's state, in the colours the site already uses for them */
+.ad-badge { display: inline-flex; align-items: center; min-height: 24px; padding: 0 10px; border-radius: 8px; font-size: 12.5px; font-weight: 600; white-space: nowrap; }
+.ad-badge--pending { background: var(--k-warn-bg); color: var(--k-warn); }
+.ad-badge--processing { background: var(--k-info-bg); color: var(--k-info); }
+.ad-badge--shipped { background: var(--k-ship-bg); color: var(--k-ship); }
+.ad-badge--delivered { background: var(--k-ok-bg); color: var(--k-ok); }
+.ad-badge--cancelled { background: var(--k-bad-bg); color: var(--k-bad); }
+
+/* saved books: a row of covers */
+.ad-shelf { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; margin: 18px 0 0; padding: 0; list-style: none; }
+.ad-shelf a { display: block; }
+.ad-shelf__cover { display: block; width: 64px; height: auto; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 4px; box-shadow: 0 1px 3px rgba(17, 18, 20, .3), 0 8px 14px -8px rgba(17, 18, 20, .45); transition: transform .2s; }
+.ad-shelf a:hover .ad-shelf__cover { transform: translateY(-3px); }
+.ad-shelf__cover.k-cover--empty { padding: 5px; font-size: 8px; overflow: hidden; }
+.ad-shelf__more { align-self: center; font-size: 14px; font-weight: 600; color: var(--k-ink-2); }
+
+/* profile: a thin progress line */
+.ad-meter { height: 8px; margin-top: 14px; border-radius: 999px; overflow: hidden; background: var(--k-track); }
+.ad-meter > span { display: block; height: 100%; border-radius: inherit; background: var(--k-accent); }
+
+/* ---------- the account details, full width in two columns ---------- */
+.ad-details { margin-top: 24px; }
+.ad-details .pf-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 56px; margin-top: 8px; }
+.ad-details .pf-row { grid-template-columns: 150px minmax(0, 1fr); }
+.ad-details .pf-row--wide { grid-column: 1 / -1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ad-shelf__cover { transition: none; }
+  .ad-shelf a:hover .ad-shelf__cover { transform: none; }
+}
+
+/* tablets and phones: one column, in the order orders, selling, saved, reviews, profile. The two columns step aside (display: contents)
+   so all five panels can be ordered together. */
+@media (max-width: 900px) {
+  .ad-grid { display: flex; flex-direction: column; gap: 18px; }
+  .ad-col { display: contents; }
+  .ad-area-orders { order: 1; }
+  .ad-area-selling { order: 2; }
+  .ad-area-saved { order: 3; }
+  .ad-area-reviews { order: 4; }
+  .ad-area-profile { order: 5; }
+  .ad-details .pf-list { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) {
+  .ad-head { margin-bottom: 24px; }
+  .ad-head__id { gap: 16px; }
+  .ad-head .pf-avatar { width: 60px; height: 60px; font-size: 26px; }
+  .ad-head__actions { width: 100%; }
+  .ad-head__actions .k-btn { flex: 1 1 140px; }
+  .ad-panel,
+  .ad-details { padding: 20px 18px 22px; }
+  .ad-panel__title { font-size: 20px; }
+  .ad-details .pf-row { grid-template-columns: minmax(0, 1fr); padding: 14px 0; }
+  .ad-row__end { align-items: flex-end; }
+  .ad-panel__actions .k-btn { flex: 1 1 130px; }
+}
