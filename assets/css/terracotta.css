@@ -36,24 +36,35 @@
   --k-announce-bg: #45352D;
   --k-announce-fg: #FFFDFC;
 
-  /* main action: terracotta glass, lit from above, with warm-white text. Hover goes to dark terracotta. */
+  /* Buttons are flat: solid colour, no gloss, no blur, no shine, no lift (the switch-off rules are at the end of this file).
+     main action: solid terracotta with warm-white text; hover goes to dark terracotta, a press a little darker still. */
   --gb1-ink: #FFFDFC;
-  --gb1-edge: rgba(255, 255, 255, .38);
-  --gb1-bg: linear-gradient(180deg, rgba(255, 255, 255, .2), rgba(255, 255, 255, 0) 54%), linear-gradient(135deg, #C26A48, #B85C3B);
-  --gb1-bg-hover: linear-gradient(180deg, rgba(255, 255, 255, .16), rgba(255, 255, 255, 0) 54%), linear-gradient(135deg, #B1573A, #A64E32);
-  --gb1-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), inset 0 -10px 18px -12px rgba(80, 26, 8, .55), 0 14px 26px -12px rgba(166, 78, 50, .7), 0 2px 6px rgba(80, 36, 18, .2);
-  --gb1-shadow-hover: inset 0 1px 0 rgba(255, 255, 255, .55), inset 0 -10px 18px -12px rgba(80, 26, 8, .55), 0 22px 34px -14px rgba(166, 78, 50, .8), 0 2px 6px rgba(80, 36, 18, .22);
-  --gb1-shadow-press: inset 0 2px 8px rgba(70, 20, 5, .45), 0 6px 12px -8px rgba(166, 78, 50, .6);
+  --gb1-edge: transparent;
+  --gb1-bg: #B85C3B;
+  --gb1-bg-hover: #A64E32;
+  --gb1-shadow: none;
+  --gb1-shadow-hover: none;
+  --gb1-shadow-press: inset 0 0 0 100px rgba(0, 0, 0, .1);
 
-  /* secondary buttons: sand glass with a muted-sand edge */
+  /* secondary buttons: solid sand with a muted-sand edge */
   --gb2-ink: #45352D;
-  --gb2-edge: rgba(217, 185, 149, .75);
-  --gb2-bg: linear-gradient(180deg, rgba(255, 255, 255, .55), rgba(255, 255, 255, 0) 70%), #F4EBDD;
-  --gb2-bg-hover: linear-gradient(180deg, rgba(255, 255, 255, .5), rgba(255, 255, 255, 0) 70%), #EBDDC8;
-  --gb2-shadow: inset 0 1px 0 rgba(255, 255, 255, .85), 0 0 0 1px rgba(160, 120, 70, .14), 0 10px 22px -14px rgba(90, 60, 30, .4);
-  --gb2-shadow-hover: inset 0 1px 0 rgba(255, 255, 255, .9), 0 0 0 1px rgba(160, 120, 70, .2), 0 16px 28px -14px rgba(90, 60, 30, .45);
-  --gb2-shadow-press: inset 0 2px 6px rgba(90, 60, 30, .18), 0 0 0 1px rgba(160, 120, 70, .18);
-  --gb0-bg-hover: rgba(244, 235, 221, .9);
+  --gb2-edge: #D9B995;
+  --gb2-bg: #F4EBDD;
+  --gb2-bg-hover: #EBDDC8;
+  --gb2-shadow: none;
+  --gb2-shadow-hover: none;
+  --gb2-shadow-press: inset 0 0 0 100px rgba(69, 53, 45, .06);
+  --gb0-edge: #D9B995;
+  --gb0-bg-hover: #F4EBDD;
+  --gb0-shadow-hover: none;
+
+  /* danger (Logout): a pale red with a red edge that fills solid red on hover */
+  --gb3-edge: rgba(179, 38, 30, .4);
+  --gb3-bg: #FBE3E1;
+  --gb3-shadow: none;
+  --gb3-edge-hover: transparent;
+  --gb3-bg-hover: #B3261E;
+  --gb3-shadow-hover: none;
   --gb-badge-ring: rgba(255, 253, 252, .6);
 }
 
@@ -91,5 +102,49 @@
 :root:not([data-theme="dark"]) body.is-terra .fl .gk-steps li.is-current .gk-steps__dot { color: #FFFDFC; background: #B85C3B; border-color: #B85C3B; box-shadow: 0 0 0 4px rgba(184, 92, 59, .2); }
 :root:not([data-theme="dark"]) body.is-terra .po-track .is-current .po-track__dot { background: #B85C3B; border-color: #B85C3B; box-shadow: 0 0 0 4px rgba(184, 92, 59, .22); }
 :root:not([data-theme="dark"]) body.is-terra .gc-ship__fill { background: #B85C3B; }
-:root:not([data-theme="dark"]) body.is-terra .pf-avatar { color: #FFFDFC; background: linear-gradient(135deg, #C9704D, #B85C3B); box-shadow: 0 0 0 1px rgba(120, 50, 25, .25), 0 12px 24px -14px rgba(166, 78, 50, .7); }
+:root:not([data-theme="dark"]) body.is-terra .pf-avatar { color: #FFFDFC; background: #B85C3B; box-shadow: none; }
 :root:not([data-theme="dark"]) body.is-terra .k-lost__code span { color: #B85C3B; }
+
+/* ---------- flat buttons, in dark mode too ----------
+   The same flat look for the dark theme: solid amber for the main action, a faint solid fill with a thin edge for the rest. */
+:root[data-theme="dark"] body.is-terra {
+  --gb1-ink: #1B1305;
+  --gb1-edge: transparent;
+  --gb1-bg: #F2B134;
+  --gb1-bg-hover: #FFC24F;
+  --gb1-shadow: none;
+  --gb1-shadow-hover: none;
+  --gb1-shadow-press: inset 0 0 0 100px rgba(0, 0, 0, .12);
+
+  --gb2-edge: rgba(255, 255, 255, .18);
+  --gb2-bg: rgba(255, 255, 255, .07);
+  --gb2-bg-hover: rgba(255, 255, 255, .14);
+  --gb2-shadow: none;
+  --gb2-shadow-hover: none;
+  --gb2-shadow-press: inset 0 0 0 100px rgba(0, 0, 0, .15);
+  --gb0-edge: rgba(255, 255, 255, .18);
+  --gb0-bg-hover: rgba(255, 255, 255, .08);
+  --gb0-shadow-hover: none;
+
+  --gb3-edge: rgba(255, 122, 110, .4);
+  --gb3-bg: rgba(255, 122, 110, .12);
+  --gb3-shadow: none;
+  --gb3-edge-hover: transparent;
+  --gb3-bg-hover: #FF7A6E;
+  --gb3-ink-hover: #2A0E0B;
+  --gb3-shadow-hover: none;
+}
+
+/* ---------- the glass mechanics, switched off ----------
+   No backdrop blur, no shine that sweeps across on hover, and no lift or squash. A button changes colour on hover and nothing else. */
+body.is-terra :is(.k-btn, .k-cart, .k-theme, .k-avatar, .k-genre, .k-chip, .k-more, .k-wish__btn, .gs-sort, .gp-qty, .gt-toast__close) {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  transition: background-color .15s, color .15s, border-color .15s;
+}
+body.is-terra :is(.k-btn, .k-cart, .k-theme, .k-avatar, .k-genre, .k-chip, .k-more, .k-wish__btn, .gs-sort, .gp-qty, .gt-toast__close)::before { display: none; }
+body.is-terra :is(.k-btn, .k-cart, .k-theme, .k-avatar, .k-genre, .k-chip, .k-more, .k-wish__btn, .gs-sort, .gp-qty, .gt-toast__close):is(:hover, :active) { transform: none; }
+/* the small phone buttons in the top bar and the cart badge ring: no glass ring either */
+body.is-terra .k-navbar .k-cart,
+body.is-terra .k-navbar .k-cart:hover { box-shadow: none; }
+:root:not([data-theme="dark"]) body.is-terra .k-avatar { color: #FFFDFC; }
