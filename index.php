@@ -51,6 +51,9 @@ $genres = [
     'Fantasy'   => '<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4M22 5h-4M4 17v2M5 18H3"/>',
 ];
 
+// Each collection pill gets its own colour: an oklch hue angle (home-flat.css turns it into the tint, the icon colour and the hover fill)
+$genre_hues = ['Fiction' => 275, 'Business' => 200, 'Tech' => 245, 'Science' => 150, 'History' => 70, 'Biography' => 35, 'Self-Help' => 115, 'Mystery' => 305, 'Romance' => 10, 'Fantasy' => 335];
+
 // Which hero cover takes which spot in the fan (left, middle and right): index in $hero_books
 $fan_order = [2, 0, 1];
 ?>
@@ -122,7 +125,7 @@ $fan_order = [2, 0, 1];
                 <?php for ($copy = 0; $copy < 4; $copy++): ?>
                     <?php foreach ($genres as $genre => $icon): ?>
                         <li<?php echo $copy ? ' aria-hidden="true"' : ''; ?>>
-                            <a class="k-genre fh-pill" href="<?php echo BASE_URL; ?>frontend/shop.php?category=<?php echo urlencode($genre); ?>"<?php echo $copy ? ' tabindex="-1"' : ''; ?>>
+                            <a class="k-genre fh-pill" style="--h:<?php echo (int) ($genre_hues[$genre] ?? 70); ?>" href="<?php echo BASE_URL; ?>frontend/shop.php?category=<?php echo urlencode($genre); ?>"<?php echo $copy ? ' tabindex="-1"' : ''; ?>>
                                 <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><?php echo $icon; ?></svg>
                                 <span><?php echo htmlspecialchars($genre); ?></span>
                             </a>

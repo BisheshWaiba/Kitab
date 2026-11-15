@@ -81,9 +81,23 @@
 @keyframes fh-marquee { to { transform: translateX(-25%); } }
 /* the band behind the pills is one flat colour, so the glass blur adds nothing here and would only cost speed while they move */
 body.is-gbtn .fh-marquee .fh-pill { -webkit-backdrop-filter: none; backdrop-filter: none; display: inline-flex; align-items: center; gap: 10px; padding: 0 22px 0 16px; white-space: nowrap; }
-.fh-pill svg { flex: none; opacity: .75; transition: opacity .2s; }
-.fh-pill:hover svg, .fh-pill:focus-visible svg { opacity: 1; }
 .fh-pill span { font-weight: 600; letter-spacing: .005em; }
+.fh-pill svg { flex: none; }
+
+/* each pill has its own colour, from the hue index.php sets in --h (an oklch hue angle): a soft tint with a matching edge and glow, the icon in
+   the full colour, and on hover the whole pill fills with it. The dark theme uses lighter colours on deeper tints so the words stay readable. */
+.fh-pill { --pc: oklch(54% .18 var(--h)); --pt: oklch(93% .055 var(--h)); --pe: oklch(80% .1 var(--h)); --pon: #fff; }
+:root[data-theme="dark"] .fh-pill { --pc: oklch(80% .14 var(--h)); --pt: oklch(32% .065 var(--h)); --pe: oklch(46% .1 var(--h)); --pon: oklch(20% .04 var(--h)); }
+body.is-gbtn .fh-marquee .fh-pill { color: var(--k-ink); border-color: var(--pe);
+  background: linear-gradient(180deg, rgb(255 255 255 / .45), rgb(255 255 255 / 0)), var(--pt);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .5), 0 8px 18px -12px color-mix(in srgb, var(--pc) 75%, transparent); }
+:where(:root[data-theme="dark"]) body.is-gbtn .fh-marquee .fh-pill { background: linear-gradient(180deg, rgb(255 255 255 / .1), rgb(255 255 255 / 0)), var(--pt); box-shadow: inset 0 1px 0 rgb(255 255 255 / .12), 0 8px 18px -12px rgb(0 0 0 / .7); }
+.fh-pill svg { color: var(--pc); transition: color .2s; }
+body.is-gbtn .fh-marquee .fh-pill:hover,
+body.is-gbtn .fh-marquee .fh-pill:focus-visible { color: var(--pon); border-color: var(--pc);
+  background: linear-gradient(180deg, rgb(255 255 255 / .28), rgb(255 255 255 / 0)), var(--pc);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .35), 0 14px 24px -12px color-mix(in srgb, var(--pc) 85%, transparent); }
+.fh-pill:hover svg, .fh-pill:focus-visible svg { color: var(--pon); }
 @media (prefers-reduced-motion: reduce) {
   .fh-marquee { -webkit-mask-image: none; mask-image: none; }
   .fh-marquee__track { animation: none; width: auto; max-width: var(--k-wrap); margin: 0 auto; padding: 0 40px; box-sizing: border-box; flex-wrap: wrap; gap: 10px; }
