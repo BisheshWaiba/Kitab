@@ -103,30 +103,42 @@ $fan_order = [2, 0, 1];
     </section>
 
     <!-- Collections -->
-    <section class="fl-sec fl-sec--band" aria-labelledby="fh-collections">
+    <section class="fl-sec fl-sec--band fh-colls" aria-labelledby="fh-collections">
         <div class="fl-wrap">
             <div class="fl-head">
                 <div>
-                    <h2 class="fl-h2" id="fh-collections">Browse by collection</h2>
+                    <h2 class="fl-h2" id="fh-collections">Browse by <em>collection</em></h2>
                     <p class="fl-sub">Start from what you love to read.</p>
                 </div>
             </div>
         </div>
 
-        <?php // An endless, slowly moving row of pills (it stops under the pointer or keyboard focus). The list is printed four times so the loop has no gap on a wide screen; the copies are hidden from screen readers and keyboard tabbing. ?>
-        <div class="fh-marquee">
-            <ul class="fh-marquee__track">
-                <?php for ($copy = 0; $copy < 4; $copy++): ?>
-                    <?php foreach ($genres as $genre => $icon): ?>
-                        <li<?php echo $copy ? ' aria-hidden="true"' : ''; ?>>
-                            <a class="k-genre fh-pill" style="--h:<?php echo (int) ($genre_hues[$genre] ?? 70); ?>" href="<?php echo BASE_URL; ?>frontend/shop.php?category=<?php echo urlencode($genre); ?>"<?php echo $copy ? ' tabindex="-1"' : ''; ?>>
-                                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><?php echo $icon; ?></svg>
-                                <span><?php echo htmlspecialchars($genre); ?></span>
-                            </a>
-                        </li>
-                    <?php endforeach; ?>
-                <?php endfor; ?>
-            </ul>
+        <?php
+        // Two endless rows of pills drifting in opposite directions (they stop under the pointer or keyboard focus). The second row has the same
+        // genres in a different order. Each list is printed four times so the loop has no gap on a wide screen; the second row and the copies are
+        // hidden from screen readers and keyboard tabbing (the first row already has every link).
+        $genre_names = array_keys($genres);
+        $marquee_rows = [$genre_names, array_merge(array_slice($genre_names, 5), array_slice($genre_names, 0, 5))];
+        ?>
+        <div class="fh-marquees">
+            <?php foreach ($marquee_rows as $row => $names): ?>
+                <div class="fh-marquee<?php echo $row ? ' fh-marquee--rev' : ''; ?>">
+                    <ul class="fh-marquee__track">
+                        <?php for ($copy = 0; $copy < 4; $copy++): ?>
+                            <?php foreach ($names as $genre): $hidden = $row > 0 || $copy > 0; ?>
+                                <li<?php echo $hidden ? ' aria-hidden="true"' : ''; ?>>
+                                    <a class="k-genre fh-pill" style="--h:<?php echo (int) ($genre_hues[$genre] ?? 70); ?>" href="<?php echo BASE_URL; ?>frontend/shop.php?category=<?php echo urlencode($genre); ?>"<?php echo $hidden ? ' tabindex="-1"' : ''; ?>>
+                                        <span class="fh-pill__badge" aria-hidden="true">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><?php echo $genres[$genre]; ?></svg>
+                                        </span>
+                                        <span class="fh-pill__name"><?php echo htmlspecialchars($genre); ?></span>
+                                    </a>
+                                </li>
+                            <?php endforeach; ?>
+                        <?php endfor; ?>
+                    </ul>
+                </div>
+            <?php endforeach; ?>
         </div>
     </section>
 
