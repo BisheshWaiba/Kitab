@@ -5,9 +5,9 @@
    Not white: one calm, warm stone for the whole page, and a slightly deeper stone for the alternating bands (Collections, Best Sellers).
    The white cards and the white top bar stand out against it. The words under headings get a touch more ink so they read as well on stone as
    they did on white. Light mode only: the dark theme already has its own page colour. Only the Home page has body.is-home. */
-:root:not([data-theme="dark"]) body.is-home { --k-paper: #F4F1EB; --k-muted: #5F6068; }
-:root:not([data-theme="dark"]) body.is-home .fl-sec--band { background: #ECE8DF; }
-:root:not([data-theme="dark"]) body.is-home .fh-colls { background: radial-gradient(55% 130% at 50% 0%, color-mix(in srgb, var(--k-gold) 15%, transparent), transparent 72%), #ECE8DF; }
+:root:not([data-theme="dark"]) body.is-home { --k-paper: #F4F1EB; --k-muted: #5F6068; --fh-band: #F2EBDC; } /* --fh-band: a soft warm cream, not grey, so the bands pick up the gold of the buttons and the covers (a stronger champagne made the pastel pills blend in) */
+:root:not([data-theme="dark"]) body.is-home .fl-sec--band { background: var(--fh-band); box-shadow: inset 0 1px 0 rgb(255 255 255 / .7), inset 0 -1px 0 rgb(150 110 30 / .1); }
+:root:not([data-theme="dark"]) body.is-home .fh-colls { background: radial-gradient(55% 130% at 50% 0%, color-mix(in srgb, var(--k-gold) 14%, transparent), transparent 72%), var(--fh-band); }
 :root:not([data-theme="dark"]) body.is-home .k-footer { background: transparent; }
 
 /* ---------- hero ---------- */
