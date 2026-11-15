@@ -586,8 +586,8 @@ function k_rating_row(int $book_id): string
         . '</span>';
 }
 
-// A book card: a tall pale stage with the cover on it, then the star rating, the title and the price. The heart (wishlist)
-// and Add to Cart sit on the stage and appear on hover or keyboard focus (always shown on touch screens, see flat.css).
+// A book card: a tall pale stage with the cover on it, then the star rating, the title and a bottom row with the price and Add to Cart.
+// The heart (wishlist) sits on the stage; the heart and Add to Cart appear on hover or keyboard focus (always shown on touch screens, see flat.css).
 // Add to Cart adds one copy without leaving the page (assets/js/main.js shows the "Added to your cart" message and updates
 // the cart badge); without JavaScript the form is sent to the Book page, which adds it and shows the message.
 // ($cta is kept for old callers; the button on the stage is always the amber one.)
@@ -606,28 +606,31 @@ function k_book_card(array $b, string $cta = 'outline'): void
             </a>
             <?php if ($sold_out): ?><span class="k-book__tag">Out of stock</span><?php endif; ?>
             <?php k_wish_button($b); ?>
-            <form method="POST" action="<?php echo $href; ?>" class="k-book__add" data-add-form
-                data-title="<?php echo htmlspecialchars($b['title']); ?>" data-cover="<?php echo htmlspecialchars($cover_url); ?>">
-                <input type="hidden" name="quantity" value="1">
-                <button type="submit" name="add_to_cart" class="k-btn k-btn--primary"<?php echo $sold_out ? ' disabled' : ''; ?>
-                    aria-label="<?php echo $sold_out ? 'Out of stock' : 'Add to Cart'; ?>: <?php echo htmlspecialchars($b['title']); ?>">
-                    <?php // the two icons only show on phones, where the button is a small round one instead of the "Add to Cart" pill (flat.css) ?>
-                    <svg class="k-book__add-icon k-book__add-icon--cart" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
-                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M3 4h2.2l2.1 10.2a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1L20.5 8H6.2" />
-                        <circle cx="9.5" cy="19.5" r="1.4" />
-                        <circle cx="17" cy="19.5" r="1.4" />
-                    </svg>
-                    <svg class="k-book__add-icon k-book__add-icon--done" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
-                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5" /></svg>
-                    <span data-add-label><?php echo $sold_out ? 'Out of stock' : 'Add to Cart'; ?></span>
-                </button>
-            </form>
         </div>
         <div class="k-book__info">
             <?php echo k_rating_row((int) $b['id']); ?>
             <a class="k-book__title" href="<?php echo $href; ?>"><?php echo htmlspecialchars($b['title']); ?><span class="k-sr"> by <?php echo htmlspecialchars($b['author']); ?></span></a>
-            <span class="k-book__price">Rs. <?php echo number_format((float) $b['price']); ?></span>
+            <?php // the bottom row: the price on the left, Add to Cart on the right (it shows on hover or keyboard focus, and always on touch screens, see flat.css) ?>
+            <div class="k-book__foot">
+                <span class="k-book__price">Rs. <?php echo number_format((float) $b['price']); ?></span>
+                <form method="POST" action="<?php echo $href; ?>" class="k-book__add" data-add-form
+                    data-title="<?php echo htmlspecialchars($b['title']); ?>" data-cover="<?php echo htmlspecialchars($cover_url); ?>">
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" name="add_to_cart" class="k-btn k-btn--primary"<?php echo $sold_out ? ' disabled' : ''; ?>
+                        aria-label="<?php echo $sold_out ? 'Out of stock' : 'Add to Cart'; ?>: <?php echo htmlspecialchars($b['title']); ?>">
+                        <?php // the two icons only show on phones, where the button is a small round one instead of the "Add to Cart" pill (flat.css) ?>
+                        <svg class="k-book__add-icon k-book__add-icon--cart" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M3 4h2.2l2.1 10.2a1.5 1.5 0 0 0 1.5 1.2h8.4a1.5 1.5 0 0 0 1.5-1.1L20.5 8H6.2" />
+                            <circle cx="9.5" cy="19.5" r="1.4" />
+                            <circle cx="17" cy="19.5" r="1.4" />
+                        </svg>
+                        <svg class="k-book__add-icon k-book__add-icon--done" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5" /></svg>
+                        <span data-add-label><?php echo $sold_out ? 'Out of stock' : 'Add to Cart'; ?></span>
+                    </button>
+                </form>
+            </div>
         </div>
     </article>
     <?php
