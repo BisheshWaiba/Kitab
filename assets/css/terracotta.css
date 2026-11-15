@@ -148,3 +148,14 @@ body.is-terra :is(.k-btn, .k-cart, .k-theme, .k-avatar, .k-genre, .k-chip, .k-mo
 body.is-terra .k-navbar .k-cart,
 body.is-terra .k-navbar .k-cart:hover { box-shadow: none; }
 :root:not([data-theme="dark"]) body.is-terra .k-avatar { color: #FFFDFC; }
+
+/* ---------- corners: softly rounded, not pills ----------
+   Text buttons, tabs, filter chips, the sort control, the quantity stepper and the search bar share one corner radius (--btn-r), the same
+   family as the 16-18px cards. Buttons that hold only an icon (heart, cart, theme, avatar, close) stay round. */
+body.is-terra { --btn-r: 12px; }
+body.is-terra :is(.k-btn, .k-more, .k-chip, .k-genre, .gs-sort, .gp-qty, .gs-preset, .gs-tag) { border-radius: var(--btn-r); }
+body.is-terra .gp-qty__btn { border-radius: 8px; }
+body.is-terra .k-search { border-radius: var(--btn-r); }
+body.is-terra .fh-pill__badge { border-radius: 8px; }
+/* the small round "add to cart" button on phone cards is icon-only, so it stays round like the heart above it */
+@media (max-width: 640px) { body.is-terra .fl .k-book__add .k-btn { border-radius: 50%; } }
