@@ -190,6 +190,26 @@ function k_book_conditions(): array
     ];
 }
 
+// A used book is one a reader listed (Sell a Book): it carries the seller's user id. The store's own new books have none.
+function k_is_used(array $book): bool
+{
+    return !empty($book['seller_id']);
+}
+
+// The seller's first name, for "Sold by ..." (only the first name is shown to other readers)
+function k_seller_name(mysqli $conn, int $user_id): string
+{
+    $stmt = $conn->prepare('SELECT name FROM users WHERE id = ?');
+    if (!$stmt) {
+        return '';
+    }
+    $stmt->bind_param('i', $user_id);
+    $stmt->execute();
+    $row = $stmt->get_result()->fetch_row();
+    $words = preg_split('/\s+/u', trim((string) ($row[0] ?? '')), -1, PREG_SPLIT_NO_EMPTY);
+    return $words[0] ?? '';
+}
+
 function k_book_condition_label(?string $key): string
 {
     return k_book_conditions()[(string) $key][0] ?? '';
@@ -398,7 +418,7 @@ function k_cover(array $b, string $class = 'k-cover', bool $lazy = true): void
 // Decorative covers beside the login/register forms. $offset chooses which books.
 function k_auth_art(mysqli $conn, int $offset = 0, bool $flip = false): void
 {
-    $rows = $conn->query("SELECT id, title, image FROM books WHERE image IS NOT NULL AND image <> '' ORDER BY id ASC LIMIT 4 OFFSET " . $offset);
+    $rows = $conn->query("SELECT id, title, image FROM books WHERE image IS NOT NULL AND image <> '' AND seller_id IS NULL ORDER BY id ASC LIMIT 4 OFFSET " . $offset);
     $books = $rows ? $rows->fetch_all(MYSQLI_ASSOC) : [];
     if (!$books) {
         return;
@@ -659,7 +679,8 @@ function k_book_card(array $b, string $cta = 'outline'): void
             <a class="k-book__cover" href="<?php echo $href; ?>" tabindex="-1" aria-hidden="true">
                 <?php k_cover($b); ?>
             </a>
-            <?php if ($sold_out): ?><span class="k-book__tag">Out of stock</span><?php endif; ?>
+            <?php if ($sold_out): ?><span class="k-book__tag">Out of stock</span>
+            <?php elseif (k_is_used($b)): $cond_say = k_book_condition_label($b['book_condition'] ?? null); ?><span class="k-book__tag k-book__tag--used">Used<?php echo $cond_say !== '' ? ' · ' . htmlspecialchars($cond_say) : ''; ?></span><?php endif; ?>
             <?php k_wish_button($b); ?>
         </div>
         <div class="k-book__info">

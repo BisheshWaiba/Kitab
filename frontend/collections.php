@@ -11,7 +11,7 @@ require_once '../includes/header.php';
 // One collection per category, built from the books themselves
 $result = $conn->query(
     "SELECT category AS name, COUNT(*) AS books FROM books
-     WHERE category IS NOT NULL AND category <> '' GROUP BY category ORDER BY category ASC"
+     WHERE category IS NOT NULL AND category <> '' AND seller_id IS NULL GROUP BY category ORDER BY category ASC"
 );
 $collections = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
 $total = count($collections);
@@ -19,7 +19,7 @@ $total = count($collections);
 // Up to three covers per collection, books that have a cover first
 $shelves = [];
 $result = $conn->query(
-    "SELECT id, title, image, category FROM books WHERE category IS NOT NULL AND category <> ''
+    "SELECT id, title, image, category FROM books WHERE category IS NOT NULL AND category <> '' AND seller_id IS NULL
      ORDER BY (image IS NULL OR image = ''), id DESC"
 );
 while ($result && ($book = $result->fetch_assoc())) {

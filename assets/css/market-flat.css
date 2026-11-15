@@ -1,0 +1,70 @@
+/* The Used Book Marketplace and My listings. The Marketplace is the Shop page in marketplace mode (shop-flat.css does the layout); everything
+   here has an mk- (Marketplace) or ml- (My listings) name, so no other page picks it up. */
+
+/* ---------- Marketplace: the page head and the Condition list ---------- */
+.mk-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 20px 32px; }
+.mk-head .fl-sub { max-width: 48ch; }
+.mk-head__actions { display: flex; flex-wrap: wrap; gap: 12px; }
+
+/* the "Condition" list under the categories. Its title shows at every width (the categories' own title only shows beside the column). */
+.gs-side__title--cond { display: block; margin: 20px 0 0; padding: 0 4px; font: 600 12px/1 var(--k-body); letter-spacing: .08em; text-transform: uppercase; color: var(--k-muted); }
+@media (min-width: 901px) { .gs-side__title--cond { padding: 0 14px; } }
+@media (max-width: 900px) { .gs-side .gs-conds { margin-top: 10px; } }
+
+/* a hint on the Shop page when a search finds nothing there but the Marketplace has copies */
+.mk-hint { margin: 28px 0 0; text-align: center; font-size: 16px; color: var(--k-ink-2); }
+.mk-hint a { color: var(--k-accent); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+
+@media (max-width: 600px) {
+  .mk-head__actions { width: 100%; }
+  .mk-head__actions .k-btn { flex: 1 1 140px; }
+}
+
+/* ---------- My listings ---------- */
+.ml { padding-top: 56px; padding-bottom: 72px; }
+.ml-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 20px 32px; margin-bottom: 28px; }
+.ml-head__actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.ml .k-alert { margin: 0 0 20px; }
+.ml-list { display: flex; flex-direction: column; gap: 16px; margin: 0; padding: 0; list-style: none; }
+
+/* one listing: the cover, what it is and whether it is still for sale, the edit fields, and the two quieter actions */
+.ml-item { display: grid; grid-template-columns: 72px minmax(0, 1fr) auto; grid-template-areas: "cover main edit" "cover more edit"; align-items: start; gap: 6px 22px; padding: 20px 22px; scroll-margin-top: 110px; }
+.ml-item__cover { grid-area: cover; display: block; align-self: start; }
+.ml-cover { display: block; width: 72px; height: auto; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 4px; box-shadow: 0 1px 3px rgba(17, 18, 20, .3), 0 8px 14px -8px rgba(17, 18, 20, .45); }
+.ml-cover.k-cover--empty { padding: 6px; font-size: 10px; overflow: hidden; }
+.ml-item__main { grid-area: main; min-width: 0; }
+.ml-item__title { margin: 0; font: 600 20px/1.25 var(--k-display); letter-spacing: -.01em; color: var(--k-ink); }
+.ml-item__title a:hover { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.ml-item__meta { margin: 4px 0 0; font-size: 15px; color: var(--k-muted); overflow-wrap: anywhere; }
+.ml-item__status { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 12px 0 0; }
+.ml-badge { display: inline-flex; align-items: center; min-height: 28px; padding: 0 12px; border-radius: 8px; font-size: 13px; font-weight: 600; }
+.ml-badge--live { background: var(--k-ok-bg); color: var(--k-ok); }
+.ml-badge--sold { background: var(--k-band); color: var(--k-ink-2); border: 1px solid var(--k-line); }
+.ml-ordered { font-size: 14px; color: var(--k-ink-2); }
+
+.ml-item__edit { grid-area: edit; display: grid; grid-template-columns: 112px 96px 150px auto; align-items: end; gap: 12px; margin: 0; }
+.ml-field { min-width: 0; gap: 6px; }
+.ml-field label { font-size: 13px; }
+.ml-field .k-input { height: 44px; padding-inline: 12px; }
+/* the drop-down looks like the one on Sell a Book */
+.ml-field select.k-input { appearance: none; -webkit-appearance: none; padding-right: 36px; cursor: pointer; background-image: linear-gradient(45deg, transparent 50%, var(--k-muted) 50%), linear-gradient(135deg, var(--k-muted) 50%, transparent 50%); background-position: calc(100% - 18px) 50%, calc(100% - 12px) 50%; background-size: 6px 6px, 6px 6px; background-repeat: no-repeat; }
+.ml-item__more { grid-area: more; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin-top: 10px; }
+.ml-item__more form { margin: 0; }
+.ml-note { font-size: 13.5px; color: var(--k-muted); }
+
+@media (max-width: 1100px) {
+  .ml-item { grid-template-columns: 72px minmax(0, 1fr); grid-template-areas: "cover main" "edit edit" "more more"; }
+  .ml-item__edit { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .ml-item__edit .k-btn { grid-column: 1 / -1; }
+  .ml-item__more { margin-top: 4px; }
+}
+@media (max-width: 600px) {
+  .ml { padding-top: 24px; padding-bottom: 48px; }
+  .ml-head { margin-bottom: 20px; }
+  .ml-head__actions { width: 100%; }
+  .ml-head__actions .k-btn { flex: 1 1 140px; }
+  .ml-item { padding: 16px; gap: 6px 16px; }
+  .ml-item__title { font-size: 18px; }
+  .ml-item__edit { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .ml-field--cond { grid-column: 1 / -1; }
+}

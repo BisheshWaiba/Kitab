@@ -28,7 +28,9 @@ if (in_array('is-gbtn', $k_body_classes, true)) {
 $current_page = basename($_SERVER['SCRIPT_NAME']);
 $nav_home = $current_page === 'index.php';
 $nav_wish = $current_page === 'wishlist.php';
-$nav_shop = in_array($current_page, ['shop.php', 'product.php'], true);
+// The Marketplace link is lit on the Marketplace and on a used book's page ($book_is_used is set by product.php before this file is included)
+$nav_market = $current_page === 'marketplace.php' || ($current_page === 'product.php' && !empty($book_is_used));
+$nav_shop = in_array($current_page, ['shop.php', 'product.php'], true) && !$nav_market;
 $user_initial = isset($_SESSION['user_name']) ? strtoupper(mb_substr($_SESSION['user_name'], 0, 1)) : '';
 ?>
 <!DOCTYPE html>
@@ -114,6 +116,8 @@ $user_initial = isset($_SESSION['user_name']) ? strtoupper(mb_substr($_SESSION['
                     class="k-link<?php echo $nav_home ? ' is-active' : ''; ?>">Home</a>
                 <a href="<?php echo BASE_URL; ?>frontend/shop.php"
                     class="k-link<?php echo $nav_shop ? ' is-active' : ''; ?>">Shop</a>
+                <a href="<?php echo BASE_URL; ?>frontend/marketplace.php"
+                    class="k-link<?php echo $nav_market ? ' is-active' : ''; ?>">Marketplace</a>
                 <?php if (isset($_SESSION['user_id'])): // a row of the phone menu only (hidden on wide screens, where the account button leads there) ?>
                     <a href="<?php echo BASE_URL; ?>frontend/orders.php"
                         class="k-link k-link--menu<?php echo $current_page === 'orders.php' ? ' is-active' : ''; ?>">My orders</a>

@@ -193,3 +193,10 @@
   .gp-buyform { flex-wrap: wrap; }
   .gp-buyform .k-btn { flex: 1 1 100%; }
 }
+
+/* a used book: who is selling it, and the note a seller sees on their own listing */
+.gp-used-line { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: -8px 0 0; font-size: 15px; color: var(--k-ink-2); }
+.gp-used { display: inline-flex; align-items: center; min-height: 28px; padding: 0 12px; border-radius: 8px; background: var(--k-accent-tint); border: 1px solid var(--k-line); font-size: 13px; font-weight: 700; letter-spacing: .02em; color: var(--k-accent-dark); }
+.gp-used-line strong { color: var(--k-ink); }
+.gp-own { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; width: 100%; box-sizing: border-box; padding: 14px 18px; border-radius: 12px; background: var(--k-band); border: 1px solid var(--k-line); }
+.gp-own p { margin: 0; font-weight: 600; color: var(--k-ink); }

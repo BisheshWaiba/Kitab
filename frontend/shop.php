@@ -5,13 +5,28 @@ require_once '../includes/helpers.php';
 // is-gbtn switches the glass buttons on, and these stylesheets are loaded by the redesigned pages only
 $body_class = 'is-gbtn';
 $extra_css = ['assets/css/glass-buttons.css', 'assets/css/flat.css', 'assets/css/shop-flat.css'];
-$meta_description = 'Browse the full KITAB catalog and filter by category, author or price.';
+// marketplace.php sets $market_mode: the same page, showing the used books readers have listed instead of the shop's own new books
+$market = !empty($market_mode);
+$base_page = $market ? 'marketplace.php' : 'shop.php';
+if ($market) {
+    $extra_css[] = 'assets/css/market-flat.css';
+    $page_title = 'Used Book Marketplace';
+    $meta_description = 'Pre-loved books from fellow readers. Filter by condition, category or price, and pay when it arrives.';
+    k_book_columns($conn); // condition, language, format and year (created the first time, if they are missing)
+} else {
+    $meta_description = 'Browse the full KITAB catalog and filter by category, author or price.';
+}
 require_once '../includes/header.php';
 
 // ---------- What the visitor asked for (every value is checked before it goes near the database) ----------
 $search_text = is_string($_GET['search'] ?? null) ? $_GET['search'] : '';
 $author_filter = is_string($_GET['author'] ?? null) ? trim($_GET['author']) : '';   // linked from the Authors page and the product page
 $active_category = is_string($_GET['category'] ?? null) ? $_GET['category'] : '';
+// Marketplace only: the condition of the copy (one of the five, checked against the list)
+$conditions = k_book_conditions();
+$condition_filter = ($market && is_string($_GET['condition'] ?? null) && isset($conditions[$_GET['condition']])) ? $_GET['condition'] : '';
+// Which books this page is about: the readers' used copies still on offer, or the shop's own books
+$scope_sql = $market ? '(books.seller_id IS NOT NULL AND (books.stock IS NULL OR books.stock > 0))' : 'books.seller_id IS NULL';
 
 // Price range: each end is a number or nothing. If they come the wrong way round, they are swapped.
 $price_number = function ($value): ?float {
@@ -71,33 +86,37 @@ if ($max_price !== null) {
 if ($rating_on) {
     $where_clauses[] = 'rt.avg_rating >= 4';
 }
+if ($condition_filter !== '') {
+    $where_clauses[] = "books.book_condition = '" . $conn->real_escape_string($condition_filter) . "'";
+}
 
-$where_sql = $where_clauses ? 'WHERE ' . implode(' AND ', $where_clauses) : '';
+$where_sql = 'WHERE ' . $scope_sql . ($where_clauses ? ' AND ' . implode(' AND ', $where_clauses) : '');
 $result = $conn->query("SELECT books.* FROM books $rating_join $where_sql ORDER BY " . $sorts[$sort][1]);
 $books = $result->fetch_all(MYSQLI_ASSOC);
 
 // When nothing matches: the best-rated books, so the page is never a dead end
 $popular = [];
 if (!$books && $where_clauses) {
-    $popular = $conn->query("SELECT books.* FROM books $rating_join ORDER BY $top_rated_order LIMIT 4")->fetch_all(MYSQLI_ASSOC);
+    $popular = $conn->query("SELECT books.* FROM books $rating_join WHERE $scope_sql ORDER BY $top_rated_order LIMIT 4")->fetch_all(MYSQLI_ASSOC);
 }
 
 // Category types shown above the books
-$cat_result = $conn->query("SELECT DISTINCT category FROM books WHERE category IS NOT NULL AND category <> '' ORDER BY category ASC");
+$cat_result = $conn->query("SELECT DISTINCT category FROM books WHERE $scope_sql AND category IS NOT NULL AND category <> '' ORDER BY category ASC");
 
 // For the result count and the hints in the price boxes
-[$total_books, $price_lo, $price_hi] = $conn->query("SELECT COUNT(*), FLOOR(MIN(price)), CEIL(MAX(price)) FROM books")->fetch_row();
+[$total_books, $price_lo, $price_hi] = $conn->query("SELECT COUNT(*), FLOOR(MIN(price)), CEIL(MAX(price)) FROM books WHERE $scope_sql")->fetch_row();
 $total_books = (int) $total_books;
 $filters_active = $where_clauses !== [];
 
 // Address of this page with some of the choices changed (null removes one); sort and price travel along
 $plain = fn(float $n): string => rtrim(rtrim(number_format($n, 2, '.', ''), '0'), '.');
 $money = fn(float $n): string => 'Rs. ' . number_format($n, $n == floor($n) ? 0 : 2);
-$build = function (array $change = []) use ($search_text, $author_filter, $active_category, $sort, $min_price, $max_price, $rating_on, $plain): string {
+$build = function (array $change = []) use ($search_text, $author_filter, $active_category, $condition_filter, $base_page, $sort, $min_price, $max_price, $rating_on, $plain): string {
     $q = [
         'search' => $search_text,
         'author' => $author_filter,
         'category' => $active_category,
+        'condition' => $condition_filter,
         'sort' => $sort !== 'newest' ? $sort : '',
         'min' => $min_price !== null ? $plain($min_price) : '',
         'max' => $max_price !== null ? $plain($max_price) : '',
@@ -107,7 +126,7 @@ $build = function (array $change = []) use ($search_text, $author_filter, $activ
         $q[$key] = $value === null ? '' : $value;
     }
     $q = array_filter($q, fn($v) => $v !== '');
-    return 'shop.php' . ($q ? '?' . http_build_query($q) : '');
+    return $base_page . ($q ? '?' . http_build_query($q) : '');
 };
 
 // "3 of 18 books", and under it one removable tag for each thing that is narrowing them down: [words, address without it]
@@ -116,6 +135,9 @@ $price_active = $min_price !== null || $max_price !== null;
 $tags = [];
 if ($active_category !== '') {
     $tags[] = [$active_category, $build(['category' => null])];
+}
+if ($condition_filter !== '') {
+    $tags[] = [k_book_condition_label($condition_filter) . ' condition', $build(['condition' => null])];
 }
 if ($author_filter !== '') {
     $tags[] = ['by ' . $author_filter, $build(['author' => null])];
@@ -133,7 +155,7 @@ if ($min_price !== null && $max_price !== null) {
 if ($rating_on) {
     $tags[] = ['4 stars and up', $build(['rating' => null])];
 }
-$clear_all = $build(['search' => null, 'author' => null, 'category' => null, 'min' => null, 'max' => null, 'rating' => null]);
+$clear_all = $build(['search' => null, 'author' => null, 'category' => null, 'condition' => null, 'min' => null, 'max' => null, 'rating' => null]);
 
 // The Price button: "Price" until a range is set, then the range itself
 $fmt = fn(float $n): string => number_format($n, $n == floor($n) ? 0 : 2);
@@ -168,8 +190,21 @@ if ($hi - $lo >= 1500) {
 <main class="fl">
 
 <section class="gs-head fl-wrap">
+<?php if ($market): ?>
+    <div class="mk-head">
+        <div>
+            <h1 class="fl-h1">Used Book Marketplace</h1>
+            <p class="fl-sub">Pre-loved books from fellow readers, each with its condition and seller. Pay when it arrives.</p>
+        </div>
+        <div class="mk-head__actions">
+            <a href="sell_book.php" class="k-btn k-btn--primary">Sell a book</a>
+            <?php if (isset($_SESSION['user_id'])): ?><a href="my_listings.php" class="k-btn k-btn--outline">My listings</a><?php endif; ?>
+        </div>
+    </div>
+<?php else: ?>
     <h1 class="fl-h1">All Books</h1>
     <p class="fl-sub">Browse our complete catalog</p>
+<?php endif; ?>
 </section>
 
 <div class="fl-wrap gs-main gs-layout">
@@ -190,6 +225,20 @@ if ($hi - $lo >= 1500) {
             <?php endwhile; ?>
         </ul>
     </nav>
+    <?php if ($market): ?>
+        <h2 class="gs-side__title gs-side__title--cond" id="gs-cond-title">Condition</h2>
+        <nav class="gs-filter" aria-labelledby="gs-cond-title">
+            <ul class="k-cats fl-chips gs-side__list gs-conds">
+                <li><a href="<?php echo htmlspecialchars($build(['condition' => null])); ?>" class="k-genre gs-side__link<?php echo $condition_filter === '' ? ' is-active' : ''; ?>"
+                        <?php echo $condition_filter === '' ? 'aria-current="page"' : ''; ?>><span class="gs-side__all">Any condition</span><span class="gs-side__chip-all">Any</span></a></li>
+                <?php foreach ($conditions as $key => [$name]): ?>
+                    <?php $is_active = ($condition_filter === $key); ?>
+                    <li><a href="<?php echo htmlspecialchars($build(['condition' => $key])); ?>" class="k-genre gs-side__link<?php echo $is_active ? ' is-active' : ''; ?>"
+                            <?php echo $is_active ? 'aria-current="page"' : ''; ?>><?php echo htmlspecialchars($name); ?></a></li>
+                <?php endforeach; ?>
+            </ul>
+        </nav>
+    <?php endif; ?>
     </aside>
 
     <div class="gs-results">
@@ -201,8 +250,8 @@ if ($hi - $lo >= 1500) {
 
         <?php $filter_applied = $price_active || $rating_on; ?>
         <?php // On phones the rating and price filters sit behind a "Filters" button (shown only with scripts on); they are open from the start while one is applied. ?>
-        <form method="GET" action="shop.php" class="gs-tools<?php echo $filter_applied ? ' is-filters-open' : ''; ?>" data-shop-tools data-validate>
-            <?php foreach (['search' => $search_text, 'author' => $author_filter, 'category' => $active_category, 'rating' => $rating_on ? '4' : ''] as $name => $value): ?>
+        <form method="GET" action="<?php echo $base_page; ?>" class="gs-tools<?php echo $filter_applied ? ' is-filters-open' : ''; ?>" data-shop-tools data-validate>
+            <?php foreach (['search' => $search_text, 'author' => $author_filter, 'category' => $active_category, 'condition' => $condition_filter, 'rating' => $rating_on ? '4' : ''] as $name => $value): ?>
                 <?php if ($value !== ''): ?>
                     <input type="hidden" name="<?php echo $name; ?>" value="<?php echo htmlspecialchars($value); ?>">
                 <?php endif; ?>
@@ -305,6 +354,16 @@ if ($hi - $lo >= 1500) {
         </div>
     <?php elseif ($filters_active): ?>
         <?php k_empty_state('cart', 'No books found', count($tags) > 1 ? 'Nothing matches all of the filters above. Take one off, or clear them all.' : 'Nothing matches ' . $tags[0][0] . '. Take it off to see every book, or try something else.', 'Clear Filters', $clear_all); ?>
+        <?php if (!$market && $search_text !== ''): ?>
+            <?php
+            $like = $conn->real_escape_string($search_text);
+            $used_hits = (int) $conn->query("SELECT COUNT(*) FROM books WHERE seller_id IS NOT NULL AND (stock IS NULL OR stock > 0) AND (title LIKE '%$like%' OR author LIKE '%$like%')")->fetch_row()[0];
+            ?>
+            <?php if ($used_hits > 0): ?>
+                <p class="mk-hint">Not in our shop, but <?php echo $used_hits === 1 ? 'a used copy is' : $used_hits . ' used copies are'; ?> in the
+                    <a href="marketplace.php?<?php echo htmlspecialchars(http_build_query(['search' => $search_text])); ?>">Marketplace</a>.</p>
+            <?php endif; ?>
+        <?php endif; ?>
         <?php if ($popular): ?>
             <section class="gs-popular" aria-labelledby="gs-popular-title">
                 <h2 class="fl-h2" id="gs-popular-title">Popular books to try</h2>
@@ -316,7 +375,11 @@ if ($hi - $lo >= 1500) {
             </section>
         <?php endif; ?>
     <?php else: ?>
-        <?php k_empty_state('cart', 'No books yet', 'The shelves are being filled. Please check back soon.', 'Back to Home', BASE_URL . 'index.php'); ?>
+        <?php if ($market): ?>
+            <?php k_empty_state('cart', 'No used books yet', 'Be the first to list one for another reader.', 'Sell a Book', 'sell_book.php'); ?>
+        <?php else: ?>
+            <?php k_empty_state('cart', 'No books yet', 'The shelves are being filled. Please check back soon.', 'Back to Home', BASE_URL . 'index.php'); ?>
+        <?php endif; ?>
     <?php endif; ?>
     </div>
 </div>

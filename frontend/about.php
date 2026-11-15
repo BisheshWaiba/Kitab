@@ -14,7 +14,7 @@ $facts = $conn->query(
     "SELECT COUNT(*) AS books,
             COUNT(DISTINCT NULLIF(TRIM(author), '')) AS authors,
             COUNT(DISTINCT NULLIF(TRIM(category), '')) AS collections
-     FROM books"
+     FROM books WHERE seller_id IS NULL"
 )->fetch_assoc();
 require_once '../includes/header.php';
 ?>

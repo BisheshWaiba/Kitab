@@ -35,6 +35,9 @@ if ($result->num_rows == 0) {
 }
 
 $book = $result->fetch_assoc();
+// A used book is one a reader listed: it shows who is selling it, and the header lights the Marketplace link
+$book_is_used = k_is_used($book);
+$seller_name = $book_is_used ? k_seller_name($conn, (int) $book['seller_id']) : '';
 
 // Handle Add to Cart
 if (isset($_POST['add_to_cart'])) {
@@ -50,7 +53,11 @@ if (isset($_POST['add_to_cart'])) {
     $in_cart = (int) ($_SESSION['cart'][$book_id] ?? 0);
     $added = min($quantity, max(0, $max - $in_cart));
     $note = '';
-    if ($max <= 0) {
+    $own_listing = isset($_SESSION['user_id']) && $book_is_used && (int) $book['seller_id'] === (int) $_SESSION['user_id'];
+    if ($own_listing) {
+        $added = 0;
+        $note = "This is your own listing, so it can't go in your cart.";
+    } elseif ($max <= 0) {
         $note = 'This book is sold out.';
     } elseif ($added <= 0) {
         $note = ($max === 1 ? 'The only copy is' : 'All ' . $max . ' available copies are') . ' already in your cart.';
@@ -154,7 +161,13 @@ $max_qty = max(1, k_max_qty($stock)); // the most the quantity box accepts
 
     <div class="gp-buy">
         <h1 class="fl-h1 gp-title"><?php echo htmlspecialchars($book['title']); ?></h1>
-        <p class="gp-by">by <a href="shop.php?author=<?php echo urlencode(trim($book['author'])); ?>"><?php echo htmlspecialchars($book['author']); ?></a></p>
+        <p class="gp-by">by <a href="<?php echo $book_is_used ? 'marketplace.php' : 'shop.php'; ?>?author=<?php echo urlencode(trim($book['author'])); ?>"><?php echo htmlspecialchars($book['author']); ?></a></p>
+        <?php if ($book_is_used): $cond_say = k_book_condition_label($book['book_condition'] ?? null); ?>
+            <p class="gp-used-line">
+                <span class="gp-used">Used<?php echo $cond_say !== '' ? ' · ' . htmlspecialchars($cond_say) : ''; ?></span>
+                <span>Sold by <strong><?php echo htmlspecialchars($seller_name !== '' ? $seller_name : 'a KITAB reader'); ?></strong> · Pay when it arrives</span>
+            </p>
+        <?php endif; ?>
         <p class="gp-rating">
             <?php if ($review_count > 0): ?>
                 <a href="#reviews"><?php echo k_stars($review_avg); ?>
@@ -214,7 +227,12 @@ $max_qty = max(1, k_max_qty($stock)); // the most the quantity box accepts
         </dl>
 
         <div class="gp-actions">
-            <?php if ($sold_out): ?>
+            <?php if ($viewer_is_seller): ?>
+                <div class="gp-own">
+                    <p>This is your listing.</p>
+                    <a href="my_listings.php#book-<?php echo (int) $book['id']; ?>" class="k-btn k-btn--outline">Manage listing</a>
+                </div>
+            <?php elseif ($sold_out): ?>
                 <div class="gp-buyform">
                     <button type="button" class="k-btn k-btn--primary k-btn--lg" disabled>Out of stock</button>
                 </div>
@@ -486,13 +504,15 @@ $max_qty = max(1, k_max_qty($stock)); // the most the quantity box accepts
 // Same-category books first; when there are fewer than four, fill up with other books
 $current_id = (int) $book['id'];
 $cat = $conn->real_escape_string((string) $book['category']);
-$sql_related = "SELECT * FROM books WHERE id != $current_id ORDER BY (category = '$cat') DESC, RAND() LIMIT 4";
+// A used book is shown with other used books, a store book with other store books
+$kind_sql = $book_is_used ? 'seller_id IS NOT NULL AND (stock IS NULL OR stock > 0)' : 'seller_id IS NULL';
+$sql_related = "SELECT * FROM books WHERE id != $current_id AND $kind_sql ORDER BY (category = '$cat') DESC, RAND() LIMIT 4";
 $result_related = $conn->query($sql_related);
 
 if ($result_related->num_rows > 0):
     ?>
     <section class="fl-wrap gp-related">
-        <h2 class="fl-h2">You May Also Like</h2>
+        <h2 class="fl-h2"><?php echo $book_is_used ? 'More used books' : 'You May Also Like'; ?></h2>
         <div class="fl-grid">
             <?php while ($row = $result_related->fetch_assoc()): ?>
                 <?php k_book_card($row, 'primary'); ?>

@@ -8,7 +8,7 @@ $extra_css = ['assets/css/glass-buttons.css', 'assets/css/flat.css', 'assets/css
 require_once 'includes/header.php';
 
 // Hero: three covers (books that have one), fanned out
-$hero_books = $conn->query("SELECT id, title, price, image FROM books WHERE image IS NOT NULL AND image <> '' ORDER BY id ASC LIMIT 3")->fetch_all(MYSQLI_ASSOC);
+$hero_books = $conn->query("SELECT id, title, price, image FROM books WHERE image IS NOT NULL AND image <> '' AND seller_id IS NULL ORDER BY id ASC LIMIT 3")->fetch_all(MYSQLI_ASSOC);
 
 // Real numbers for the hero: the shop's average review rating, and the featured book (the middle cover)
 $review_total = 0;
@@ -21,16 +21,16 @@ $review_avg = $review_total > 0 ? $review_sum / $review_total : 0.0;
 $featured = $hero_books[0] ?? null;
 
 // Best Sellers (random)
-$result_best = $conn->query("SELECT * FROM books ORDER BY RAND() LIMIT 5");
+$result_best = $conn->query("SELECT * FROM books WHERE seller_id IS NULL ORDER BY RAND() LIMIT 5");
 
 // New Arrivals (latest)
-$result_new = $conn->query("SELECT * FROM books ORDER BY created_at DESC LIMIT 4");
+$result_new = $conn->query("SELECT * FROM books WHERE seller_id IS NULL ORDER BY created_at DESC LIMIT 4");
 
 // Fetch Curated Categories
 $curated_cats = ['Arts & Photography', 'Travel', 'Nature'];
 $curated_data = [];
 foreach ($curated_cats as $cat) {
-    $sql_curated = "SELECT * FROM books WHERE category = ? ORDER BY RAND() LIMIT 4";
+    $sql_curated = "SELECT * FROM books WHERE category = ? AND seller_id IS NULL ORDER BY RAND() LIMIT 4";
     $stmt = $conn->prepare($sql_curated);
     $stmt->bind_param("s", $cat);
     $stmt->execute();

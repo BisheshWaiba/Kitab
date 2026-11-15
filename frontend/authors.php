@@ -11,7 +11,7 @@ require_once '../includes/header.php';
 // One entry per author, built from the books themselves
 $result = $conn->query(
     "SELECT MIN(TRIM(author)) AS name, COUNT(*) AS books, GROUP_CONCAT(title ORDER BY title SEPARATOR ' · ') AS titles
-     FROM books WHERE TRIM(author) <> '' GROUP BY TRIM(author) ORDER BY name ASC"
+     FROM books WHERE TRIM(author) <> '' AND seller_id IS NULL GROUP BY TRIM(author) ORDER BY name ASC"
 );
 $authors = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
 $total = count($authors);

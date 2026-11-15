@@ -67,7 +67,7 @@ $item_count = array_sum(array_column($cart_items, 'qty'));
 $suggestions = [];
 if ($cart_items && $left > 0) {
     $in_cart = implode(',', array_map('intval', array_column($cart_items, 'id')));
-    $stmt = $conn->prepare("SELECT * FROM books WHERE id NOT IN ($in_cart) AND price >= ? ORDER BY RAND() LIMIT 3");
+    $stmt = $conn->prepare("SELECT * FROM books WHERE id NOT IN ($in_cart) AND price >= ? AND seller_id IS NULL ORDER BY RAND() LIMIT 3");
     $stmt->bind_param("d", $left);
     $stmt->execute();
     $suggestions = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);

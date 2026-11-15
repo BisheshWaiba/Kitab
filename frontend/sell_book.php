@@ -159,12 +159,12 @@ require_once '../includes/header.php';
 <main class="fl">
     <div class="fl-wrap pf pf--sell">
         <h1 class="fl-h1">Sell a book</h1>
-        <p class="fl-lede sb-lede">List a book and it shows up in the shop right away. Honest details help a copy sell, so tell buyers what they are getting.</p>
+        <p class="fl-lede sb-lede">List a book and it shows up in the <a href="marketplace.php">Marketplace</a> right away. Honest details help a copy sell, so tell buyers what they are getting. Already listed some? <a href="my_listings.php">See your listings</a>.</p>
 
         <?php if (is_array($listed)): ?>
             <div class="k-alert k-alert--success pf-notice" role="status">
-                &ldquo;<?php echo htmlspecialchars($listed['title']); ?>&rdquo; is listed and now in the shop.
-                <a href="product.php?id=<?php echo (int) $listed['id']; ?>">View it</a>
+                &ldquo;<?php echo htmlspecialchars($listed['title']); ?>&rdquo; is listed and now in the Marketplace.
+                <a href="product.php?id=<?php echo (int) $listed['id']; ?>">View it</a> or <a href="my_listings.php">manage your listings</a>.
             </div>
         <?php endif; ?>
 

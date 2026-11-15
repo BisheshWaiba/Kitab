@@ -13,7 +13,7 @@ $page_title = 'Page not found';
 require_once __DIR__ . '/includes/header.php';
 
 // Something to look at instead: the newest books
-$result = $conn->query("SELECT * FROM books ORDER BY created_at DESC, id DESC LIMIT 4");
+$result = $conn->query("SELECT * FROM books WHERE seller_id IS NULL ORDER BY created_at DESC, id DESC LIMIT 4");
 $books = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
 ?>
 

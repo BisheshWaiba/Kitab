@@ -55,6 +55,8 @@
 /* a sold-out book: the cover is dimmed, "Out of stock" sits in the corner, and the button (disabled, see k_book_card) says so */
 .fl .k-book.is-soldout .k-cover { opacity: .5; filter: grayscale(.6); }
 .fl .k-book__tag { top: 14px; left: 14px; }
+.fl .k-book__tag--used { color: var(--k-accent-dark); }
+@media (max-width: 640px) { .fl .k-book__tag--used { top: auto; bottom: 8px; left: 8px; max-width: calc(100% - 16px); } } /* the cards are narrow here: the tag moves to the bottom corner, clear of the heart */
 
 /* the heart sits on the stage; Add to Cart sits in the bottom row of the card, opposite the price. Both fade in on hover or keyboard focus; on a touch
    screen (no hover) they are always there. */
