@@ -3,7 +3,7 @@ require_once 'config/db.php';
 require_once 'includes/helpers.php';
 // The Home page is flat (white and light-grey surfaces, from the design canvas); only its buttons are glass.
 // is-gbtn switches the glass buttons on, and both stylesheets are loaded by this page alone.
-$body_class = 'is-gbtn';
+$body_class = 'is-gbtn is-home'; // is-home gives the page its warm stone colour instead of white (home-flat.css)
 $extra_css = ['assets/css/glass-buttons.css', 'assets/css/flat.css', 'assets/css/home-flat.css'];
 require_once 'includes/header.php';
 

@@ -1,6 +1,15 @@
 /* The parts of the flat Home page that no other page has: the hero, the collections marquee, Best Sellers and the Our picks grid.
    Shared pieces (wrap, headings, sections, book cards) are in flat.css. Everything here starts with .fh- or sits under .fl. */
 
+/* ---------- the page colour ----------
+   Not white: one calm, warm stone for the whole page, and a slightly deeper stone for the alternating bands (Collections, Best Sellers).
+   The white cards and the white top bar stand out against it. The words under headings get a touch more ink so they read as well on stone as
+   they did on white. Light mode only: the dark theme already has its own page colour. Only the Home page has body.is-home. */
+:root:not([data-theme="dark"]) body.is-home { --k-paper: #F4F1EB; --k-muted: #5F6068; }
+:root:not([data-theme="dark"]) body.is-home .fl-sec--band { background: #ECE8DF; }
+:root:not([data-theme="dark"]) body.is-home .fh-colls { background: radial-gradient(55% 130% at 50% 0%, color-mix(in srgb, var(--k-gold) 15%, transparent), transparent 72%), #ECE8DF; }
+:root:not([data-theme="dark"]) body.is-home .k-footer { background: transparent; }
+
 /* ---------- hero ---------- */
 /* a warm wash across the full width (two soft glows of the brand gold), so the first screen is not a flat white sheet */
 .fh-top { position: relative; overflow: clip; background:
