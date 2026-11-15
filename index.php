@@ -110,12 +110,6 @@ $fan_order = [2, 0, 1];
                     <h2 class="fl-h2" id="fh-collections">Browse by collection</h2>
                     <p class="fl-sub">Start from what you love to read.</p>
                 </div>
-                <a href="<?php echo BASE_URL; ?>frontend/shop.php" class="k-more">All books
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M5 12h14M13 6l6 6-6 6" />
-                    </svg>
-                </a>
             </div>
         </div>
 
