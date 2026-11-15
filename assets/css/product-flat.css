@@ -115,9 +115,9 @@
 .gr-empty { margin: 0; padding: 36px 0; border-bottom: 1px solid var(--k-line); font-size: 16px; color: var(--k-muted); }
 .gr-empty a { color: var(--k-ink); text-decoration: underline; text-underline-offset: 3px; }
 
-/* writing one: a plain bordered box under the list */
-.gr-write { margin-top: 40px; max-width: 620px; padding: 28px; box-sizing: border-box; border: 1px solid var(--k-line); border-radius: 12px; }
-.gr-write__title { margin: 0 0 16px; font: 600 22px/1.2 var(--k-display); letter-spacing: -.01em; }
+/* writing one: a plain bordered box under the list, as wide as the list itself */
+.gr-write { margin-top: 40px; padding: 28px; box-sizing: border-box; border: 1px solid var(--k-line); border-radius: 12px; }
+.gr-write__title { margin: 0 0 16px; font: 600 22px/1.2 var(--k-display); letter-spacing: -.01em; color: var(--k-ink); }
 .gr-write__form .gr-write__title { margin-bottom: 0; }
 .gr-write__note { margin: 0 0 18px; font-size: 16px; line-height: 1.6; color: var(--k-ink-2); }
 .gr-write__form { display: flex; flex-direction: column; gap: 20px; }
