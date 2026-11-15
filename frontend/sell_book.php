@@ -18,6 +18,11 @@ if (!isset($_SESSION['user_id'])) {
 const SELL_MAX_PRICE = 1000000;     // Rs.; a bigger number is almost certainly a typo
 const SELL_MAX_DESCRIPTION = 2000;  // characters
 
+k_book_columns($conn); // condition, language, format and year published (created the first time, if they are missing)
+$conditions = k_book_conditions();
+$languages = k_book_languages();
+$formats = k_book_formats();
+
 $error = '';   // a problem with the whole form (the book could not be saved)
 $errors = [];  // problems with one field, shown under it (field name => message)
 
@@ -44,6 +49,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $publisher = $field('publisher');
     $pages_text = $field('pages');
     $isbn = $field('isbn');
+    $condition = $field('condition');
+    $language = $field('language');
+    $format = $field('format');
+    $year_text = $field('year');
     $seller_id = (int) $_SESSION['user_id'];
 
     if (!k_csrf_valid($_POST['csrf'] ?? '')) {
@@ -84,6 +93,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if ($isbn !== '' && !preg_match('/^(\d{9}[\dXx]|\d{13})$/', preg_replace('/[\s-]/', '', $isbn))) {
             $errors['isbn'] = "Enter the ISBN as 10 or 13 digits. Hyphens are fine.";
         }
+        if (!isset($conditions[$condition])) {
+            $errors['condition'] = "Choose the condition of your copy.";
+        }
+        if ($language !== '' && !in_array($language, $languages, true)) {
+            $errors['language'] = "Choose a language from the list.";
+        }
+        if ($format !== '' && !in_array($format, $formats, true)) {
+            $errors['format'] = "Choose a format from the list.";
+        }
+        if ($year_text !== '' && (!preg_match('/^\d{4}$/', $year_text) || (int) $year_text < 1450 || (int) $year_text > (int) date('Y') + 1)) {
+            $errors['year'] = "Enter a four-digit year, like 2019.";
+        }
 
         $image = ''; // no cover: pages show a titled placeholder
         if (!$errors) {
@@ -101,11 +122,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $pages = $pages_text === '' ? 0 : (int) $pages_text;
             $stock = (int) $stock_text;
             $category_id = $categories[$category];
+            $language_value = $language === '' ? 'English' : $language;
+            $format_value = $format === '' ? null : $format;
+            $year = $year_text === '' ? null : (int) $year_text;
             $stmt = $conn->prepare(
-                "INSERT INTO books (title, author, description, price, image, category, category_id, publisher, pages, isbn, seller_id, stock, created_at)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())"
+                "INSERT INTO books (title, author, description, price, image, category, category_id, publisher, pages, isbn, seller_id, stock, book_condition, `language`, `format`, published_year, created_at)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())"
             );
-            $stmt->bind_param("sssdssisisii", $title, $author, $description, $price, $image, $category, $category_id, $publisher, $pages, $isbn, $seller_id, $stock);
+            $stmt->bind_param("sssdssisisiisssi", $title, $author, $description, $price, $image, $category, $category_id, $publisher, $pages, $isbn, $seller_id, $stock, $condition, $language_value, $format_value, $year);
             if ($stmt->execute()) {
                 // Back to a fresh page with a message, so refreshing it cannot list the same book twice
                 $_SESSION['sell_notice'] = ['id' => (int) $conn->insert_id, 'title' => $title];
@@ -117,7 +141,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         }
     }
     $old = ['title' => $title, 'author' => $author, 'price' => $price_text, 'stock' => $stock_text, 'category' => $category,
-        'description' => $description, 'publisher' => $publisher, 'pages' => $pages_text, 'isbn' => $isbn];
+        'description' => $description, 'publisher' => $publisher, 'pages' => $pages_text, 'isbn' => $isbn,
+        'condition' => $condition, 'language' => $language, 'format' => $format, 'year' => $year_text];
 } else {
     $old = [];
 }
@@ -134,7 +159,7 @@ require_once '../includes/header.php';
 <main class="fl">
     <div class="fl-wrap pf pf--sell">
         <h1 class="fl-h1">Sell a book</h1>
-        <p class="fl-lede sb-lede">List a book and it shows up in the shop right away.</p>
+        <p class="fl-lede sb-lede">List a book and it shows up in the shop right away. Honest details help a copy sell, so tell buyers what they are getting.</p>
 
         <?php if (is_array($listed)): ?>
             <div class="k-alert k-alert--success pf-notice" role="status">
@@ -178,6 +203,7 @@ require_once '../includes/header.php';
                             data-msg-missing="Enter a price." data-msg-invalid="Enter a price above zero, like 499."
                             value="<?php echo htmlspecialchars($old['price'] ?? ''); ?>" <?php k_field_invalid($errors, 'price'); ?>>
                         <?php k_field_error($errors, 'price'); ?>
+                        <p class="sb-help">For one copy, in rupees.</p>
                     </div>
                     <div class="k-field">
                         <label for="stock">Copies available</label>
@@ -205,8 +231,26 @@ require_once '../includes/header.php';
                         placeholder="What is it about, and what condition is your copy in?"
                         <?php k_field_invalid($errors, 'description'); ?>><?php echo htmlspecialchars($old['description'] ?? ''); ?></textarea>
                     <?php k_field_error($errors, 'description'); ?>
+                    <p class="sb-help">Say what the book is about and mention anything a buyer should know, such as a missing dust jacket or a name written inside.</p>
                 </div>
             </div>
+
+            <!-- Condition -->
+            <fieldset class="pf-group sb-condition" <?php k_field_invalid($errors, 'condition'); ?>>
+                <legend class="sb-h">Condition</legend>
+                <p class="sb-help sb-help--lead">Pick the one that fits your copy best. Buyers see it on the book's page.</p>
+                <div class="k-tiles sb-cond">
+                    <?php foreach ($conditions as $key => [$name, $meaning]): ?>
+                        <label class="k-tile sb-cond__tile">
+                            <input type="radio" name="condition" value="<?php echo htmlspecialchars($key); ?>" required
+                                data-msg-missing="Choose the condition of your copy."
+                                <?php echo ($old['condition'] ?? '') === $key ? 'checked' : ''; ?>>
+                            <span class="sb-cond__text"><strong><?php echo htmlspecialchars($name); ?></strong><small><?php echo htmlspecialchars($meaning); ?></small></span>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
+                <?php k_field_error($errors, 'condition'); ?>
+            </fieldset>
 
             <!-- Cover -->
             <div class="pf-group">
@@ -252,6 +296,35 @@ require_once '../includes/header.php';
                             pattern="[0-9Xx\- ]{10,20}" data-msg-invalid="Enter the ISBN as 10 or 13 digits. Hyphens are fine."
                             value="<?php echo htmlspecialchars($old['isbn'] ?? ''); ?>" <?php k_field_invalid($errors, 'isbn'); ?>>
                         <?php k_field_error($errors, 'isbn'); ?>
+                        <p class="sb-help">On the back cover, above the barcode.</p>
+                    </div>
+                    <div class="k-field">
+                        <label for="language">Language</label>
+                        <select id="language" name="language" class="k-input" <?php k_field_invalid($errors, 'language'); ?>>
+                            <?php $old_language = $old['language'] ?? 'English'; ?>
+                            <?php foreach ($languages as $name): ?>
+                                <option value="<?php echo htmlspecialchars($name); ?>"<?php echo $old_language === $name ? ' selected' : ''; ?>><?php echo htmlspecialchars($name); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <?php k_field_error($errors, 'language'); ?>
+                    </div>
+                    <div class="k-field">
+                        <label for="format">Format</label>
+                        <select id="format" name="format" class="k-input" <?php k_field_invalid($errors, 'format'); ?>>
+                            <option value="">Not sure</option>
+                            <?php foreach ($formats as $name): ?>
+                                <option value="<?php echo htmlspecialchars($name); ?>"<?php echo ($old['format'] ?? '') === $name ? ' selected' : ''; ?>><?php echo htmlspecialchars($name); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <?php k_field_error($errors, 'format'); ?>
+                    </div>
+                    <div class="k-field">
+                        <label for="year">Year published</label>
+                        <input type="number" min="1450" max="<?php echo (int) date('Y') + 1; ?>" step="1" id="year" name="year" class="k-input" inputmode="numeric"
+                            placeholder="<?php echo (int) date('Y') - 6; ?>" data-msg-invalid="Enter a four-digit year, like 2019."
+                            value="<?php echo htmlspecialchars($old['year'] ?? ''); ?>" <?php k_field_invalid($errors, 'year'); ?>>
+                        <?php k_field_error($errors, 'year'); ?>
+                        <p class="sb-help">On the copyright page, near the front.</p>
                     </div>
                 </div>
             </div>

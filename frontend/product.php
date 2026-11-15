@@ -176,6 +176,13 @@ $max_qty = max(1, k_max_qty($stock)); // the most the quantity box accepts
         <?php endif; ?>
 
         <dl class="gp-specs">
+            <?php // what a seller said about this copy (only for books that have it, so older listings look as before) ?>
+            <?php if (k_book_condition_label($book['book_condition'] ?? null) !== ''): ?>
+                <div>
+                    <dt>Condition</dt>
+                    <dd><?php echo htmlspecialchars(k_book_condition_label($book['book_condition'])); ?></dd>
+                </div>
+            <?php endif; ?>
             <div>
                 <dt>Publisher</dt>
                 <dd><?php echo htmlspecialchars($book['publisher'] ?: 'N/A'); ?></dd>
@@ -188,6 +195,18 @@ $max_qty = max(1, k_max_qty($stock)); // the most the quantity box accepts
                 <dt>Pages</dt>
                 <dd><?php echo htmlspecialchars($book['pages'] ?: 'N/A'); ?></dd>
             </div>
+            <?php if (!empty($book['format'])): ?>
+                <div>
+                    <dt>Format</dt>
+                    <dd><?php echo htmlspecialchars($book['format']); ?></dd>
+                </div>
+            <?php endif; ?>
+            <?php if (!empty($book['published_year'])): ?>
+                <div>
+                    <dt>Published</dt>
+                    <dd><?php echo (int) $book['published_year']; ?></dd>
+                </div>
+            <?php endif; ?>
             <div>
                 <dt>ISBN</dt>
                 <dd><?php echo htmlspecialchars($book['isbn'] ?: 'N/A'); ?></dd>

@@ -177,6 +177,61 @@ function k_user_columns(mysqli $conn): void
     }
 }
 
+// What a seller can say about a copy, on the Sell a Book page and shown on the Book page.
+// Condition: key => [name, one line that says what it means]. The key is what the books table stores.
+function k_book_conditions(): array
+{
+    return [
+        'new' => ['New', 'Unread, exactly as it left the printer.'],
+        'like_new' => ['Like new', 'Read once or twice. No marks, creases or wear.'],
+        'very_good' => ['Very good', 'Light wear only, such as a faint crease. Nothing written inside.'],
+        'good' => ['Good', 'Clearly read. Some wear or a few notes, every page intact.'],
+        'acceptable' => ['Acceptable', 'Heavy wear, but complete and readable.'],
+    ];
+}
+
+function k_book_condition_label(?string $key): string
+{
+    return k_book_conditions()[(string) $key][0] ?? '';
+}
+
+function k_book_languages(): array
+{
+    return ['English', 'Nepali', 'Hindi', 'French', 'German', 'Spanish', 'Other'];
+}
+
+function k_book_formats(): array
+{
+    return ['Paperback', 'Hardcover', 'Other'];
+}
+
+// The optional details added to the books table (condition, language, format, year published). Created on first use, so an existing
+// database needs no manual step; database/update_schema_book_details.php does the same thing by hand.
+function k_book_columns(mysqli $conn): void
+{
+    static $done = false;
+    if ($done) {
+        return;
+    }
+    $done = true;
+    $columns = [
+        'book_condition' => 'VARCHAR(20) NULL DEFAULT NULL',
+        'language' => 'VARCHAR(40) NULL DEFAULT NULL',
+        'format' => 'VARCHAR(20) NULL DEFAULT NULL',
+        'published_year' => 'SMALLINT UNSIGNED NULL DEFAULT NULL',
+    ];
+    try {
+        foreach ($columns as $name => $definition) {
+            $found = $conn->query("SHOW COLUMNS FROM books LIKE '$name'");
+            if ($found && $found->num_rows === 0) {
+                $conn->query("ALTER TABLE books ADD `$name` $definition");
+            }
+        }
+    } catch (Throwable $e) {
+        error_log('KITAB: could not add the book detail columns: ' . $e->getMessage());
+    }
+}
+
 // Readable payment method (cash_on_delivery -> Cash on Delivery); empty means the default
 function k_payment_label(?string $method): string
 {
