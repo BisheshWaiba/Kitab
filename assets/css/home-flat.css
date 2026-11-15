@@ -1,14 +1,23 @@
 /* The parts of the flat Home page that no other page has: the hero, the collections marquee, Best Sellers and the Our picks grid.
    Shared pieces (wrap, headings, sections, book cards) are in flat.css. Everything here starts with .fh- or sits under .fl. */
 
-/* ---------- the page colour ----------
-   Not white: one calm, warm stone for the whole page, and a slightly deeper stone for the alternating bands (Collections, Best Sellers).
-   The white cards and the white top bar stand out against it. The words under headings get a touch more ink so they read as well on stone as
-   they did on white. Light mode only: the dark theme already has its own page colour. Only the Home page has body.is-home. */
-:root:not([data-theme="dark"]) body.is-home { --k-paper: #F4F1EB; --k-muted: #5F6068; --fh-band: #F2EBDC; } /* --fh-band: a soft warm cream, not grey, so the bands pick up the gold of the buttons and the covers (a stronger champagne made the pastel pills blend in) */
-:root:not([data-theme="dark"]) body.is-home .fl-sec--band { background: var(--fh-band); box-shadow: inset 0 1px 0 rgb(255 255 255 / .7), inset 0 -1px 0 rgb(150 110 30 / .1); }
-:root:not([data-theme="dark"]) body.is-home .fh-colls { background: radial-gradient(55% 130% at 50% 0%, color-mix(in srgb, var(--k-gold) 14%, transparent), transparent 72%), var(--fh-band); }
-:root:not([data-theme="dark"]) body.is-home .k-footer { background: transparent; }
+/* ---------- Terracotta & Sand: the Home parts of the colour style (light mode; the shared parts are in terracotta.css) ----------
+   Sections alternate warm white and warm sand. The hero's wash, the sun behind the covers, the highlighter under a word and the little arrow
+   all turn from gold to terracotta and sand, and the genre pills keep their own hues but muted, so they sit quietly in an earthy palette. */
+:root:not([data-theme="dark"]) body.is-terra .fl-sec--band,
+:root:not([data-theme="dark"]) body.is-terra .fh-colls { background: var(--k-band); }
+:root:not([data-theme="dark"]) body.is-terra .fh-top { background:
+  linear-gradient(180deg, transparent 66%, var(--k-paper) 100%), /* fades out at the bottom, so the wash does not stop in a hard edge */
+  radial-gradient(55% 90% at 92% 12%, rgba(184, 92, 59, .15), transparent 70%),
+  radial-gradient(45% 70% at -4% 100%, rgba(217, 185, 149, .3), transparent 70%); }
+:root:not([data-theme="dark"]) body.is-terra .fl-h1 em,
+:root:not([data-theme="dark"]) body.is-terra .fh-colls .fl-h2 em { background: linear-gradient(transparent 68%, rgba(184, 92, 59, .28) 68%, rgba(184, 92, 59, .28) 92%, transparent 92%); }
+:root:not([data-theme="dark"]) body.is-terra .fh-stage { --disc: radial-gradient(circle at 50% 32%, #FBEADB, #EDBC9E 52%, #D98A64); }
+:root:not([data-theme="dark"]) body.is-terra .fh-stage::before { box-shadow: inset 0 -26px 60px rgba(140, 62, 32, .22), 0 30px 70px -30px rgba(166, 78, 50, .5); }
+:root:not([data-theme="dark"]) body.is-terra .fh-chip__go { background: linear-gradient(180deg, #C9704D, #B85C3B); color: #FFFDFC; }
+:root:not([data-theme="dark"]) body.is-terra .fh-chip--rating .k-stars { background: linear-gradient(90deg, var(--k-gold) var(--pct, 0%), color-mix(in srgb, var(--k-ink) 16%, transparent) var(--pct, 0%)); -webkit-background-clip: text; background-clip: text; }
+:root:not([data-theme="dark"]) body.is-terra .fh-best__price { color: #B85C3B; }
+:root:not([data-theme="dark"]) body.is-terra .fh-pill { --pc: oklch(50% .095 var(--h)); --pt: oklch(94.5% .03 var(--h)); --pe: oklch(83% .05 var(--h)); }
 
 /* ---------- hero ---------- */
 /* a warm wash across the full width (two soft glows of the brand gold), so the first screen is not a flat white sheet */

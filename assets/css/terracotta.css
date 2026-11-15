@@ -1,0 +1,81 @@
+/* KITAB "Terracotta & Sand" colour style (light mode).
+   A page opts in with <body class="is-terra"> (together with is-gbtn, which gives the glass buttons), so no other page is touched. Dark mode keeps
+   its own colours: every rule here starts with the light-mode prefix.
+
+     Main background      Warm White   #FFFDFC          Product cards       #FFFFFF
+     Alternate sections   Warm Sand    #F4EBDD          Product prices      Terracotta  #B85C3B
+     Navbar               Warm White   #FFFDFC          Product borders     Muted Sand  #D9B995
+     Logo                 Terracotta   #B85C3B          Footer              Deep Brown  #45352D
+     Navigation text      Deep Brown   #45352D          Footer text         Warm White  #FFFDFC
+     Navigation hover     Terracotta   #B85C3B          Headings            Deep Brown  #45352D
+     Primary buttons      Terracotta   #B85C3B          Paragraphs                      #6F6259
+     Button hover         Dark Terracotta #A64E32
+     Secondary buttons    Sand         #F4EBDD
+
+   The colours are set once, as the k- tokens (every page colour already reads them) and the glass-button variables; the rules after that
+   cover the few places that name a colour themselves (logo, footer, prices, card borders). */
+
+:root:not([data-theme="dark"]) body.is-terra {
+  --k-paper: #FFFDFC;           /* main background */
+  --k-band: #F4EBDD;            /* alternate sections (and the pale stage behind each cover) */
+  --k-white: #FFFFFF;           /* cards */
+  --k-ink: #45352D;             /* headings and main text: deep brown */
+  --k-ink-2: #6F6259;           /* paragraphs */
+  --k-muted: #6F6259;
+  --k-line: #EADFCF;            /* quiet hairlines, a warm sand */
+  --k-hairline: #F1E8DA;
+  --k-border: #DCC9B0;          /* the edge of an input */
+  --k-border-mid: #DCC9B0;
+  --k-border-strong: #D9B995;   /* muted sand */
+  --k-track: #E9DCC8;
+  --k-accent: #B85C3B;          /* terracotta: links, focus rings, the active nav underline */
+  --k-accent-dark: #A64E32;     /* dark terracotta */
+  --k-accent-tint: #F4EBDD;
+  --k-accent-wash: #FBF5EC;
+  --k-gold: #C98A4B;            /* the warm tone of the stars and small highlights, taken from the sand family */
+  --k-announce-bg: #45352D;
+  --k-announce-fg: #FFFDFC;
+
+  /* main action: terracotta glass, lit from above, with warm-white text. Hover goes to dark terracotta. */
+  --gb1-ink: #FFFDFC;
+  --gb1-edge: rgba(255, 255, 255, .38);
+  --gb1-bg: linear-gradient(180deg, rgba(255, 255, 255, .2), rgba(255, 255, 255, 0) 54%), linear-gradient(135deg, #C26A48, #B85C3B);
+  --gb1-bg-hover: linear-gradient(180deg, rgba(255, 255, 255, .16), rgba(255, 255, 255, 0) 54%), linear-gradient(135deg, #B1573A, #A64E32);
+  --gb1-shadow: inset 0 1px 0 rgba(255, 255, 255, .5), inset 0 -10px 18px -12px rgba(80, 26, 8, .55), 0 14px 26px -12px rgba(166, 78, 50, .7), 0 2px 6px rgba(80, 36, 18, .2);
+  --gb1-shadow-hover: inset 0 1px 0 rgba(255, 255, 255, .55), inset 0 -10px 18px -12px rgba(80, 26, 8, .55), 0 22px 34px -14px rgba(166, 78, 50, .8), 0 2px 6px rgba(80, 36, 18, .22);
+  --gb1-shadow-press: inset 0 2px 8px rgba(70, 20, 5, .45), 0 6px 12px -8px rgba(166, 78, 50, .6);
+
+  /* secondary buttons: sand glass with a muted-sand edge */
+  --gb2-ink: #45352D;
+  --gb2-edge: rgba(217, 185, 149, .75);
+  --gb2-bg: linear-gradient(180deg, rgba(255, 255, 255, .55), rgba(255, 255, 255, 0) 70%), #F4EBDD;
+  --gb2-bg-hover: linear-gradient(180deg, rgba(255, 255, 255, .5), rgba(255, 255, 255, 0) 70%), #EBDDC8;
+  --gb2-shadow: inset 0 1px 0 rgba(255, 255, 255, .85), 0 0 0 1px rgba(160, 120, 70, .14), 0 10px 22px -14px rgba(90, 60, 30, .4);
+  --gb2-shadow-hover: inset 0 1px 0 rgba(255, 255, 255, .9), 0 0 0 1px rgba(160, 120, 70, .2), 0 16px 28px -14px rgba(90, 60, 30, .45);
+  --gb2-shadow-press: inset 0 2px 6px rgba(90, 60, 30, .18), 0 0 0 1px rgba(160, 120, 70, .18);
+  --gb0-bg-hover: rgba(244, 235, 221, .9);
+  --gb-badge-ring: rgba(255, 253, 252, .6);
+}
+
+/* ---------- top bar ---------- */
+:root:not([data-theme="dark"]) body.is-terra .k-nav { background: #FFFDFC; border-bottom-color: var(--k-line); }
+:root:not([data-theme="dark"]) body.is-terra .k-logo,
+:root:not([data-theme="dark"]) body.is-terra .k-logo span { color: #B85C3B; }
+:root:not([data-theme="dark"]) body.is-terra .k-link { color: #45352D; }
+:root:not([data-theme="dark"]) body.is-terra .k-link:hover { color: #B85C3B; }
+:root:not([data-theme="dark"]) body.is-terra .k-link.is-active { color: #45352D; }
+:root:not([data-theme="dark"]) body.is-terra .k-cart__badge { background: #B85C3B; color: #FFFDFC; }
+
+/* ---------- product cards: white, with a muted-sand border and the price in terracotta ---------- */
+:root:not([data-theme="dark"]) body.is-terra .fl .k-book { border: 1px solid #D9B995; box-shadow: 0 1px 2px rgba(69, 53, 45, .06), 0 14px 28px -18px rgba(69, 53, 45, .3); transition: box-shadow .25s, border-color .25s; }
+:root:not([data-theme="dark"]) body.is-terra .fl .k-book:hover,
+:root:not([data-theme="dark"]) body.is-terra .fl .k-book:focus-within { border-color: #C9A171; box-shadow: 0 2px 4px rgba(69, 53, 45, .08), 0 22px 40px -18px rgba(69, 53, 45, .38); }
+:root:not([data-theme="dark"]) body.is-terra .fl .k-book__price { color: #B85C3B; }
+:root:not([data-theme="dark"]) body.is-terra .fl .k-book__rating .k-stars { background-image: linear-gradient(90deg, var(--k-gold) var(--pct, 0%), color-mix(in srgb, var(--k-ink) 14%, transparent) var(--pct, 0%)); }
+
+/* ---------- footer: deep brown with warm-white text ---------- */
+:root:not([data-theme="dark"]) body.is-terra .k-footer { background: #45352D; color: #FFFDFC; border-top: 0; }
+:root:not([data-theme="dark"]) body.is-terra .k-footer a { color: #FFFDFC; }
+:root:not([data-theme="dark"]) body.is-terra .k-footer a:hover { color: #FFFFFF; }
+:root:not([data-theme="dark"]) body.is-terra .k-footer__logo { color: #FFFDFC; }
+:root:not([data-theme="dark"]) body.is-terra .k-footer__logo span { color: #E39A78; } /* the dot: a lighter terracotta, so it shows on the brown */
