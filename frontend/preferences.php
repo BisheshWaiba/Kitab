@@ -89,9 +89,10 @@ if ($saved_picture !== '') {
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/kitab.css">
     <!-- This page is flat (it already was); only its buttons are glass, switched on by the is-gbtn class below -->
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/glass-buttons.css">
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/terracotta.css">
 </head>
 
-<body class="is-gbtn">
+<body class="is-gbtn is-terra">
 
     <main class="k-setup">
         <a href="<?php echo BASE_URL; ?>index.php" class="k-logo">KITAB<span>.</span></a>

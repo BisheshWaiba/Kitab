@@ -14,6 +14,17 @@ if (isset($_SESSION['cart'])) {
 require_once __DIR__ . '/helpers.php';
 $wish_count = count(k_wishlist_ids());
 
+// The Terracotta & Sand colour style (assets/css/terracotta.css, light mode) goes on every page that has the glass buttons (is-gbtn), which is every
+// shop page. The admin area has its own header and is not touched. It is added last, so a page's own stylesheets cannot undo it.
+$k_body_classes = preg_split('/\s+/', (string) ($body_class ?? ''), -1, PREG_SPLIT_NO_EMPTY);
+if (in_array('is-gbtn', $k_body_classes, true)) {
+    if (!in_array('is-terra', $k_body_classes, true)) {
+        $k_body_classes[] = 'is-terra';
+    }
+    $body_class = implode(' ', $k_body_classes);
+    $extra_css = array_values(array_unique(array_merge(array_filter((array) ($extra_css ?? [])), ['assets/css/terracotta.css'])));
+}
+
 $current_page = basename($_SERVER['SCRIPT_NAME']);
 $nav_home = $current_page === 'index.php';
 $nav_wish = $current_page === 'wishlist.php';

@@ -3,8 +3,8 @@ require_once 'config/db.php';
 require_once 'includes/helpers.php';
 // The Home page is flat (white and light-grey surfaces, from the design canvas); only its buttons are glass.
 // is-gbtn switches the glass buttons on, and both stylesheets are loaded by this page alone.
-$body_class = 'is-gbtn is-terra'; // is-terra switches on the Terracotta & Sand colour style (assets/css/terracotta.css, light mode)
-$extra_css = ['assets/css/glass-buttons.css', 'assets/css/flat.css', 'assets/css/terracotta.css', 'assets/css/home-flat.css'];
+$body_class = 'is-gbtn'; // includes/header.php adds the Terracotta & Sand colour style (is-terra) to every page that has the glass buttons
+$extra_css = ['assets/css/glass-buttons.css', 'assets/css/flat.css', 'assets/css/home-flat.css'];
 require_once 'includes/header.php';
 
 // Hero: three covers (books that have one), fanned out

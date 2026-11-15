@@ -79,3 +79,17 @@
 :root:not([data-theme="dark"]) body.is-terra .k-footer a:hover { color: #FFFFFF; }
 :root:not([data-theme="dark"]) body.is-terra .k-footer__logo { color: #FFFDFC; }
 :root:not([data-theme="dark"]) body.is-terra .k-footer__logo span { color: #E39A78; } /* the dot: a lighter terracotta, so it shows on the brown */
+
+/* ---------- the other places that name a gold or yellow themselves (every page) ---------- */
+:root:not([data-theme="dark"]) body.is-terra .fl-h1 em { background: linear-gradient(transparent 70%, rgba(184, 92, 59, .28) 70%, rgba(184, 92, 59, .28) 92%, transparent 92%); }
+:root:not([data-theme="dark"]) body.is-terra .fl .k-book__rating .k-stars { background-image: linear-gradient(90deg, var(--k-gold) var(--pct, 0%), color-mix(in srgb, var(--k-ink) 14%, transparent) var(--pct, 0%)); }
+:root:not([data-theme="dark"]) body.is-terra .fl .gr { --gr-gold: var(--k-gold); }   /* the review stars and bars on the Book page */
+:root:not([data-theme="dark"]) body.is-terra .gp-price { color: #B85C3B; }          /* the big price on the Book page */
+:root:not([data-theme="dark"]) body.is-terra .k-empty__badge { background: rgba(184, 92, 59, .13); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .7), 0 0 0 8px rgba(184, 92, 59, .06); color: #B85C3B; }
+:root:not([data-theme="dark"]) body.is-terra .gk-success__icon { background: rgba(184, 92, 59, .16); box-shadow: 0 0 0 8px rgba(184, 92, 59, .08); color: #B85C3B; }
+:root:not([data-theme="dark"]) body.is-terra .gs-preset.is-on { background: rgba(184, 92, 59, .13); border-color: #B85C3B; }
+:root:not([data-theme="dark"]) body.is-terra .fl .gk-steps li.is-current .gk-steps__dot { color: #FFFDFC; background: #B85C3B; border-color: #B85C3B; box-shadow: 0 0 0 4px rgba(184, 92, 59, .2); }
+:root:not([data-theme="dark"]) body.is-terra .po-track .is-current .po-track__dot { background: #B85C3B; border-color: #B85C3B; box-shadow: 0 0 0 4px rgba(184, 92, 59, .22); }
+:root:not([data-theme="dark"]) body.is-terra .gc-ship__fill { background: #B85C3B; }
+:root:not([data-theme="dark"]) body.is-terra .pf-avatar { color: #FFFDFC; background: linear-gradient(135deg, #C9704D, #B85C3B); box-shadow: 0 0 0 1px rgba(120, 50, 25, .25), 0 12px 24px -14px rgba(166, 78, 50, .7); }
+:root:not([data-theme="dark"]) body.is-terra .k-lost__code span { color: #B85C3B; }
