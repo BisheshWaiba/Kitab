@@ -17,7 +17,9 @@
 :root:not([data-theme="dark"]) body.is-terra .fh-chip__go { background: #B85C3B; color: #FFFDFC; }
 :root:not([data-theme="dark"]) body.is-terra .fh-chip--rating .k-stars { background: linear-gradient(90deg, var(--k-gold) var(--pct, 0%), color-mix(in srgb, var(--k-ink) 16%, transparent) var(--pct, 0%)); -webkit-background-clip: text; background-clip: text; }
 :root:not([data-theme="dark"]) body.is-terra .fh-best__price { color: #B85C3B; }
-:root:not([data-theme="dark"]) body.is-terra .fh-pill { --pc: oklch(50% .095 var(--h)); --pt: oklch(94.5% .03 var(--h)); --pe: oklch(83% .05 var(--h)); }
+/* the genre pills use the palette, not a colour each: white with a muted-sand edge, a terracotta icon in a sand badge, deep brown words, and a solid
+   terracotta fill on hover. */
+:root:not([data-theme="dark"]) body.is-terra .fh-pill { --pc: #B85C3B; --pt: #FFFFFF; --pe: #D9B995; --pb: #F4EBDD; --pon: #FFFDFC; --pbh: rgba(255, 255, 255, .2); }
 
 /* ---------- hero ---------- */
 /* a warm wash across the full width (two soft glows of the brand gold), so the first screen is not a flat white sheet */
@@ -116,7 +118,7 @@ body.is-gbtn .fh-marquee .fh-pill { -webkit-backdrop-filter: none; backdrop-filt
 /* each pill has its own colour, from the hue index.php sets in --h (an oklch hue angle): a soft flat tint with a matching edge, the badge in white
    with the icon in the full colour, and on hover the whole pill fills with it. The dark theme uses lighter colours on deeper tints so the words stay readable. */
 .fh-pill { --pc: oklch(54% .18 var(--h)); --pt: oklch(92% .06 var(--h)); --pe: oklch(80% .1 var(--h)); --pb: #fff; --pon: #fff; --pbh: rgb(255 255 255 / .22); }
-:root[data-theme="dark"] .fh-pill { --pc: oklch(80% .14 var(--h)); --pt: oklch(32% .065 var(--h)); --pe: oklch(46% .1 var(--h)); --pb: oklch(22% .045 var(--h)); --pon: oklch(20% .04 var(--h)); --pbh: rgb(0 0 0 / .12); }
+:root[data-theme="dark"] .fh-pill { --pc: #F2B134; --pt: rgb(255 255 255 / .06); --pe: rgb(255 255 255 / .16); --pb: rgb(255 255 255 / .08); --pon: #1B1305; --pbh: rgb(0 0 0 / .12); } /* dark: one calm tone with the amber accent, like the rest of the dark theme */
 body.is-gbtn .fh-marquee .fh-pill { color: var(--k-ink); border-color: var(--pe); background: var(--pt); box-shadow: none; }
 body.is-gbtn .fh-marquee .fh-pill:hover,
 body.is-gbtn .fh-marquee .fh-pill:focus-visible { color: var(--pon); border-color: var(--pc); background: var(--pc); box-shadow: none; }
